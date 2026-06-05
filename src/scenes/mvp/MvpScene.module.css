@@ -1,0 +1,623 @@
+.scene {
+  --mvp-frame: rgba(255,255,255,0.105);
+  --mvp-frame-soft: rgba(255,255,255,0.065);
+  --mvp-panel: rgba(3,4,3,0.66);
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--theme-background-gradient);
+  color: var(--theme-text);
+  font-family: var(--theme-font-family);
+  isolation: isolate;
+}
+
+.scene::before {
+  position: absolute;
+  inset: 0;
+  z-index: -4;
+  background:
+    radial-gradient(circle at 28% 22%, var(--theme-primary-soft), transparent 30%),
+    radial-gradient(circle at 74% 70%, var(--theme-primary-softer), transparent 32%),
+    linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.58));
+  content: '';
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: -5;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 96px 96px;
+  opacity: 0.28;
+}
+
+.lightBand {
+  position: absolute;
+  top: 118px;
+  left: 48%;
+  z-index: -3;
+  width: 640px;
+  height: 980px;
+  border-left: 4px solid var(--theme-primary);
+  border-right: 1px solid var(--theme-primary-border);
+  background: linear-gradient(180deg, transparent, var(--theme-primary-soft), transparent 76%);
+  box-shadow: 0 0 44px var(--theme-primary-glow);
+  opacity: 0.68;
+  transform: rotate(12deg);
+}
+
+.scanline {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,0.055) 0 1px, transparent 1px 4px);
+  mix-blend-mode: screen;
+  opacity: 0.045;
+}
+
+.topbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 46px;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(5,6,5,0.82);
+  padding: 0 34px;
+}
+
+.interfaceLabel {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.interfaceLabel span {
+  width: 10px;
+  height: 10px;
+  background: var(--theme-primary);
+  box-shadow: 0 0 16px var(--theme-primary-glow);
+}
+
+.interfaceLabel strong,
+.topbar em,
+.footer span,
+.footer strong {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.content {
+  position: absolute;
+  inset: 86px 82px 70px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 500px;
+  gap: 26px;
+}
+
+.poster {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--mvp-frame);
+  background:
+    radial-gradient(circle at 40% 34%, var(--theme-primary-soft), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,0.035), rgba(0,0,0,0.22)),
+    #050505;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.035),
+    0 30px 82px rgba(0,0,0,0.42);
+  animation: mvpPosterIn 680ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.poster::before {
+  position: absolute;
+  top: 34px;
+  right: 34px;
+  left: 34px;
+  z-index: 7;
+  height: 5px;
+  background: linear-gradient(90deg, var(--theme-primary), rgba(255,255,255,0.68), var(--theme-primary));
+  box-shadow: 0 0 30px var(--theme-primary-glow);
+  content: '';
+  animation: mvpSweep 2.8s ease-in-out 420ms both;
+}
+
+.poster::after {
+  position: absolute;
+  top: -16%;
+  right: 11%;
+  z-index: 3;
+  width: 250px;
+  height: 132%;
+  border-left: 1px solid var(--theme-primary-border);
+  background: linear-gradient(180deg, transparent, var(--theme-primary-softer), transparent);
+  content: '';
+  opacity: 0.8;
+  transform: rotate(12deg);
+}
+
+.posterFrame {
+  position: absolute;
+  inset: 26px;
+  z-index: 6;
+  pointer-events: none;
+  border: 1px solid rgba(255,255,255,0.075);
+}
+
+.posterFrame::before,
+.posterFrame::after {
+  position: absolute;
+  width: 118px;
+  height: 118px;
+  border-color: var(--theme-primary);
+  content: '';
+}
+
+.posterFrame::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--theme-primary);
+  border-left: 2px solid var(--theme-primary);
+}
+
+.posterFrame::after {
+  right: -1px;
+  bottom: -1px;
+  border-right: 2px solid var(--theme-primary);
+  border-bottom: 2px solid var(--theme-primary);
+}
+
+.heroImage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 36%;
+  opacity: 0.7;
+  filter: contrast(1.16) saturate(0.96) brightness(0.9);
+  transform: scale(1.06);
+}
+
+.posterShade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.07), rgba(0,0,0,0.14) 36%, rgba(0,0,0,0.78)),
+    linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.36) 50%, #020202 91%);
+}
+
+.giantText {
+  position: absolute;
+  right: -34px;
+  bottom: 68px;
+  z-index: 4;
+  color: rgba(255,255,255,0.07);
+  font-size: 315px;
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 0.78;
+  text-transform: uppercase;
+  text-shadow: 0 0 40px rgba(0,0,0,0.32);
+}
+
+.mvpBadge {
+  position: absolute;
+  top: 72px;
+  left: 54px;
+  z-index: 8;
+  display: inline-grid;
+  animation: mvpSlideDown 520ms ease-out 260ms both;
+}
+
+.mvpBadge span {
+  display: grid;
+  min-height: 38px;
+  place-items: center;
+  border: 1px solid var(--theme-primary-border);
+  min-width: 118px;
+  padding: 0 18px;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.mvpBadge span {
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.playerBlock {
+  position: absolute;
+  right: 62px;
+  bottom: 60px;
+  left: 62px;
+  z-index: 8;
+  display: grid;
+  gap: 15px;
+  min-width: 0;
+  animation: mvpPlayerIn 760ms cubic-bezier(0.2, 0.8, 0.2, 1) 360ms both;
+}
+
+.playerBlock span,
+.playerBlock p {
+  margin: 0;
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.playerBlock span {
+  color: var(--theme-primary);
+  font-size: 14px;
+  letter-spacing: 0.24em;
+}
+
+.playerBlock h1 {
+  margin: 0;
+  overflow: hidden;
+  color: var(--theme-text);
+  font-size: 116px;
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 0.84;
+  text-overflow: ellipsis;
+  text-shadow: 0 12px 34px rgba(0,0,0,0.72);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.playerBlock p {
+  color: var(--theme-muted-text);
+  font-size: 15px;
+  letter-spacing: 0.18em;
+}
+
+.playerBlock i {
+  width: 220px;
+  height: 6px;
+  background: var(--theme-primary);
+  box-shadow: 0 0 28px var(--theme-primary-glow);
+}
+
+.infoPanel {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    linear-gradient(135deg, var(--theme-primary-softer), transparent 44%),
+    rgba(0,0,0,0.38);
+  padding: 16px;
+  animation: mvpInfoIn 640ms ease-out 320ms both;
+}
+
+.railHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  border-left: 3px solid var(--theme-primary);
+  background: rgba(0,0,0,0.3);
+  padding: 12px 14px;
+}
+
+.railHeader span,
+.railHeader strong {
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.railHeader span {
+  color: var(--theme-primary);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+}
+
+.railHeader strong {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+.teamStrip {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  border-bottom: 3px solid var(--theme-primary);
+  padding-bottom: 12px;
+}
+
+.teamMark {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border: 1px solid var(--theme-primary-border);
+  background: rgba(0,0,0,0.44);
+}
+
+.teamMark img {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+}
+
+.teamStrip span,
+.teamStrip strong {
+  display: block;
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamStrip span {
+  color: var(--theme-primary);
+  font-size: 15px;
+  letter-spacing: 0.22em;
+}
+
+.teamStrip strong {
+  margin-top: 7px;
+  color: var(--theme-text);
+  font-size: 32px;
+  line-height: 0.95;
+}
+
+.featuredStats {
+  display: grid;
+  gap: 8px;
+}
+
+.featuredStats article {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 94px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 68%),
+    rgba(0,0,0,0.3);
+  padding: 11px;
+  animation: mvpStatIn 480ms ease-out both;
+}
+
+.featuredStats article:nth-child(1) {
+  animation-delay: 520ms;
+}
+
+.featuredStats article:nth-child(2) {
+  animation-delay: 610ms;
+}
+
+.featuredStats article:nth-child(3) {
+  animation-delay: 700ms;
+}
+
+.featuredStats article > span {
+  display: grid;
+  place-items: center;
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+  font-size: 25px;
+  font-weight: 950;
+}
+
+.featuredStats div {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.featuredStats em,
+.featuredStats strong {
+  overflow: hidden;
+  font-style: normal;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.featuredStats em {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+
+.featuredStats strong {
+  color: var(--theme-primary);
+  font-size: 42px;
+  line-height: 0.9;
+  text-shadow: 0 0 22px var(--theme-primary-glow);
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(68px, 1fr);
+  gap: 8px;
+  min-height: 0;
+}
+
+.statGrid span {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.025);
+  padding: 10px 12px;
+}
+
+.statGrid em,
+.statGrid strong {
+  overflow: hidden;
+  font-style: normal;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statGrid em {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+}
+
+.statGrid strong {
+  color: var(--theme-text);
+  font-size: 25px;
+  line-height: 0.95;
+}
+
+.noteBox {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+  padding: 14px;
+}
+
+.noteBox span,
+.noteBox strong {
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.noteBox span {
+  color: var(--theme-primary);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+
+.noteBox strong {
+  color: var(--theme-text);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+
+.footer {
+  position: absolute;
+  right: 82px;
+  bottom: 14px;
+  left: 82px;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  color: var(--theme-muted-text);
+}
+
+.footer strong {
+  color: var(--theme-primary);
+}
+
+@keyframes mvpPosterIn {
+  from {
+    opacity: 0;
+    transform: translateX(-24px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes mvpInfoIn {
+  from {
+    opacity: 0;
+    transform: translateX(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes mvpPlayerIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mvpSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mvpStatIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mvpSweep {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster,
+  .poster::before,
+  .mvpBadge,
+  .playerBlock,
+  .infoPanel,
+  .featuredStats article {
+    animation: none;
+  }
+}

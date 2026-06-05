@@ -1,0 +1,267 @@
+﻿/* === Matchup editor === */
+
+.upNextDesk {
+  display: grid;
+  grid-template-columns: clamp(300px, 24vw, 380px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.upNextRail {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.upNextTeamsPanel {
+  min-width: 0;
+}
+
+.upNextTeamGrid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 112px minmax(260px, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.upNextTeamCard {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 12px;
+}
+
+.upNextTeamCard .field {
+  margin-bottom: 0;
+}
+
+.upNextTeamTopbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.upNextTeamIdentity {
+  display: grid;
+  grid-template-columns: 64px 72px minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  min-height: 38px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 72%),
+    rgba(255,255,255,0.035);
+}
+
+.upNextTeamIdentity span,
+.upNextTeamIdentity strong,
+.upNextTeamIdentity em {
+  overflow: hidden;
+  padding: 0 10px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.upNextTeamIdentity span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.upNextTeamIdentity strong {
+  color: var(--theme-primary);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+}
+
+.upNextTeamIdentity em {
+  color: var(--theme-text);
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+
+.upNextTeamEditButton {
+  min-width: 0;
+  min-height: 38px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.upNextTeamEditButton:hover,
+.upNextTeamEditButton[aria-expanded='true'] {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.upNextTeamSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.upNextTeamSummaryGrid div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+  padding: 9px 10px;
+}
+
+.upNextTeamSummaryGrid span,
+.upNextTeamSummaryGrid strong {
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.upNextTeamSummaryGrid span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+
+.upNextTeamSummaryGrid strong {
+  color: var(--theme-primary);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+.upNextColorChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upNextColorChip::before {
+  content: "";
+  width: 18px;
+  height: 10px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: var(--team-color);
+}
+
+.upNextTeamDetails {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid rgba(255,255,255,0.09);
+  padding-top: 8px;
+}
+
+.upNextTeamHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 36px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.035);
+  padding: 0 10px;
+}
+
+.upNextTeamHeader span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.upNextTeamHeader strong {
+  color: var(--theme-primary);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.upNextReadonlyScore {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px;
+  gap: 8px;
+  align-items: center;
+  min-height: 38px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.025);
+}
+
+.upNextReadonlyScore span {
+  padding-left: 10px;
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.upNextReadonlyScore strong {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.upNextVsControl {
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  justify-items: stretch;
+  min-width: 0;
+}
+
+.upNextVsControl span,
+.upNextVsControl strong {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.upNextVsControl span {
+  min-height: 118px;
+  font-size: 28px;
+}
+
+.upNextVsControl strong {
+  min-height: 38px;
+  font-size: 12px;
+}
+
+.upNextVsControl button {
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}

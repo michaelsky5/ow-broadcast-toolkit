@@ -1,0 +1,1162 @@
+﻿/* === Roster editor === */
+
+.rosterDesk {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  color-scheme: dark;
+}
+
+.rosterDesk .panel {
+  border-color: rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    linear-gradient(180deg, rgba(42,42,42,0.78), rgba(24,24,24,0.78));
+  padding: 12px;
+}
+
+.rosterDesk input,
+.rosterDesk select,
+.rosterDesk button {
+  box-sizing: border-box;
+  height: 40px;
+  min-height: 40px;
+}
+
+.rosterDesk button {
+  overflow: hidden;
+  padding: 0 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rosterDesk button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.rosterDesk .field {
+  margin-bottom: 0;
+}
+
+.rosterWorkspace {
+  display: grid;
+  grid-template-columns: clamp(300px, 24vw, 380px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.rosterRail {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  min-width: 0;
+  height: 100%;
+}
+
+.rosterRail .panel:last-child {
+  height: 100%;
+}
+
+.teamColorControl {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 6px;
+  align-items: stretch;
+}
+
+.teamColorControl input[type="color"] {
+  min-width: 0;
+}
+
+.teamColorControl button {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.teamColorControl .activeOutline {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.teamLogoSaveRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 74px;
+  gap: 6px;
+  align-items: end;
+}
+
+.teamLogoInputRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 66px;
+  gap: 6px;
+  min-width: 0;
+}
+
+.teamLogoInputRow button {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.teamLogoInputRow button:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}
+
+.teamDbSaveButton {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.teamDbSaveButton:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}
+
+.teamStaffDesk {
+  display: grid;
+  gap: 7px;
+  margin-top: 8px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.14);
+  padding: 8px;
+}
+
+.teamStaffDeskHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 6px;
+}
+
+.teamStaffDeskHeader span,
+.teamStaffDeskHeader strong,
+.teamStaffRow span {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.teamStaffDeskHeader strong {
+  color: var(--theme-primary);
+}
+
+.teamStaffRow {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) 66px;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.teamStaffRow span {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.24);
+  padding: 0 10px;
+}
+
+.teamStaffRow input {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
+  color: var(--theme-text);
+  padding: 0 11px;
+  outline: none;
+}
+
+.teamStaffRow input:focus {
+  border-color: var(--theme-primary-border);
+}
+
+.teamStaffRow button {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.teamStaffRow .activeOutline {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.rosterPlayersPanel {
+  height: 100%;
+  min-width: 0;
+}
+
+.rosterStatusStrip {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) repeat(5, minmax(72px, 0.42fr)) 108px 92px;
+  gap: 6px;
+  align-items: stretch;
+  margin-bottom: 12px;
+}
+
+.rosterStatusStrip div {
+  display: grid;
+  grid-template-columns: minmax(56px, 1fr) auto;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.26);
+}
+
+.rosterStatusStrip div:first-child {
+  grid-template-columns: 58px minmax(72px, 1fr);
+}
+
+.rosterStatusStrip div:nth-child(2) {
+  grid-template-columns: minmax(0, 1fr) 28px;
+}
+
+.rosterStatusStrip div:nth-child(3) {
+  grid-template-columns: minmax(0, 1fr) 38px;
+}
+
+.rosterStatusStrip div:nth-child(4) {
+  grid-template-columns: minmax(0, 1fr) 28px;
+}
+
+.rosterStatusStrip div:nth-child(5) {
+  grid-template-columns: minmax(0, 1fr) 28px;
+}
+
+.rosterStatusStrip div:nth-child(6) {
+  grid-template-columns: minmax(0, 1fr) 28px;
+}
+
+.rosterStatusStrip div:nth-child(n + 1):nth-child(-n + 6) span {
+  justify-content: center;
+  padding: 0 6px;
+}
+
+.rosterStatusStrip div:nth-child(2) strong,
+.rosterStatusStrip div:nth-child(3) strong,
+.rosterStatusStrip div:nth-child(4) strong,
+.rosterStatusStrip div:nth-child(5) strong,
+.rosterStatusStrip div:nth-child(6) strong {
+  justify-content: center;
+  padding: 0;
+}
+
+.rosterStatusStrip span {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 28px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+  padding: 0 8px;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.rosterStatusStrip strong {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-primary);
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.rosterStatusStrip button {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.rosterStatusStrip button:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}
+
+.rosterStatusStrip .primaryButton {
+  border-color: var(--theme-primary);
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.rosterPlayerHeader {
+  display: grid;
+  grid-template-columns: 64px minmax(76px, 0.64fr) minmax(134px, 1fr) 88px minmax(84px, 0.64fr) 64px minmax(148px, 1fr) 58px;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 0 8px;
+}
+
+.rosterPlayerHeader span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.rosterPlayerHeaderNoBattleTag {
+  grid-template-columns: 64px minmax(112px, 1fr) 88px minmax(94px, 0.78fr) 64px minmax(154px, 1fr) 58px;
+}
+
+.rosterPlayerList {
+  display: grid;
+  gap: 7px;
+}
+
+.rosterPlayerRow {
+  display: grid;
+  grid-template-columns: 64px minmax(76px, 0.64fr) minmax(134px, 1fr) 88px minmax(84px, 0.64fr) 64px minmax(148px, 1fr) 58px;
+  gap: 6px;
+  align-items: stretch;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 8px;
+}
+
+.rosterPlayerRowNoBattleTag {
+  grid-template-columns: 64px minmax(112px, 1fr) 88px minmax(94px, 0.78fr) 64px minmax(154px, 1fr) 58px;
+}
+
+.rosterPlayerInactive {
+  border-color: rgba(255,255,255,0.055);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.008) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.32);
+}
+
+.rosterPlayerInactive .rosterIndex {
+  background: rgba(255,255,255,0.035);
+  color: rgba(72, 214, 178, 0.48);
+}
+
+.rosterPlayerInactive input,
+.rosterPlayerInactive select {
+  color: rgba(255,255,255,0.58);
+}
+
+.rosterXControlWithReset {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.18);
+}
+
+.rosterXControlWithReset input[type="number"] {
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  padding: 0 3px;
+  text-align: center;
+}
+
+.rosterXControlWithReset input[type="number"]::-webkit-outer-spin-button,
+.rosterXControlWithReset input[type="number"]::-webkit-inner-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.rosterXControlWithReset input[type="number"] {
+  appearance: textfield;
+}
+
+.rosterXControlWithReset button {
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  border: 0;
+  border-left: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-muted-text);
+  padding: 0;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.rosterXControlWithReset button:hover {
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.rosterXControlWithReset button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.rosterImageControl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rosterImageControl button {
+  min-width: 0;
+  padding: 0 4px;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+
+.rosterPlayerDragging {
+  border-color: var(--theme-primary-border);
+  opacity: 0.48;
+}
+
+.rosterPlayerRow .field span {
+  display: none;
+}
+
+.rosterIndex {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  place-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--theme-primary-softer);
+  color: var(--theme-primary);
+  padding: 4px 3px;
+  cursor: grab;
+  user-select: none;
+}
+
+.rosterIndex:active {
+  cursor: grabbing;
+}
+
+.rosterIndex strong {
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.rosterIndex span {
+  margin-top: 3px;
+  color: var(--theme-muted-text);
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rosterRowActions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rosterRowActions button {
+  min-width: 0;
+  padding: 0 4px;
+  font-size: 9px;
+  letter-spacing: 0;
+}
+
+.rosterRowActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.34;
+}
+
+.teamDbDesk {
+  display: grid;
+  min-width: 0;
+  color-scheme: dark;
+}
+
+.teamDbDesk .panel {
+  border-color: rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    linear-gradient(180deg, rgba(42,42,42,0.78), rgba(24,24,24,0.78));
+  padding: 12px;
+}
+
+.teamDbDesk input,
+.teamDbDesk select,
+.teamDbDesk button {
+  box-sizing: border-box;
+  height: 40px;
+  min-height: 40px;
+}
+
+.teamDbDesk input,
+.teamDbDesk select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.38);
+  color: var(--theme-text);
+  padding: 0 10px;
+  outline: none;
+}
+
+.teamDbDesk input:focus,
+.teamDbDesk select:focus {
+  border-color: var(--theme-primary-border);
+}
+
+.teamDbDesk button {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 0 9px;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.teamDbDesk button:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}
+
+.teamDbDesk .primaryButton {
+  border-color: var(--theme-primary);
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.teamDbDesk button:disabled {
+  cursor: not-allowed;
+  opacity: 0.36;
+}
+
+.teamDbDesk .field {
+  margin-bottom: 0;
+}
+
+.teamDbFileInput {
+  display: none;
+}
+
+.teamDbPanel {
+  overflow: hidden;
+}
+
+.teamDbToolbar {
+  display: grid;
+  grid-template-columns: 112px 96px minmax(300px, 1fr) 108px 108px 120px 112px;
+  gap: 8px;
+  align-items: stretch;
+  margin-bottom: 12px;
+}
+
+.teamDbMetric,
+.teamDbSearch {
+  display: grid;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.26);
+}
+
+.teamDbMetric {
+  grid-template-columns: 62px minmax(0, 1fr);
+}
+
+.teamDbSearch {
+  grid-template-columns: 70px minmax(0, 1fr);
+}
+
+.teamDbMetric span,
+.teamDbSearch span {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+  padding: 0 9px;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDbMetric strong {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  color: var(--theme-primary);
+  padding: 0 9px;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.teamDbSearch input {
+  border: 0;
+  background: rgba(0,0,0,0.12);
+}
+
+.teamDbListHeader,
+.teamDbListRow {
+  display: grid;
+  grid-template-columns: 34px 58px minmax(142px, 1fr) 72px 50px 162px;
+  gap: 6px;
+  min-width: 0;
+}
+
+.teamDbListHeader {
+  display: none;
+}
+
+.teamDbListHeader span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDbList {
+  display: grid;
+  align-content: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-height: clamp(190px, 36vh, 420px);
+  overflow-y: auto;
+}
+
+.teamDbListRow {
+  align-items: stretch;
+  grid-template-areas:
+    "index short name status roster actions"
+    "index short roles staff staff actions";
+  border: 1px solid rgba(255,255,255,0.08);
+  border-left: 2px solid rgba(255,255,255,0.16);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 7px;
+}
+
+.teamDbListRow > span:nth-of-type(1) {
+  grid-area: index;
+  justify-content: center;
+  padding: 0;
+}
+
+.teamDbListRow > span:nth-of-type(2) {
+  grid-area: roster;
+}
+
+.teamDbListRow > span:nth-of-type(3) {
+  grid-area: roles;
+}
+
+.teamDbListRow > span:nth-of-type(4) {
+  grid-area: staff;
+}
+
+.teamDbListRow > span:nth-of-type(5) {
+  grid-area: status;
+}
+
+.teamDbListRow > strong {
+  grid-area: short;
+}
+
+.teamDbListRow > em {
+  grid-area: name;
+}
+
+.teamDbListRow > span,
+.teamDbListRow > strong,
+.teamDbListRow > em {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.18);
+  padding: 0 9px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDbListRow > strong {
+  color: var(--theme-primary);
+  font-size: 12px;
+  justify-content: center;
+  letter-spacing: 0.06em;
+}
+
+.teamDbListRow > em {
+  color: var(--theme-text);
+}
+
+.teamDbListActions {
+  display: grid;
+  grid-area: actions;
+  grid-template-columns: 52px 30px 30px 38px;
+  gap: 4px;
+  justify-self: end;
+  min-width: 0;
+  width: 162px;
+}
+
+.teamDbListActions button {
+  padding: 0 5px;
+  font-size: 9px;
+  letter-spacing: 0;
+}
+
+.teamDbEmptyState {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+  min-height: 54px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-left: 2px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 7px;
+}
+
+.teamDbEmptyState span,
+.teamDbEmptyState strong {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.18);
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDbEmptyState span {
+  color: var(--theme-muted-text);
+}
+
+.teamDbEmptyState strong {
+  justify-content: flex-end;
+  color: var(--theme-primary);
+}
+
+.teamDbGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(620px, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.teamDbCard {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-left: 2px solid rgba(255,255,255,0.16);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 10px;
+}
+
+.teamDbCardActive {
+  border-left-color: var(--theme-primary);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 46%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+}
+
+.teamDbCardHeader {
+  display: grid;
+  grid-template-columns: minmax(14ch, 1fr) minmax(76px, auto);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 8px;
+}
+
+.teamDbCardHeader div {
+  min-width: 0;
+}
+
+.teamDbCardHeader span,
+.teamDbCardHeader em {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDbCardHeader strong {
+  display: block;
+  min-width: 8ch;
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--theme-text);
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDbCardHeader em {
+  color: var(--theme-primary);
+  text-align: right;
+}
+
+.teamDbTeamFields {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.55fr) minmax(132px, 0.62fr) minmax(240px, 1fr);
+  gap: 8px;
+  min-width: 0;
+}
+
+.teamDbTeamFields .field span {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.teamDbRosterBar {
+  display: grid;
+  grid-template-columns: 76px 70px minmax(0, 1fr) 58px;
+  gap: 6px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.teamDbRosterBar span,
+.teamDbRosterBar strong,
+.teamDbRosterBar em {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.035);
+  padding: 0 8px;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDbRosterBar span {
+  color: var(--theme-muted-text);
+}
+
+.teamDbRosterBar strong,
+.teamDbRosterBar em {
+  justify-content: flex-end;
+  color: var(--theme-primary);
+}
+
+.teamDbPlayerHeader,
+.teamDbPlayerRow {
+  display: grid;
+  grid-template-columns: 28px minmax(96px, 1fr) minmax(84px, 0.74fr) 84px minmax(106px, 1fr) 44px;
+  gap: 5px;
+  min-width: 0;
+}
+
+.teamDbPlayerHeader {
+  padding: 0 5px;
+}
+
+.teamDbPlayerHeader span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDbPlayerList {
+  display: grid;
+  gap: 5px;
+}
+
+.teamDbPlayerRow {
+  align-items: stretch;
+}
+
+.teamDbPlayerRow > span {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: var(--theme-primary-softer);
+  color: var(--theme-primary);
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.teamDbPlayerRow button {
+  padding: 0 4px;
+  font-size: 9px;
+  letter-spacing: 0;
+}
+
+.teamDbCardActions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.teamDbModalBackdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,0.68);
+  backdrop-filter: blur(2px);
+  padding: 24px;
+}
+
+.teamDbModal {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  width: min(1180px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-top: 2px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    linear-gradient(180deg, rgba(42,42,42,0.98), rgba(18,18,18,0.98));
+  box-shadow: 0 28px 80px rgba(0,0,0,0.48), inset 0 0 0 1px rgba(255,255,255,0.025);
+}
+
+.teamDbModalHeader,
+.teamDbModalActions {
+  display: grid;
+  gap: 8px;
+  align-items: stretch;
+  border-bottom: 1px solid rgba(255,255,255,0.09);
+  padding: 10px 12px;
+}
+
+.teamDbModalHeader {
+  grid-template-columns: minmax(0, 1fr) 96px;
+}
+
+.teamDbModalHeader div {
+  min-width: 0;
+}
+
+.teamDbModalHeader span {
+  display: block;
+  color: var(--theme-primary);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.teamDbModalHeader strong {
+  display: block;
+  min-width: 0;
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--theme-text);
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDbModalSummary {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.8fr) 110px minmax(180px, 1fr) minmax(120px, 0.8fr);
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.09);
+  padding: 8px 12px;
+}
+
+.teamDbModalSummary div {
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr);
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.22);
+}
+
+.teamDbModalSummary span,
+.teamDbModalSummary strong {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 8px;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDbModalSummary span {
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+}
+
+.teamDbModalSummary strong {
+  justify-content: flex-end;
+  color: var(--theme-primary);
+}
+
+.teamDbModalBody {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  overflow: auto;
+  padding: 10px 12px;
+}
+
+.teamDbModalBody .teamDbTeamFields,
+.teamDbModalBody .teamDbRosterBar,
+.teamDbModalBody .teamDbPlayerHeader,
+.teamDbModalBody .teamDbPlayerList {
+  min-width: 0;
+}
+
+.teamDbModalBody .teamDbTeamFields {
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.18);
+  padding: 8px;
+}
+
+.teamDbModalBody .field {
+  gap: 5px;
+  margin-bottom: 0;
+}
+
+.teamDbModalBody .teamDbRosterBar {
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.18);
+  padding: 8px;
+}
+
+.teamDbModalBody .teamDbPlayerList {
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.14);
+  padding: 8px;
+}
+
+.teamDbModalActions {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid rgba(255,255,255,0.09);
+  border-bottom: 0;
+}

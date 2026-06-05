@@ -1,0 +1,65 @@
+﻿/* === Show package navigation === */
+
+.showPackageModeBar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.26);
+  padding: 8px;
+}
+
+.showPackageModeButton {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  min-height: 54px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-text);
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.showPackageModeButton:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.showPackageModeButton span {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.showPackageModeButton em {
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.showPackageModeButton strong {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  color: var(--theme-primary);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.showPackageModeActive {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}

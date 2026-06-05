@@ -1,0 +1,406 @@
+﻿/* === Team data editor === */
+
+.teamDataDesk {
+  display: grid;
+  grid-template-columns: clamp(300px, 24vw, 380px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.teamDataDeskStack {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.teamDataWorkbench {
+  display: grid;
+  grid-template-columns: 300px 390px minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.teamDataWorkbench .panel {
+  border-color: rgba(255,255,255,0.09);
+  padding: 12px;
+}
+
+.teamDataWorkbench button,
+.teamDataWorkbench input,
+.teamDataWorkbench select {
+  box-sizing: border-box;
+  min-height: 40px;
+}
+
+.teamDataWorkbench .field {
+  margin-bottom: 0;
+}
+
+.teamDataSetupPanel,
+.teamDataPickerPanel {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.teamDataControlStack {
+  display: grid;
+  gap: 10px;
+}
+
+.teamDataControlStack .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.teamDataCardTagControl .segmented {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.teamDataCardTagControl button {
+  min-width: 0;
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
+.teamDataPackageMode {
+  display: grid;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.teamDataPackageMode .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.teamDataPackageMode .segmented {
+  min-width: 0;
+}
+
+.teamDataPackageMode button {
+  min-height: 40px;
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.teamDataStatusStrip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.teamDataStatusStrip div {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 34px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+}
+
+.teamDataStatusStrip span,
+.teamDataStatusStrip strong {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 9px;
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.teamDataStatusStrip span {
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+  letter-spacing: 0.12em;
+}
+
+.teamDataStatusStrip strong {
+  justify-content: flex-start;
+  overflow: hidden;
+  color: var(--theme-primary);
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.teamDataActivePlayer {
+  display: grid;
+  gap: 7px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 58%),
+    rgba(0,0,0,0.24);
+  padding: 12px;
+}
+
+.teamDataActivePlayer span,
+.teamDataActivePlayer strong,
+.teamDataActivePlayer em {
+  min-width: 0;
+  overflow: hidden;
+  font-style: normal;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDataActivePlayer span {
+  color: var(--theme-primary);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+.teamDataActivePlayer strong {
+  color: var(--theme-text);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.teamDataActivePlayer em {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.teamDataHeroOverride {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  gap: 8px;
+  align-items: end;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.2);
+  padding: 10px;
+}
+
+.teamDataHeroOverride .field {
+  min-width: 0;
+}
+
+.teamDataHeroOverride button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.teamDataMatchupBuilder {
+  display: grid;
+  gap: 8px;
+}
+
+.teamDataMatchupSide {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.18);
+  padding: 8px;
+}
+
+.teamDataMatchupHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 126px;
+  gap: 7px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.teamDataMatchupSide .teamDataActivePlayer {
+  gap: 4px;
+  padding: 9px;
+}
+
+.teamDataMatchupSide .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.teamDataMatchupSide .segmented button {
+  min-height: 100%;
+  padding: 0 6px;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+.teamDataMatchupSide .teamDataActivePlayer strong {
+  font-size: 20px;
+}
+
+.teamDataMatchupSide .teamDataActivePlayer span,
+.teamDataMatchupSide .teamDataActivePlayer em {
+  font-size: 9px;
+}
+
+.teamDataMatchupSide .teamDataHeroOverride {
+  grid-template-columns: minmax(0, 1fr) 76px;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.teamDataMatchupSide .teamDataHeroOverride .field {
+  gap: 4px;
+}
+
+.teamDataMatchupSide .teamDataHeroOverride .field span {
+  font-size: 10px;
+}
+
+.teamDataMatchupSide .teamDataHeroOverride button,
+.teamDataMatchupSide .teamDataHeroOverride select {
+  min-height: 38px;
+}
+
+.teamDataCompactSlots {
+  display: grid;
+  gap: 6px;
+}
+
+.teamDataMatchupSlotGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.teamDataCompactSlots .teamDataSlotCard {
+  min-height: 38px;
+  padding: 5px;
+}
+
+.teamDataCompactSlots .teamDataSlotCard span {
+  height: 28px;
+}
+
+.teamDataMatchupSlotGrid .teamDataSlotCard {
+  grid-template-columns: 1fr;
+  gap: 3px;
+  min-height: 48px;
+  padding: 5px 3px;
+  text-align: center;
+}
+
+.teamDataMatchupSlotGrid .teamDataSlotCard span {
+  justify-self: center;
+  width: 30px;
+  height: 19px;
+}
+
+.teamDataMatchupSlotGrid .teamDataSlotCard strong {
+  font-size: 9px;
+  letter-spacing: 0.02em;
+}
+
+.teamDataMatchupSlotGrid .teamDataSlotCard em {
+  display: none;
+}
+
+.teamDataMatchupActions {
+  display: grid;
+}
+
+.teamDataMatchupActions button {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.teamDataSlotGrid {
+  display: grid;
+  gap: 8px;
+}
+
+.teamDataSlotCard {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 78px;
+  gap: 7px;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  color: var(--theme-text);
+  padding: 7px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.teamDataSlotCard:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.teamDataSlotCard span,
+.teamDataSlotCard strong,
+.teamDataSlotCard em,
+.teamDataRankList strong,
+.teamDataRankList span,
+.teamDataRankList em,
+.teamDataRankList b {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDataSlotCard span {
+  display: grid;
+  height: 32px;
+  place-items: center;
+  background: var(--theme-primary-softer);
+  color: var(--theme-primary);
+}
+
+.teamDataSlotCard strong,
+.teamDataRankList span {
+  color: var(--theme-text);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.teamDataSlotCard em,
+.teamDataRankList em {
+  color: var(--theme-muted-text);
+}
+
+.teamDataRankList strong,
+.teamDataRankList b {
+  color: var(--theme-primary);
+  text-align: right;
+}
+
+.teamDataSlotActive {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  box-shadow: inset 3px 0 0 var(--theme-primary);
+}
+
+.teamDataRankList {
+  display: grid;
+  gap: 8px;
+}
+
+.teamDataRankList div {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 64px 78px;
+  gap: 7px;
+  align-items: center;
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+  padding: 0 9px;
+}

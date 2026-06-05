@@ -1,0 +1,621 @@
+﻿/* === Stats shared controls === */
+
+.statsRail {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.statsControlStack {
+  display: grid;
+  gap: 10px;
+}
+
+.statsControlBlock {
+  display: grid;
+  gap: 7px;
+}
+
+.statsControlBlock > span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.statsSummary {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.statsSummary div {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  min-height: 36px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.26);
+}
+
+.statsSummary span,
+.statsSummary strong {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.statsSummary span {
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+  letter-spacing: 0.12em;
+}
+
+.statsSummary strong {
+  justify-content: flex-end;
+  overflow: hidden;
+  color: var(--theme-primary);
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statsMetricsPanel {
+  min-width: 0;
+}
+
+.statsBoardHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.55fr);
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 10px;
+}
+
+.statsBoardHeader > div:first-child {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.statsBoardHeader span,
+.statsBoardHeader em {
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statsBoardHeader strong {
+  overflow: hidden;
+  color: var(--theme-primary);
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statsBoardHeader em {
+  color: rgba(255,255,255,0.42);
+  letter-spacing: 0.08em;
+}
+
+.statsBoardMeta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 0;
+}
+
+.statsBoardMeta span {
+  display: grid;
+  min-height: 34px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.28);
+  color: var(--theme-primary);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+.statsToolbar {
+  display: grid;
+  grid-template-columns: 150px 150px minmax(0, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.secondaryButton,
+.activeMiniButton,
+.mutedMiniButton {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.secondaryButton:hover,
+.activeMiniButton:hover,
+.mutedMiniButton:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.secondaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.activeMiniButton,
+.mutedMiniButton {
+  display: grid;
+  min-height: 40px;
+  place-items: center;
+  padding: 0 8px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.activeMiniButton {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.mutedMiniButton {
+  color: var(--theme-muted-text);
+}
+
+.statsMetricHeader,
+.statsMetricRow {
+  display: grid;
+  grid-template-columns: 56px 70px minmax(80px, 0.72fr) minmax(80px, 0.72fr) 76px 76px 78px;
+  gap: 6px;
+}
+
+.statsMetricHeader {
+  margin-bottom: 8px;
+  padding: 0 9px;
+}
+
+.statsMetricHeader span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.statsMetricList {
+  display: grid;
+  gap: 7px;
+}
+
+.statsMetricRow {
+  align-items: stretch;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 7px;
+}
+
+.statsMetricRow .field {
+  margin: 0;
+}
+
+.statsMetricRow .field span {
+  display: none;
+}
+
+.statsMetricRow button {
+  min-width: 0;
+}
+
+.statsMetricName {
+  display: grid;
+  align-items: stretch;
+  min-height: 36px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.26);
+}
+
+.statsMetricName strong,
+.statsMetricName span {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.statsMetricName strong {
+  justify-content: center;
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+  letter-spacing: 0.1em;
+}
+
+.statsMetricName span {
+  overflow: hidden;
+  color: var(--theme-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statsMetricValueCell,
+.statsMetricRateCell,
+.statsStateCell {
+  display: grid;
+  min-height: 36px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.26);
+}
+
+.statsMetricRow input,
+.statsMetricRow button {
+  min-height: 36px;
+}
+
+.statsMetricValueCell,
+.statsMetricRateCell,
+.statsStateCell {
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 8px;
+  color: var(--theme-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.statsMetricValueCell,
+.statsMetricRateCell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statsMetricValueCell {
+  justify-content: flex-start;
+  color: var(--theme-text);
+}
+
+.statsMetricRateCell {
+  color: var(--theme-primary);
+}
+
+.statsStateCell {
+  display: flex;
+  color: var(--theme-muted-text);
+}
+
+.statsStateActive {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.statsEmptyState {
+  display: grid;
+  gap: 6px;
+  border: 1px dashed rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.025);
+  padding: 18px;
+}
+
+.statsEmptyState strong {
+  color: var(--theme-text);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.statsEmptyState span {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.teamDataHint {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.025);
+  padding: 14px;
+}
+
+.teamDataHint strong {
+  color: var(--theme-text);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.teamDataHint span {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.teamDataPlayerPreview {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.48fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 0;
+}
+
+.teamDataPlayerPreview > div {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.24);
+  padding: 10px;
+}
+
+.teamDataPlayerPreview > div:first-child {
+  display: grid;
+  gap: 6px;
+}
+
+.teamDataPlayerPreview > div:last-child {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.teamDataPlayerPreview span,
+.teamDataPlayerPreview strong,
+.teamDataPlayerPreview em {
+  min-width: 0;
+  overflow: hidden;
+  font-style: normal;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDataPlayerPreview > div:first-child > span {
+  color: var(--theme-primary);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+.teamDataPlayerPreview > div:first-child > strong {
+  color: var(--theme-text);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.teamDataPlayerPreview > div:first-child > em {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.teamDataPlayerPreview > div:last-child > span {
+  display: grid;
+  gap: 5px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.025);
+  padding: 8px;
+}
+
+.teamDataPlayerPreview > div:last-child em {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.teamDataPlayerPreview > div:last-child strong {
+  color: var(--theme-primary);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+
+.teamDataOutputStack {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.teamDataOutputRosterGrid {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.teamDataOutputRoster {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.18);
+  padding: 9px;
+}
+
+.teamDataOutputRosterTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  padding-bottom: 7px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.teamDataOutputRosterTitle span,
+.teamDataOutputRosterTitle strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDataOutputRosterTitle span {
+  color: var(--theme-text);
+}
+
+.teamDataOutputRosterTitle strong {
+  color: var(--theme-primary);
+}
+
+.teamDataOutputHeader,
+.teamDataOutputRow {
+  display: grid;
+  grid-template-columns: 38px minmax(92px, 1.18fr) repeat(3, 46px) repeat(3, minmax(70px, 0.86fr));
+  gap: 5px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.teamDataOutputHeader {
+  padding: 0 4px;
+}
+
+.teamDataOutputHeader span {
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDataOutputHeader span:nth-child(n + 3) {
+  text-align: center;
+}
+
+.teamDataOutputRows {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.teamDataOutputRow {
+  min-height: 34px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+  padding: 5px;
+}
+
+.teamDataOutputRow strong,
+.teamDataOutputRow span,
+.teamDataOutputRow b {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.teamDataOutputRow strong {
+  justify-content: center;
+  background: var(--theme-primary-softer);
+  color: var(--theme-primary);
+}
+
+.teamDataOutputRow span {
+  color: var(--theme-text);
+  padding: 0 6px;
+}
+
+.teamDataOutputRow b {
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.025);
+  color: var(--theme-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.teamDataOutputRowActive {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+  box-shadow: inset 3px 0 0 var(--theme-primary);
+}
+
+.teamDataOutputRowActive b {
+  color: var(--theme-primary);
+}
+
+.teamDataMatchupPreview {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 0;
+}
+
+.teamDataRowPreview {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.teamDataRowPreview div {
+  display: grid;
+  grid-template-columns: 52px repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  min-height: 38px;
+}
+
+.teamDataRowPreview strong,
+.teamDataRowPreview span {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.28);
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.teamDataRowPreview strong {
+  color: var(--theme-primary);
+}
+
+.teamDataRowPreview span {
+  color: var(--theme-text);
+}
+
+.teamDataRowPreview .teamDataRowActive strong,
+.teamDataRowPreview .teamDataRowActive span {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}

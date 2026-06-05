@@ -1,0 +1,18 @@
+﻿/* === Shared layout grids === */
+
+.panelGrid,
+.matchupGrid,
+.twoPanelGrid,
+.panelGridWide {
+  display: grid;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.panelGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.matchupGrid {
+  grid-template-columns: 0.92fr 1fr 1fr;
+}

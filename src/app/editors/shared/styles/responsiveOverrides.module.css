@@ -1,0 +1,230 @@
+﻿/* === Responsive overrides === */
+
+@media (max-width: 1280px) {
+  .panelGrid,
+  .matchupGrid,
+  .twoPanelGrid,
+  .panelGridWide,
+  .showPackageModeBar,
+  .statsDesk,
+  .statsWorkbench,
+  .statsStoreTopGrid,
+  .statsStoreActionGrid,
+  .statsStoreSummary,
+  .statsMetricHeader,
+  .statsMetricRow,
+  .statsToolbar,
+  .teamDataDesk,
+  .teamDataWorkbench,
+  .mvpWorkbench,
+  .captureWorkspace,
+  .captureTables,
+  .captureTopConsole,
+  .captureTopUtility,
+  .showFlowDesk,
+  .showFlowLineupTeams,
+  .upNextDesk,
+  .upNextTeamGrid,
+  .liveMainGrid,
+  .liveUtilityGrid,
+  .livePackageGrid,
+  .mapSetupWorkspace,
+  .rosterWorkspace,
+  .casterWorkspace,
+  .casterPeopleGrid,
+  .casterStaffToolsGrid,
+  .casterToolsGrid,
+  .casterLowerThirdBus,
+  .casterLowerThirdWorkspaceContext,
+  .casterLowerThirdWorkspaceFull,
+  .mediaWorkbench {
+    grid-template-columns: 1fr;
+  }
+
+  .widePanel {
+    grid-column: auto;
+  }
+
+  .casterMatchToolPanel,
+  .casterLowerThirdPanel,
+  .casterInterviewToolPanel,
+  .casterDeskNoteToolPanel {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .mapMainRow,
+  .mapBanPanel,
+  .mapBanToolbar,
+  .mapBanTeams,
+  .mapBanTeamCard,
+  .mapBanFields,
+  .mediaSourceActions,
+  .mediaToggleGrid,
+  .mapFlowHeader,
+  .mapPoolModeGrid,
+  .mapCurrentGrid,
+  .casterStatusStrip,
+  .casterLibraryHeader,
+  .casterRow,
+  .thanksCreditSummary,
+  .rosterStatusStrip,
+  .rosterPlayerHeader,
+  .rosterPlayerRow,
+  .teamDbGrid,
+  .teamDbToolbar,
+  .teamDbTeamFields,
+  .teamDbPlayerHeader,
+  .teamDbPlayerRow,
+  .teamDbCardActions,
+  .teamDbModalHeader,
+  .teamDbModalSummary,
+  .teamDbModalActions,
+  .resultDeskGrid,
+  .resultFlowScoreGrid,
+  .resultOutputHeader,
+  .showFlowSummaryGrid,
+  .postActionGrid,
+  .tickerGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .editorHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .editorHeaderActions {
+    width: 100%;
+  }
+
+  .editorSceneTabs {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .editorTakeButton {
+    margin-left: auto;
+  }
+
+  .teamDbList {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .twoCol,
+  .playerRow,
+  .scoreBox,
+  .playerMeta,
+  .lineupActions,
+  .liveActionGrid,
+  .liveTeamPresetRow,
+  .liveTeamControlGrid,
+  .liveTeamMetaRow,
+  .liveTeamInfoRow,
+  .liveBanPanel,
+  .liveLineupGrid,
+  .liveTickerGrid,
+  .livePackagePairGrid,
+  .livePackageRecordGrid,
+  .livePackageNote,
+  .mapCurrentGrid,
+  .mapSetupStatusStrip,
+  .mapPoolTopbar,
+  .mapPoolActions,
+  .mapFlowHeader,
+  .mapPoolModeGrid,
+  .showPackageModeBar,
+  .statsDesk,
+  .statsWorkbench,
+  .statsMetricHeader,
+  .statsMetricRow,
+  .statsToolbar,
+  .teamDataDesk,
+  .teamDataWorkbench,
+  .mvpWorkbench,
+  .teamDataSlotCard,
+  .mvpSlotGrid,
+  .mvpFeatureGrid,
+  .mvpAllStats,
+  .teamDataRankList div,
+  .teamDataRowPreview div,
+  .statsCaptureActions,
+  .captureWorkspace,
+  .captureTables,
+  .captureTopConsole,
+  .captureTopUtility,
+  .showFlowDesk,
+  .showFlowLineupTeams,
+  .showFlowMetaGrid,
+  .captureSummaryStrip,
+  .captureTextPanel summary,
+  .captureTextEditor,
+  .captureCropGrid,
+  .upNextDesk,
+  .upNextTeamGrid,
+  .casterStaffToolsGrid,
+  .casterLowerThirdRouter,
+  .casterInlineRouter,
+  .casterInlineContextGrid,
+  .casterInlineInterviewGrid,
+  .casterLowerThirdBus,
+  .casterLowerThirdStatusRail,
+  .casterLowerThirdWorkspaceContext,
+  .casterLowerThirdWorkspaceFull,
+  .casterLowerThirdInterviewGrid,
+  .casterInterviewCompact,
+  .casterStaffLockHeader,
+  .casterStaffLockGrid,
+  .casterStatusStrip,
+  .casterLibraryHeader,
+  .casterRow,
+  .thanksCreditSummary,
+  .rosterStatusStrip,
+  .rosterPlayerHeader,
+  .rosterPlayerRow,
+  .teamDbGrid,
+  .teamDbToolbar,
+  .teamDbTeamFields,
+  .teamDbPlayerHeader,
+  .teamDbPlayerRow,
+  .teamDbCardActions,
+  .teamDbModalHeader,
+  .teamDbModalSummary,
+  .teamDbModalActions,
+  .coreScoreBox,
+  .banInlineGroup,
+  .mapBanTeamCard,
+  .mapBanFields {
+    grid-template-columns: 1fr;
+  }
+
+  .casterInterviewModeControl,
+  .casterInterviewTeamControl,
+  .casterInterviewCompact > .field,
+  .casterLowerThirdInterviewGrid > *,
+  .casterLowerThirdInterviewGrid .casterInterviewControl:first-child,
+  .casterLowerThirdInterviewGrid .casterInterviewControl:nth-child(2),
+  .casterLowerThirdInterviewGrid > .field:nth-child(3),
+  .casterLowerThirdInterviewGrid > .field:nth-child(n + 4) {
+    grid-column: 1;
+  }
+
+  .teamDbList {
+    grid-template-columns: 1fr;
+  }
+
+  .teamDbListRow {
+    grid-template-columns: 32px 64px minmax(0, 1fr);
+    grid-template-areas:
+      "index short name"
+      "index short status"
+      "roster roles staff"
+      "actions actions actions";
+  }
+
+  .teamDbListActions {
+    grid-template-columns: minmax(0, 1fr) repeat(3, 42px);
+  }
+}

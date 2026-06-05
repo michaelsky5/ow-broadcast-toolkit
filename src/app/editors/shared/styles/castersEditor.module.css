@@ -1,0 +1,1110 @@
+﻿/* === Casters editor === */
+
+.casterDesk {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.casterDesk .panel {
+  border-color: rgba(255,255,255,0.09);
+  padding: 12px;
+}
+
+.casterDesk input,
+.casterDesk select,
+.casterDesk button {
+  box-sizing: border-box;
+  height: 40px;
+  min-height: 40px;
+}
+
+.casterDesk button {
+  overflow: hidden;
+  padding: 0 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.casterDesk .field {
+  margin-bottom: 0;
+}
+
+.casterWorkspace {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(620px, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.casterPeopleGrid {
+  display: grid;
+  grid-template-columns: minmax(292px, 330px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.casterControlColumn {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 12px;
+  align-content: stretch;
+  min-width: 0;
+  min-height: 100%;
+}
+
+.casterToolsGrid {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.9fr) minmax(520px, 1.1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.casterStaffToolsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.casterPackagePanel {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  align-self: stretch;
+  height: 100%;
+}
+
+.casterCopyGrid {
+  display: grid;
+  gap: 8px;
+}
+
+.casterPackageModeRow {
+  display: grid;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.casterPackageModeRow .casterControlBlock {
+  margin-top: 0;
+}
+
+.staffCapacityButton {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 7px 9px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.staffCapacityButton:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.staffCapacityButton span,
+.staffCapacityButton strong {
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.staffCapacityButton span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.staffCapacityButton strong {
+  justify-self: end;
+  color: var(--theme-primary);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+}
+
+.casterPackagePanel .casterControlBlock .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.casterToolPanel {
+  min-width: 0;
+  min-height: 100%;
+}
+
+.casterInlineToolsPanel {
+  display: block;
+  min-height: 0;
+}
+
+.casterInlineToolsPanel .panelTitle {
+  margin-bottom: 10px;
+}
+
+.casterLowerThirdDeck {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.casterLowerThirdBus {
+  display: grid;
+  grid-template-columns: 150px minmax(360px, 1fr) 252px;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-left: 2px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 8px;
+}
+
+.casterLowerThirdBus .casterConsoleKicker {
+  align-self: center;
+}
+
+.casterLowerThirdBus .segmented {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.casterLowerThirdBus .segmented button {
+  height: 34px;
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.casterLowerThirdStatusRail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 0;
+}
+
+.casterLowerThirdStatusRail div {
+  display: grid;
+  grid-template-rows: 12px minmax(0, 1fr);
+  gap: 2px;
+  min-width: 0;
+  min-height: 34px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.26);
+  padding: 5px 8px;
+}
+
+.casterLowerThirdStatusRail span,
+.casterLowerThirdStatusRail strong {
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.casterLowerThirdStatusRail span {
+  color: var(--theme-muted-text);
+  letter-spacing: 0.13em;
+}
+
+.casterLowerThirdStatusRail strong {
+  color: var(--theme-primary);
+  letter-spacing: 0.06em;
+}
+
+.casterLowerThirdWorkspace {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.casterLowerThirdWorkspaceContext {
+  grid-template-columns: minmax(390px, 0.92fr) minmax(0, 1.08fr);
+}
+
+.casterLowerThirdWorkspaceFull {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.casterLowerThirdBay {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 8px;
+}
+
+.casterLowerThirdModeBay {
+  border-left: 2px solid var(--theme-primary);
+}
+
+.casterLowerThirdModeBay .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.casterLowerThirdModeBay .segmented button,
+.casterLowerThirdInterviewGrid .segmented button {
+  height: 34px;
+  min-height: 34px;
+  padding: 0 8px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.casterConsoleKicker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-height: 18px;
+}
+
+.casterConsoleKicker span,
+.casterConsoleKicker strong {
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.casterConsoleKicker span {
+  color: var(--theme-muted-text);
+  letter-spacing: 0.14em;
+}
+
+.casterConsoleKicker strong {
+  color: var(--theme-primary);
+  letter-spacing: 0.08em;
+}
+
+.casterInlineContextGrid {
+  display: grid;
+  grid-template-columns: minmax(118px, 1.12fr) minmax(78px, 0.72fr) minmax(126px, 1fr) minmax(82px, 0.76fr);
+  gap: 6px;
+}
+
+.casterInlineContextGrid div {
+  display: grid;
+  grid-template-rows: 13px minmax(0, 1fr);
+  gap: 2px;
+  min-width: 0;
+  min-height: 42px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.24);
+  padding: 6px 8px;
+}
+
+.casterInlineContextGrid div:first-child,
+.casterInlineContextGrid div:nth-child(3) {
+  grid-column: auto;
+}
+
+.casterInlineContextGrid span,
+.casterInlineContextGrid strong {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.casterInlineContextGrid span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+
+.casterInlineContextGrid strong {
+  justify-content: flex-start;
+  color: var(--theme-primary);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.casterLowerThirdPayloadBay {
+  overflow: hidden;
+}
+
+.casterInterviewBuilderBay,
+.casterDeskNoteBuilderBay,
+.casterOffBuilderBay {
+  align-content: stretch;
+}
+
+.casterPayloadReadout {
+  display: grid;
+  grid-template-columns: minmax(118px, 0.34fr) minmax(0, 1fr);
+  min-height: 42px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.28);
+}
+
+.casterPayloadReadout span,
+.casterPayloadReadout strong,
+.casterPayloadReadout input {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.casterPayloadReadout span {
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+  letter-spacing: 0.12em;
+}
+
+.casterPayloadReadout strong {
+  color: var(--theme-primary);
+  letter-spacing: 0.04em;
+}
+
+.casterPayloadReadout input {
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--theme-text);
+  letter-spacing: 0.04em;
+  outline: none;
+}
+
+.casterPayloadReadout input:focus {
+  box-shadow: inset 0 -1px 0 var(--theme-primary);
+  color: var(--theme-primary);
+}
+
+.casterPayloadInputReadout {
+  grid-template-columns: minmax(118px, 0.34fr) minmax(0, 1fr);
+}
+
+.casterPayloadInputOnly {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.casterPayloadInputOnly input {
+  color: var(--theme-primary);
+}
+
+.casterLowerThirdInterviewGrid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+  min-width: 0;
+}
+
+.casterLowerThirdInterviewGrid > * {
+  min-width: 0;
+}
+
+.casterLowerThirdInterviewGrid .field {
+  min-width: 0;
+}
+
+.casterLowerThirdInterviewGrid .field span,
+.casterLowerThirdInterviewGrid .casterInterviewControl > span {
+  font-size: 9px;
+  letter-spacing: 0.11em;
+}
+
+.casterLowerThirdInterviewGrid .casterInterviewControl:first-child .segmented {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.casterLowerThirdInterviewGrid .casterInterviewControl:nth-child(2) .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.casterLowerThirdInterviewGrid .casterInterviewControl:first-child,
+.casterLowerThirdInterviewGrid .casterInterviewControl:nth-child(2) {
+  grid-column: span 3;
+}
+
+.casterLowerThirdInterviewGrid > .field:nth-child(3) {
+  grid-column: span 6;
+}
+
+.casterLowerThirdInterviewGrid > .field:nth-child(n + 4) {
+  grid-column: span 4;
+}
+
+.casterLowerThirdInterviewGrid input,
+.casterLowerThirdInterviewGrid select,
+.casterLowerThirdInterviewGrid button {
+  height: 36px;
+  min-height: 36px;
+  min-width: 0;
+}
+
+.casterLowerThirdInterviewGrid input,
+.casterLowerThirdInterviewGrid select {
+  padding: 0 9px;
+}
+
+.casterMatchToolPanel {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.casterInterviewToolPanel {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.casterInterviewToolPanel .casterToolHeader {
+  grid-template-columns: minmax(0, 1fr) 132px;
+}
+
+.casterDeskNoteToolPanel {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.casterLowerThirdPanel {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  min-height: auto;
+}
+
+.casterLowerThirdRouter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px;
+  gap: 8px;
+  align-items: end;
+}
+
+.casterLowerThirdRouter .casterControlBlock {
+  margin-top: 0;
+}
+
+.casterLowerThirdRouter .segmented {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.casterToolHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(110px, 0.32fr);
+  gap: 8px;
+  align-items: stretch;
+}
+
+.casterToolHeader .casterToggleButton {
+  margin-top: 0;
+}
+
+.casterToolState {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  min-width: 0;
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.25);
+  padding: 7px 9px;
+}
+
+.casterToolState span,
+.casterToolState strong {
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.casterToolState span {
+  color: var(--theme-muted-text);
+}
+
+.casterToolState strong {
+  color: var(--theme-primary);
+}
+
+.casterContextCompact {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.casterMatchToolPanel .casterContextCompact {
+  margin-top: 0;
+}
+
+.casterContextCompact div {
+  display: grid;
+  grid-template-columns: minmax(78px, 0.68fr) minmax(0, 1fr);
+  min-width: 0;
+  min-height: 36px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.24);
+}
+
+.casterContextCompact div:first-child {
+  grid-column: 1 / -1;
+}
+
+.casterContextCompact div:nth-child(n + 2) {
+  min-height: 34px;
+}
+
+.casterContextCompact span,
+.casterContextCompact strong {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 9px;
+  font-size: 10px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.casterContextCompact span {
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+  letter-spacing: 0.12em;
+}
+
+.casterContextCompact strong {
+  justify-content: flex-end;
+  color: var(--theme-primary);
+  letter-spacing: 0.08em;
+}
+
+.casterControlBlock {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.casterControlBlock > span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.casterControlBlock .segmented {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.casterLowerThirdRouter .casterControlBlock .segmented {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.casterControlBlockTwo .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.casterToggleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.casterElementRows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 0;
+}
+
+.casterElementRows .casterToggleButton:first-child {
+  grid-column: auto;
+}
+
+.casterElementRows .casterToggleButton:last-child {
+  grid-column: 1 / -1;
+}
+
+.casterToggleButton {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  gap: 6px;
+  align-items: center;
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+  padding: 0 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.casterToggleButton:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.casterToggleButton span,
+.casterToggleButton strong {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.casterToggleButton strong {
+  justify-self: end;
+  color: rgba(255,255,255,0.42);
+  font-size: 10px;
+}
+
+.casterToggleButtonActive {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-text);
+}
+
+.casterToggleButtonActive strong {
+  color: var(--theme-primary);
+}
+
+.casterInterviewCompact {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 7px 8px;
+  margin-top: 10px;
+  align-items: end;
+}
+
+.casterInterviewToolPanel .casterInterviewCompact {
+  margin-top: 0;
+}
+
+.casterInterviewControl {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.casterInterviewControl > span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.casterInterviewModeControl {
+  grid-column: span 8;
+}
+
+.casterInterviewTeamControl {
+  grid-column: span 4;
+}
+
+.casterInterviewTeamControl .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.casterInterviewCompact > .field {
+  grid-column: span 6;
+  min-width: 0;
+}
+
+.casterInterviewCompact input,
+.casterInterviewCompact select,
+.casterInterviewCompact button {
+  height: 36px;
+  min-height: 36px;
+}
+
+.casterDeskNoteFields {
+  display: grid;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.casterStaffLockPanel {
+  display: grid;
+  gap: 10px;
+  max-width: 920px;
+}
+
+.casterStaffLockHeader {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  min-height: 42px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.24);
+}
+
+.casterStaffLockHeader span,
+.casterStaffLockHeader strong,
+.casterStaffLockGrid span,
+.casterStaffLockGrid strong {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.casterStaffLockHeader span,
+.casterStaffLockGrid span {
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+  letter-spacing: 0.12em;
+}
+
+.casterStaffLockHeader strong,
+.casterStaffLockGrid strong {
+  justify-content: flex-end;
+  color: var(--theme-primary);
+  letter-spacing: 0.08em;
+}
+
+.casterStaffLockGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(110px, 1fr)) 140px;
+  gap: 7px;
+}
+
+.casterStaffLockGrid div {
+  display: grid;
+  grid-template-columns: minmax(74px, 0.62fr) minmax(0, 1fr);
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.24);
+}
+
+.casterStaffLockGrid button {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.casterStaffLockGrid button:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.casterUnavailablePanel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 220px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-top: 2px solid rgba(255,255,255,0.28);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018));
+  padding: 18px;
+}
+
+.casterUnavailablePanel span,
+.casterUnavailablePanel strong,
+.casterUnavailablePanel p {
+  grid-column: 1 / -1;
+}
+
+.casterUnavailablePanel span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.casterUnavailablePanel strong {
+  color: rgba(255,255,255,0.74);
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.casterUnavailablePanel p {
+  max-width: 720px;
+  margin: 0 0 8px;
+  color: rgba(255,255,255,0.42);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.casterUnavailablePanel div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 48px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+  padding: 8px 10px;
+}
+
+.casterUnavailablePanel em,
+.casterUnavailablePanel b {
+  min-width: 0;
+  overflow: hidden;
+  font-style: normal;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.casterUnavailablePanel em {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.casterUnavailablePanel b {
+  color: rgba(255,255,255,0.62);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.casterLibraryPanel {
+  min-width: 0;
+  overflow-x: visible;
+}
+
+.casterLibraryPanelFull {
+  width: 100%;
+}
+
+.casterStatusStrip {
+  display: grid;
+  grid-template-columns: 112px 96px 176px minmax(230px, 1fr);
+  gap: 8px;
+  align-items: stretch;
+  margin-bottom: 12px;
+  min-width: 0;
+}
+
+.casterStatusStripStaff {
+  grid-template-columns: 108px 92px 148px 118px minmax(210px, 1fr);
+}
+
+.casterStatusStrip div {
+  display: grid;
+  grid-template-columns: minmax(50px, 0.72fr) minmax(0, 1fr);
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.26);
+}
+
+.casterStatusStrip span {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.casterStatusStrip strong {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-primary);
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.casterStatusStrip div:last-child strong {
+  justify-content: flex-start;
+}
+
+.casterLibraryHeader {
+  display: grid;
+  grid-template-columns: 52px minmax(126px, 1.08fr) minmax(98px, 0.72fr) minmax(108px, 0.82fr) minmax(206px, 1.12fr) 64px;
+  gap: 7px;
+  margin-bottom: 8px;
+  padding: 0 8px;
+  min-width: 0;
+}
+
+.casterLibraryHeader span {
+  min-width: 0;
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.casterLibrary {
+  display: grid;
+  gap: 8px;
+}
+
+.casterRow {
+  display: grid;
+  grid-template-columns: 52px minmax(126px, 1.08fr) minmax(98px, 0.72fr) minmax(108px, 0.82fr) minmax(206px, 1.12fr) 64px;
+  gap: 7px;
+  align-items: stretch;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 8px;
+}
+
+.casterRowActive {
+  border-color: var(--theme-primary-border);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 54%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.28);
+}
+
+.casterRowHidden {
+  opacity: 0.72;
+}
+
+.casterRowHidden:hover {
+  opacity: 1;
+}
+
+.casterRow .field span {
+  display: none;
+}
+
+.casterIndex {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--theme-primary-softer);
+  color: var(--theme-primary);
+  padding: 4px 3px;
+  user-select: none;
+}
+
+.casterIndex strong {
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.casterIndex span {
+  margin-top: 3px;
+  color: var(--theme-muted-text);
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.casterAvatarControl {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 44px 44px;
+  gap: 6px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.casterAvatarControl button {
+  min-width: 0;
+  padding: 0 6px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.casterAvatarControl input {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
+  color: var(--theme-text);
+  padding: 0 8px;
+  outline: none;
+}
+
+.casterAvatarControl input:focus {
+  border-color: var(--theme-primary-border);
+}
+
+.casterThumb {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.11);
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-primary);
+  font-size: 13px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.casterThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

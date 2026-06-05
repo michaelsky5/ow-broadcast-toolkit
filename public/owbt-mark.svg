@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="OWBT mark">
+  <g fill="none" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M82 76c-18 19-28 44-28 72s10 53 28 72" stroke="#f8fffb" stroke-width="14"/>
+    <path d="M174 76c18 19 28 44 28 72s-10 53-28 72" stroke="#f8fffb" stroke-width="14"/>
+    <path d="M103 95c-11 14-17 30-17 53s6 39 17 53" stroke="#4cd3b5" stroke-width="12"/>
+    <path d="M153 95c11 14 17 30 17 53s-6 39-17 53" stroke="#4cd3b5" stroke-width="12"/>
+    <path d="M128 72v94" stroke="#f8fffb" stroke-width="14"/>
+    <path d="M104 166h56" stroke="#f8fffb" stroke-width="14"/>
+    <path d="M96 220h64" stroke="#4cd3b5" stroke-width="8"/>
+  </g>
+  <rect x="116" y="42" width="24" height="24" fill="#4cd3b5"/>
+</svg>

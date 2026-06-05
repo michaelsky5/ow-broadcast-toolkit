@@ -1,0 +1,806 @@
+.entry {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 18% 0%, var(--theme-primary-soft), transparent 30%),
+    linear-gradient(135deg, #050505, #101010 48%, #030303);
+  color: var(--theme-text);
+  font-family: var(--theme-font-family);
+  isolation: isolate;
+}
+
+.gridLayer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.32;
+}
+
+.topbar,
+.workspace {
+  max-width: 1540px;
+  margin-inline: auto;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) 528px;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.titleBlock,
+.topStatus,
+.panel,
+.statusPanel {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 22px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+}
+
+.titleBlock {
+  display: grid;
+  align-content: center;
+  min-height: 64px;
+  padding: 10px 14px;
+}
+
+.titleBlock span,
+.topStatus span,
+.panelTitle,
+.field span,
+.statusStack span,
+.brandPlate span {
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.titleBlock h1 {
+  margin: 5px 0 0;
+  font-size: 28px;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.topStatus {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px 172px;
+  min-height: 64px;
+}
+
+.topStatus div {
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  min-width: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 12px;
+}
+
+.topStatus strong,
+.statusStack strong,
+.outputGrid strong {
+  overflow: hidden;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.enterButton,
+.panelTitle button,
+.urlRow button,
+.inputActionRow button {
+  border: 1px solid var(--theme-primary-border);
+  background: var(--theme-primary);
+  color: #06110e;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.enterButton {
+  min-height: 64px;
+}
+
+.enterButton:hover,
+.panelTitle button:hover,
+.urlRow button:hover,
+.inputActionRow button:hover {
+  filter: brightness(1.06);
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 340px;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.setupColumn,
+.preflightRail {
+  display: grid;
+  gap: 10px;
+  height: 100%;
+  min-height: 392px;
+}
+
+.setupColumn {
+  align-content: stretch;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.preflightRail {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.panel,
+.statusPanel {
+  min-width: 0;
+  padding: 10px;
+}
+
+.panel {
+  min-height: 190px;
+}
+
+.eventPanel {
+  min-height: 276px;
+}
+
+.setupColumn > .panel:first-child {
+  min-height: 240px;
+}
+
+.statusPanel {
+  min-height: 0;
+  height: 100%;
+}
+
+.checkPanel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.panelTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28px;
+  margin: -10px -10px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 10px;
+  color: var(--theme-primary);
+}
+
+.panelTitle > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panelTitle > span::before {
+  width: 7px;
+  height: 7px;
+  background: var(--theme-primary);
+  box-shadow: 0 0 12px var(--theme-primary);
+  content: '';
+}
+
+.panelTitle button {
+  min-width: 92px;
+  min-height: 28px;
+  margin-right: -10px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--theme-primary);
+}
+
+.panelTitle strong {
+  color: var(--theme-primary);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.field input,
+.field select,
+.urlRow input,
+.readonlyValue {
+  width: 100%;
+  height: 36px;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--theme-text);
+  padding: 0 10px;
+  outline: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.field input:focus,
+.field select:focus,
+.urlRow input:focus {
+  border-color: var(--theme-primary-border);
+  box-shadow: 0 0 0 1px var(--theme-primary-border);
+}
+
+.field select option:disabled {
+  color: rgba(255, 255, 255, 0.36);
+}
+
+.fieldHint {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.field input[type="color"] {
+  padding: 3px;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.eventAssetRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 148px;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.twoCol + .field,
+.field + .twoCol,
+.field + .eventAssetRow {
+  margin-top: 8px;
+}
+
+.urlRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px 116px;
+  gap: 8px;
+}
+
+.urlRow button,
+.inputActionRow button {
+  height: 36px;
+}
+
+.inputActionRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 62px 62px;
+  gap: 8px;
+}
+
+.inputActionRow button {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+
+.eventIdentityGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 178px;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.logoPreviewCard {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 22px),
+    rgba(0, 0, 0, 0.26);
+}
+
+.logoPreviewFrame {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logoPreviewFrame img,
+.brandPlateLogo img {
+  display: block;
+  max-width: 74%;
+  max-height: 74%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.34));
+}
+
+.logoPreviewMeta {
+  min-width: 0;
+  padding: 10px;
+}
+
+.logoPreviewMeta span,
+.stateTile span,
+.stateActionTile span {
+  display: block;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.54);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.logoPreviewMeta strong,
+.stateTile strong,
+.stateActionTile strong {
+  display: block;
+  overflow: hidden;
+  margin-top: 7px;
+  color: var(--theme-primary);
+  font-size: 13px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.logoPreviewMeta em,
+.stateTile em,
+.stateActionTile em {
+  display: block;
+  overflow: hidden;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logoBackdropAuto {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 34%),
+    linear-gradient(315deg, var(--theme-primary-softer), transparent 48%),
+    #161918;
+}
+
+.logoBackdropDark {
+  background: #080909;
+}
+
+.logoBackdropLight {
+  background: #eceeed;
+}
+
+.logoBackdropNone {
+  background:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25% 75%, rgba(255, 255, 255, 0.06) 75%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25% 75%, rgba(255, 255, 255, 0.06) 75%);
+  background-position: 0 0, 8px 8px;
+  background-size: 16px 16px;
+}
+
+.statusStack div {
+  display: grid;
+  align-content: center;
+  min-height: 54px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0 10px;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.fourSegmented {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.segmented button,
+.binarySegmented button {
+  position: relative;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.segmented .segmentActive,
+.binarySegmented .segmentActive {
+  border-color: var(--theme-primary-border);
+  background: rgba(76, 211, 181, 0.12);
+  box-shadow: inset 0 -3px 0 var(--theme-primary);
+  color: var(--theme-primary);
+}
+
+.binarySegmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.readonlyValue {
+  display: grid;
+  align-items: center;
+  color: var(--theme-primary);
+}
+
+.outputStateGrid,
+.startupStateGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.startupStateGrid {
+  grid-template-columns: 1fr;
+}
+
+.stateTile,
+.stateActionTile {
+  min-width: 0;
+  min-height: 56px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(90deg, rgba(76, 211, 181, 0.08), transparent 48%),
+    rgba(0, 0, 0, 0.24);
+  padding: 9px 10px;
+}
+
+.stateActionTile {
+  display: block;
+  color: var(--theme-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.stateActionTile:hover {
+  border-color: var(--theme-primary-border);
+  background:
+    linear-gradient(90deg, rgba(76, 211, 181, 0.14), transparent 48%),
+    rgba(0, 0, 0, 0.32);
+}
+
+.outputChecklist {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.outputChecklistTitle {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+  border-left: 3px solid var(--theme-primary);
+  color: var(--theme-primary);
+  padding-left: 8px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.outputChecklist div:not(.outputChecklistTitle) {
+  display: grid;
+  align-content: center;
+  min-height: 62px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 22px),
+    rgba(0, 0, 0, 0.24);
+  padding: 10px;
+}
+
+.outputChecklist span {
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.54);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.outputChecklist strong {
+  overflow: hidden;
+  margin-top: 8px;
+  color: var(--theme-primary);
+  font-size: 13px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.noteGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.noteGrid article {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 92px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(0, 0, 0, 0.24);
+  padding: 12px;
+}
+
+.noteGrid strong {
+  display: block;
+  min-height: 16px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 950;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.noteGrid p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.updateNotesStrip {
+  display: grid;
+  grid-template-columns: 74px 58px minmax(0, 1fr) 86px;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  row-gap: 5px;
+  align-items: center;
+  align-content: center;
+  min-width: 0;
+  min-height: 76px;
+  margin-top: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 3px solid var(--theme-primary);
+  background:
+    linear-gradient(90deg, rgba(76, 211, 181, 0.1), transparent 52%),
+    rgba(0, 0, 0, 0.26);
+  color: var(--theme-text);
+  padding: 0 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.updateNotesStrip:hover {
+  border-color: var(--theme-primary-border);
+  background:
+    linear-gradient(90deg, rgba(76, 211, 181, 0.16), transparent 52%),
+    rgba(0, 0, 0, 0.34);
+}
+
+.updateNotesStrip span,
+.updateNotesStrip strong,
+.updateNotesStrip p,
+.updateNotesStrip em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.updateNotesStrip span {
+  grid-column: 1;
+  grid-row: 1;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.updateNotesStrip strong {
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--theme-primary);
+  font-size: 12px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.updateNotesStrip p {
+  grid-column: 1 / 4;
+  grid-row: 2;
+  display: -webkit-box;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.35;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.updateNotesStrip em {
+  grid-column: 4;
+  grid-row: 1 / 3;
+  align-self: center;
+  color: var(--theme-text);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.statusPanel {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.brandPlate {
+  display: grid;
+  align-content: end;
+  min-height: 184px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 4px solid var(--theme-primary);
+  background:
+    linear-gradient(90deg, rgba(76, 211, 181, 0.1), transparent 46%),
+    rgba(0, 0, 0, 0.25);
+  padding: 14px;
+}
+
+.brandPlateLogo {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brandPlate strong {
+  overflow: hidden;
+  margin-top: 18px;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 950;
+  line-height: 0.96;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.brandPlate em {
+  overflow: hidden;
+  margin-top: 8px;
+  color: var(--theme-primary);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusStack {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.statusStack div {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 5px;
+}
+
+@media (max-width: 1280px) {
+  .topbar,
+  .workspace,
+  .setupColumn,
+  .preflightRail {
+    grid-template-columns: 1fr;
+  }
+
+  .setupColumn,
+  .preflightRail {
+    min-height: auto;
+    height: auto;
+  }
+
+  .setupColumn {
+    grid-template-rows: auto;
+  }
+
+  .topStatus {
+    grid-template-columns: minmax(0, 1fr) 112px 172px;
+  }
+
+  .noteGrid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .eventIdentityGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .logoPreviewFrame {
+    min-height: 118px;
+  }
+}
+
+@media (max-width: 760px) {
+  .entry {
+    padding: 12px;
+  }
+
+  .topStatus,
+  .twoCol,
+  .eventAssetRow,
+  .urlRow,
+  .outputStateGrid,
+  .startupStateGrid,
+  .outputChecklist,
+  .updateNotesStrip,
+  .fourSegmented {
+    grid-template-columns: 1fr;
+  }
+
+  .outputChecklistTitle {
+    grid-column: auto;
+  }
+
+  .updateNotesStrip span,
+  .updateNotesStrip strong,
+  .updateNotesStrip p,
+  .updateNotesStrip em {
+    grid-column: 1;
+    grid-row: auto;
+    text-align: left;
+  }
+}

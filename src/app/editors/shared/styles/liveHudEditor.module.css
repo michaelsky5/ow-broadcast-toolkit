@@ -1,0 +1,957 @@
+﻿/* === Live HUD editor === */
+
+.liveDesk {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.liveDesk .panel {
+  border-color: rgba(255,255,255,0.09);
+  padding: 12px;
+}
+
+.liveDesk .panelTitle {
+  margin-bottom: 12px;
+}
+
+.liveDesk .panelTitle::before {
+  box-shadow: 0 0 8px var(--theme-primary-border);
+}
+
+.liveDesk input,
+.liveDesk select,
+.liveDesk button {
+  box-sizing: border-box;
+  height: 40px;
+  min-height: 40px;
+}
+
+.liveDesk button {
+  overflow: hidden;
+  padding: 0 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.liveDesk .field input,
+.liveDesk .field select,
+.liveDesk .field textarea {
+  padding: 0 10px;
+}
+
+.liveDesk .field input[type="color"] {
+  padding: 3px;
+}
+
+.liveDesk .activeOutline {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.liveDesk .dangerButton,
+.liveDesk .dangerActive {
+  border-color: rgba(255,77,77,0.36) !important;
+  background: rgba(255,77,77,0.12) !important;
+  color: #ff8b8b !important;
+}
+
+.liveDesk .dangerActive {
+  box-shadow: inset 0 0 0 1px rgba(255,77,77,0.08);
+}
+
+.liveMainGrid {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) clamp(280px, 15vw, 300px) minmax(360px, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.liveTeamPanel,
+.liveCorePanel {
+  box-sizing: border-box;
+  height: 100%;
+  min-width: 0;
+}
+
+.liveTeamPanel {
+  display: grid;
+  grid-template-rows: auto auto auto auto 1fr;
+  align-content: start;
+  gap: 8px;
+}
+
+.liveCorePanel {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.liveTeamControlGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  align-items: stretch;
+}
+
+.liveTeamControlGrid.noSideControl .liveSideBadge {
+  grid-column: span 2;
+}
+
+.liveSideBadge,
+.liveSideName {
+  display: grid;
+  grid-template-rows: 11px minmax(0, 1fr);
+  gap: 3px;
+  min-width: 0;
+  height: 40px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.26);
+  padding: 5px 9px;
+}
+
+.liveSideBadge {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.liveSideBadge span,
+.liveSideName span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.liveSideBadge strong,
+.liveSideName strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-primary);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.liveSideName strong {
+  color: var(--theme-text);
+}
+
+.liveTeamControlGrid button,
+.liveLineupActions button,
+.liveTickerGrid button {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.liveTeamControlGrid button:hover,
+.liveLineupActions button:hover,
+.liveTickerGrid button:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}
+
+.liveTeamControlGrid .activeOutline {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.liveTeamControlGrid .primaryButton {
+  border-color: var(--theme-primary);
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.inlineLabel,
+.presetDisplay,
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.26);
+  color: var(--theme-muted-text);
+  padding: 0 9px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.presetDisplay {
+  overflow: hidden;
+  color: var(--theme-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sectionTitle {
+  min-height: 32px;
+  color: var(--theme-text);
+  line-height: 1.1;
+}
+
+.liveTeamMetaRow {
+  display: grid;
+  grid-template-columns: 1.2fr 88px minmax(0, 1fr) 96px;
+  gap: 8px;
+  align-items: end;
+}
+
+.liveTeamInfoRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) 92px minmax(0, 1fr) 76px;
+  gap: 8px;
+  align-items: end;
+}
+
+.liveTeamInfoUnlockButton,
+.liveTeamInfoUnlockActive {
+  align-self: end;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 0 6px;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.liveTeamInfoUnlockButton:hover,
+.liveTeamInfoUnlockActive:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.liveTeamInfoUnlockActive {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.liveTeamInfoRowLocked input {
+  color: rgba(255,255,255,0.48);
+  cursor: not-allowed;
+}
+
+.liveTeamMetaRow .field,
+.liveTeamInfoRow .field,
+.liveTickerGrid .field {
+  margin-bottom: 0;
+}
+
+.liveBanPanel {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  align-items: stretch;
+  border: 1px solid rgba(255,77,77,0.18);
+  background: rgba(255,77,77,0.055);
+  padding: 7px 8px;
+}
+
+.liveBanPanelActive {
+  opacity: 1;
+}
+
+.liveBanPanelDimmed {
+  opacity: 0.58;
+}
+
+.liveBanPanel .sectionTitle {
+  border-color: rgba(255,77,77,0.18);
+  background: rgba(255,77,77,0.06);
+  color: #ff8b8b;
+}
+
+.liveBanPanel .sectionTitle,
+.liveBanPanel button,
+.liveBanPanel select {
+  height: 36px;
+  min-height: 36px;
+}
+
+.liveBanPanel select,
+.mapBanPanel select,
+.banInlineGroup select,
+.livePlayerSlot select {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.35);
+  color: var(--theme-text);
+  padding: 0 10px;
+  outline: none;
+}
+
+.livePlayersPanel {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.livePlayersGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.livePlayerSlot {
+  display: grid;
+  grid-template-rows: 24px 40px 26px;
+  gap: 4px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.livePlayerSlot span {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.04);
+  color: var(--theme-primary);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.livePlayerSlot select {
+  padding: 0 6px;
+  font-size: 11px;
+  text-overflow: ellipsis;
+}
+
+.liveTeamPresetRow button,
+.liveBanPanel button,
+.liveBanPanel select {
+  font-size: 11px;
+}
+
+.liveCorePanel .segmented button {
+  padding: 0 4px;
+  font-size: 10px;
+}
+
+.livePlayerActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.livePlayerActions button {
+  height: 26px;
+  min-height: 26px;
+  padding: 0 6px;
+  font-size: 10px;
+}
+
+.coreScoreBox {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px 12px 42px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  min-height: 52px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.24);
+  padding: 6px 8px;
+}
+
+.coreScoreBox strong {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  color: var(--theme-text);
+  font-size: 28px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.coreScoreBox span {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.coreScoreBox span:last-child {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.coreScoreBox em {
+  color: var(--theme-primary);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 950;
+  text-align: center;
+}
+
+.coreScoreControls {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.coreScoreControls button {
+  padding: 0 4px;
+  font-size: 10px;
+}
+
+.coreControlGroup {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.coreControlGroup + .coreControlGroup {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 8px;
+}
+
+.coreSection {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 12px;
+}
+
+.coreSectionPlain {
+  display: grid;
+  gap: 8px;
+}
+
+.liveCorePanel .segmented {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.liveMetaStrip {
+  display: grid;
+  grid-template-columns: 92px 112px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.liveMetaStrip span,
+.liveMetaStrip strong,
+.liveMetaStrip em {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.26);
+  padding: 9px 10px;
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.liveMetaStrip strong {
+  color: var(--theme-primary);
+}
+
+.liveMetaStrip em {
+  color: var(--theme-text);
+}
+
+.liveTriggerGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.liveTriggerGrid button {
+  padding: 0 6px;
+  font-size: 11px;
+}
+
+.liveUtilityGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.liveToolsPanel {
+  box-sizing: border-box;
+  min-width: 0;
+  height: 100%;
+}
+
+.liveLineupGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.liveLineupCard {
+  display: grid;
+  grid-template-rows: 18px 34px 40px;
+  gap: 7px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 10px;
+}
+
+.liveLineupCard span,
+.liveLineupCard strong {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.liveLineupCard span {
+  color: var(--theme-primary);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.liveLineupCard strong {
+  color: var(--theme-text);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+}
+
+.liveLineupActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.liveTickerGrid {
+  display: grid;
+  grid-template-columns: 138px 74px minmax(0, 1fr);
+  gap: 8px;
+  align-items: end;
+}
+
+.liveTickerGrid .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.liveTickerGrid input {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
+  color: var(--theme-text);
+  padding: 9px 10px;
+  outline: none;
+}
+
+.livePackageGrid {
+  display: grid;
+  grid-template-columns: minmax(560px, 1.35fr) minmax(320px, 0.65fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.livePackagePanel {
+  height: auto;
+}
+
+.liveStatusPanel {
+  align-self: start;
+}
+
+.livePackageStack {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.livePackagePairGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+
+.livePackageThreeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+
+.livePackageTopRow {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.9fr) minmax(420px, 1.1fr);
+  gap: 8px;
+  align-items: end;
+}
+
+.livePackageToggleRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.livePackageCapsuleField {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.livePackageCapsuleField > span {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.livePackageSection {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 10px;
+}
+
+.livePackageRecordGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+
+.livePackageStack .field {
+  margin-bottom: 0;
+}
+
+.livePackageStack .toggleField {
+  margin-top: 0;
+}
+
+.livePackageTopRow .field {
+  margin-bottom: 0;
+}
+
+.livePackageToggleRow .toggleField {
+  min-height: 40px;
+  height: 40px;
+}
+
+.livePackageToggleRow .toggleField {
+  margin-top: 0;
+  padding: 0 10px;
+}
+
+.livePackageActionField {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.livePackageActionLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.livePackageActionLabel span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.livePackageActionLabel button,
+.livePackageClearButton {
+  height: 22px;
+  min-height: 22px;
+  border: 1px solid rgba(255,255,255,0.11);
+  background: rgba(255,255,255,0.045);
+  color: var(--theme-muted-text);
+  padding: 0 8px;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.livePackageActionLabel button:hover,
+.livePackageClearButton:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.livePackageActionField input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
+  color: var(--theme-text);
+  padding: 0 10px;
+  outline: none;
+}
+
+.livePackageActionField input:focus {
+  border-color: var(--theme-primary-border);
+}
+
+.livePackageActionField input:disabled {
+  color: rgba(255,255,255,0.42);
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.livePackageActionField input[type="color"] {
+  padding: 3px;
+}
+
+.livePackageClearButton {
+  justify-self: end;
+  min-width: 124px;
+}
+
+.livePackagePanel .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.livePackagePanel .field:first-child .segmented {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.livePackageGrid .livePackagePanel:first-child .field:first-child .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.liveStatusPanel .field:first-child .segmented {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.liveStatusPanel .livePackageRecordGrid,
+.liveStatusPanel .livePackagePairGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.livePackageNote {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  min-height: 42px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.26);
+}
+
+.livePackageNote span,
+.livePackageNote strong {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.livePackageNote span {
+  background: rgba(255,255,255,0.04);
+  color: var(--theme-primary);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+}
+
+.livePackageNote strong {
+  color: var(--theme-muted-text);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.liveRouterGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.liveRouterGrid button:first-child,
+.liveRouterGrid button:nth-child(2),
+.liveRouterGrid button:last-child {
+  grid-column: 1 / -1;
+}
+
+.liveHudGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.liveFlowGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.scoreBox {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  margin-top: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.24);
+  padding: 10px;
+}
+
+.scoreBox span {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.scoreBox strong {
+  color: var(--theme-primary);
+  font-size: 22px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.scoreBox div,
+.liveScore {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.scoreBox button,
+.liveScore button {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 8px 11px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.scoreBox button:hover,
+.liveScore button:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}
+
+.lineupList {
+  display: grid;
+  gap: 8px;
+}
+
+.playerRow {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+
+.playerRow div {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+}
+
+.playerRow span {
+  color: var(--theme-primary);
+  font-size: 16px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.playerRow strong {
+  margin-top: 4px;
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.playerRow select {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
+  color: var(--theme-text);
+  padding: 10px 11px;
+  outline: none;
+}
+
+.playerMeta {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 120px 1fr 1.4fr;
+  gap: 8px;
+  margin-top: -2px;
+}
+
+.playerMeta select,
+.playerMeta input,
+.mapMainRow select,
+.tickerGrid input {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
+  color: var(--theme-text);
+  padding: 9px 10px;
+  outline: none;
+}
+
+.lineupActions,
+.liveActionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.liveActionGrid {
+  margin-top: 12px;
+  margin-bottom: 0;
+}

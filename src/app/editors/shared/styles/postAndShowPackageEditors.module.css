@@ -1,0 +1,1539 @@
+﻿/* === Post and show package editors === */
+
+.breakDeskGrid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(240px, 0.72fr) minmax(330px, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.breakEditorShell {
+  display: grid;
+  grid-template-columns: minmax(520px, 0.86fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.breakEditorControlStack,
+.breakEditorMainStack,
+.breakModeFields {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.breakEditorMainStack {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.breakCorePanel {
+  display: grid;
+  gap: 12px;
+}
+
+.breakEditorShell label {
+  margin-bottom: 0;
+}
+
+.breakEditorShell input,
+.breakEditorShell select {
+  padding: 8px 10px;
+}
+
+.breakCorePanel .field,
+.breakModeRow .field,
+.breakCopyGrid .field,
+.breakTimerInputs .field,
+.breakVideoGrid .field,
+.breakSponsorGrid .field,
+.breakScheduleMetaGrid .field,
+.breakScheduleTeamGrid .field,
+.breakScheduleAssetGrid .field {
+  margin-bottom: 0;
+}
+
+.breakModeRow {
+  display: grid;
+  grid-template-columns: minmax(270px, 0.9fr) minmax(220px, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.breakCopyGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.breakToggleStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+  gap: 8px;
+}
+
+.breakToggleStrip .toggleField,
+.breakSponsorHeader .toggleField {
+  min-height: 36px;
+  margin-top: 0;
+}
+
+.breakToggleStrip label,
+.breakSponsorHeader label {
+  min-height: 36px;
+  margin-top: 0;
+}
+
+.breakTimerStrip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 10px;
+  align-items: end;
+  border-top: 1px solid rgba(255,255,255,0.09);
+  padding-top: 12px;
+}
+
+.breakTimerStrip .countdownActions {
+  margin-top: 0;
+}
+
+.breakTimerInputs {
+  display: grid;
+  grid-template-columns: 92px 92px minmax(160px, 1fr);
+  gap: 10px;
+}
+
+.breakVideoGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.breakSponsorHeader {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.52fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.breakSponsorHeader > span {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.22);
+  color: var(--theme-muted-text);
+  padding: 10px 12px;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakSponsorGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.breakSchedulePanel {
+  align-self: start;
+}
+
+.breakScheduleHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 128px;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 12px;
+}
+
+.breakScheduleHeader > div {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 72%),
+    rgba(0,0,0,0.24);
+}
+
+.breakScheduleHeader strong,
+.breakScheduleHeader span {
+  overflow: hidden;
+  padding: 0 12px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakScheduleHeader strong {
+  color: var(--theme-primary);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.breakScheduleHeader span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.breakScheduleHeader button {
+  min-height: 38px;
+}
+
+.breakScheduleList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.breakScheduleCard {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left: 3px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 10px;
+}
+
+.breakScheduleCard header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 88px;
+  gap: 8px;
+  align-items: stretch;
+  border-bottom: 1px solid rgba(255,255,255,0.09);
+  padding-bottom: 9px;
+}
+
+.breakScheduleCard header div {
+  min-width: 0;
+}
+
+.breakScheduleCard header strong,
+.breakScheduleCard header span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakScheduleCard header strong {
+  color: var(--theme-text);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.breakScheduleCard header span {
+  margin-top: 4px;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.breakScheduleCard header button {
+  min-height: 34px;
+  padding: 0 8px;
+}
+
+.breakScheduleMetaGrid {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 62px 62px;
+  gap: 8px;
+}
+
+.breakScheduleTeamGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.breakScheduleAssetGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr) 54px;
+  gap: 8px;
+}
+
+.breakEmptySchedule {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+  min-height: 118px;
+  place-items: center;
+  border: 1px dashed rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.18);
+  padding: 18px;
+  text-align: center;
+}
+
+.breakEmptySchedule strong,
+.breakEmptySchedule span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakEmptySchedule strong {
+  color: var(--theme-text);
+  font-size: 14px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.breakEmptySchedule span {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+/* === Break editor final width override === */
+
+.breakEditorShell {
+  grid-template-columns: 288px minmax(0, 1fr);
+}
+
+.breakEditorShell .panel {
+  padding: 10px;
+}
+
+.breakEditorShell .panelTitle {
+  margin-bottom: 10px;
+}
+
+.breakEditorShell .segmented {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.breakEditorShell .segmented button {
+  min-height: 34px;
+  padding: 7px 5px;
+  font-size: 10px;
+}
+
+.breakEditorShell input,
+.breakEditorShell select {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.breakCopyGrid {
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.breakTimerConsole {
+  grid-template-columns: 48px 48px minmax(0, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.breakTimerConsole button {
+  min-height: 30px;
+  padding: 0 7px;
+}
+
+.breakFeatureStrip {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.breakFeatureStrip label {
+  min-height: 30px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+/* === Break editor compact slot layout === */
+
+.breakEditorShell {
+  grid-template-columns: 380px minmax(0, 1fr);
+}
+
+.breakCopyGrid {
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.breakTimerConsole {
+  grid-template-columns: 56px 56px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.breakTimerConsole button:first-of-type {
+  grid-column: 1 / 3;
+}
+
+.breakTimerConsole button:last-of-type {
+  grid-column: 3;
+}
+
+.breakFeatureStrip {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.breakScheduleHeader {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.breakScheduleHeader > div {
+  grid-template-columns: 82px minmax(0, 1fr);
+  min-height: 38px;
+}
+
+.breakScheduleSlot {
+  gap: 0;
+  padding: 0;
+}
+
+.breakScheduleSlotHidden {
+  opacity: 0.52;
+}
+
+.breakScheduleSlotHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+  padding: 8px;
+}
+
+.breakScheduleSlotButton {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 64px minmax(0, 1fr) 136px;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  min-height: 38px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+  color: var(--theme-text);
+  padding: 0;
+  cursor: pointer;
+}
+
+.breakScheduleSlotButton:hover {
+  border-color: var(--theme-primary-border);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 72%),
+    rgba(0,0,0,0.24);
+}
+
+.breakScheduleSlotButton[aria-expanded='true'] {
+  border-color: var(--theme-primary-border);
+}
+
+.breakScheduleSlotButton span,
+.breakScheduleSlotButton strong,
+.breakScheduleSlotButton em,
+.breakScheduleSlotButton small {
+  overflow: hidden;
+  padding: 0 10px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakScheduleSlotButton span {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+}
+
+.breakScheduleSlotButton strong {
+  color: var(--theme-text);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+}
+
+.breakScheduleSlotButton em {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  background: var(--theme-primary);
+  color: #050505;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.breakScheduleSlotButton small {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-align: right;
+}
+
+.breakScheduleVisibility {
+  min-width: 0;
+}
+
+.breakScheduleVisibility label {
+  min-height: 38px;
+  margin: 0;
+}
+
+.breakScheduleDetails {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid rgba(255,255,255,0.09);
+  padding: 8px;
+}
+
+.breakSchedulePrimaryGrid {
+  grid-template-columns: 72px minmax(110px, 0.72fr) 58px 58px minmax(120px, 1fr) minmax(120px, 1fr);
+}
+
+.breakScheduleAssetsGrid {
+  grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr) 54px;
+}
+
+.breakModeHint {
+  display: grid;
+  gap: 7px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 70%),
+    rgba(0,0,0,0.24);
+  padding: 12px;
+}
+
+.breakCompactStatus {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.4fr) minmax(0, 1fr);
+  align-items: center;
+  min-height: 38px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 70%),
+    rgba(0,0,0,0.24);
+}
+
+.breakModeHint strong,
+.breakModeHint span,
+.breakCompactStatus strong,
+.breakCompactStatus span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakModeHint strong,
+.breakCompactStatus strong {
+  color: var(--theme-primary);
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.breakModeHint span,
+.breakCompactStatus span {
+  color: var(--theme-muted-text);
+  padding: 0 12px;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.countdownActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.breakDeskGrid .toggleGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.breakEditorShell .toggleGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.breakEditorHint {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.24);
+  padding: 12px;
+}
+
+.breakEditorHint strong,
+.breakEditorHint span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakEditorHint strong {
+  color: var(--theme-primary);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.breakEditorHint span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.postActionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.postActionGrid .dangerButton {
+  grid-column: 1 / -1;
+}
+
+.resultDeskGrid {
+  display: grid;
+  grid-template-columns: 170px 170px minmax(0, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.liveScore {
+  align-items: center;
+}
+
+.liveScore strong {
+  min-width: 132px;
+  color: var(--theme-primary);
+  font-size: 28px;
+  font-weight: 950;
+  text-align: center;
+}
+
+.toggleGrid {
+  display: grid;
+  gap: 8px;
+}
+
+/* === Show flow editor === */
+
+.showFlowDesk {
+  display: grid;
+  grid-template-columns: clamp(360px, 28vw, 430px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.lineupEditorDesk,
+.resultEditorDesk,
+.thanksEditorDesk {
+  min-width: 0;
+}
+
+.resultEditorCompact {
+  display: grid;
+  grid-template-columns: minmax(520px, 0.72fr);
+  align-items: start;
+}
+
+.lineupEditorDesk {
+  grid-template-columns: clamp(340px, 25vw, 400px) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.upNextDesk,
+.resultEditorDesk,
+.thanksEditorDesk {
+  align-items: stretch;
+}
+
+.lineupEditorDesk > .showFlowRail {
+  height: 100%;
+}
+
+.upNextDesk > .showFlowRail,
+.thanksEditorDesk > .showFlowRail {
+  height: 100%;
+}
+
+.lineupEditorDesk > .showFlowRail > .panel,
+.upNextDesk > .showFlowRail > .panel,
+.thanksEditorDesk > .showFlowRail > .panel,
+.resultEditorDesk > .resultFlowPanel {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.showFlowRail,
+.showFlowMainStack {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.showFlowCompactPanel {
+  align-self: start;
+}
+
+.showFlowCompactPanel .field {
+  margin-bottom: 10px;
+}
+
+.showFlowCompactPanel textarea {
+  min-height: 118px;
+}
+
+.showFlowMetaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+
+.showFlowMetaGrid .field {
+  margin-bottom: 10px;
+}
+
+.showFlowMetaGrid > button {
+  align-self: end;
+  min-height: 40px;
+  margin-bottom: 10px;
+}
+
+.showFlowToggleStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
+  gap: 8px;
+}
+
+.showFlowToggleStrip label {
+  min-height: 38px;
+  margin-top: 0;
+}
+
+.showFlowStatusStrip {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  align-items: stretch;
+  min-height: 40px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 76%),
+    rgba(0,0,0,0.24);
+}
+
+.showFlowStatusStrip span,
+.showFlowStatusStrip strong {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 12px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.showFlowStatusStrip span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.showFlowStatusStrip strong {
+  color: var(--theme-primary);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.showFlowSummaryGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr 0.72fr;
+  gap: 8px;
+}
+
+.showFlowSummaryGrid div,
+.resultFlowScoreboard {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.24);
+  padding: 10px 12px;
+}
+
+.showFlowSummaryGrid span,
+.showFlowSummaryGrid strong,
+.resultFlowScoreboard span,
+.resultFlowScoreboard strong {
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.showFlowSummaryGrid span,
+.resultFlowScoreboard span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.showFlowSummaryGrid strong,
+.resultFlowScoreboard strong {
+  color: var(--theme-primary);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+.showFlowLineupTeams {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+.lineupSummaryPanel {
+  min-width: 0;
+}
+
+.lineupTeamTopbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  gap: 8px;
+  align-items: stretch;
+  margin-bottom: 9px;
+}
+
+.lineupTeamIdentity {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 82px;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 72%),
+    rgba(0,0,0,0.24);
+}
+
+.lineupTeamIdentity span,
+.lineupTeamIdentity strong,
+.lineupTeamIdentity em {
+  overflow: hidden;
+  padding: 0 10px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lineupTeamIdentity span {
+  color: var(--theme-primary);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+}
+
+.lineupTeamIdentity strong {
+  color: var(--theme-text);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+.lineupTeamIdentity em {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  text-align: right;
+}
+
+.lineupExpandButton,
+.lineupQuickActions button,
+.lineupSummarySlots {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.lineupExpandButton:hover,
+.lineupQuickActions button:hover,
+.lineupSummarySlots:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}
+
+.lineupExpandButton {
+  min-width: 0;
+  padding: 0 10px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lineupQuickActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 9px;
+}
+
+.lineupQuickActions button {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.lineupQuickActions .primaryButton {
+  border-color: var(--theme-primary);
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.lineupSummarySlots {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  width: 100%;
+  padding: 8px;
+  text-align: left;
+}
+
+.lineupSummarySlots span {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 76px;
+  grid-template-areas:
+    "index name role";
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  min-height: 34px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.28);
+  padding: 0 9px;
+}
+
+.lineupSummarySlots b,
+.lineupSummarySlots strong,
+.lineupSummarySlots em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lineupSummarySlots b {
+  grid-area: index;
+  color: var(--theme-primary);
+  font-size: 16px;
+  font-weight: 950;
+  text-align: center;
+}
+
+.lineupSummarySlots strong {
+  grid-area: name;
+  color: var(--theme-text);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.03em;
+}
+
+.lineupSummarySlots em {
+  grid-area: role;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-align: right;
+}
+
+.lineupSummaryPanel .lineupList {
+  margin-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.09);
+  padding-top: 10px;
+}
+
+.resultFlowPanel {
+  min-width: 0;
+}
+
+.resultOutputHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.resultOutputHeader .showFlowStatusStrip {
+  margin-bottom: 0;
+}
+
+.resultFlowScoreGrid {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.8fr) minmax(180px, 0.72fr) minmax(190px, 0.8fr);
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.resultFlowScoreboard {
+  min-height: 70px;
+  place-content: center;
+  text-align: center;
+}
+
+.resultFlowScoreboard strong {
+  color: var(--theme-text);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.thanksCreditSummary {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+}
+
+.thanksCreditSummary span,
+.thanksCreditSummary strong {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.035);
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.thanksCreditSummary span {
+  color: var(--theme-muted-text);
+  letter-spacing: 0.14em;
+}
+
+.thanksCreditSummary strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-primary);
+  letter-spacing: 0.05em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* === Break editor redesign === */
+
+.breakEditorShell {
+  display: grid;
+  grid-template-columns: minmax(560px, 0.72fr) minmax(680px, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.breakEditorControlStack {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.breakEditorShell label {
+  margin-bottom: 0;
+}
+
+.breakEditorShell input,
+.breakEditorShell select {
+  min-width: 0;
+  padding: 8px 10px;
+}
+
+.breakModeRow {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.96fr) minmax(190px, 0.72fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.breakModeHint {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 72%),
+    rgba(0,0,0,0.24);
+  padding: 10px 12px;
+}
+
+.breakModeHint strong,
+.breakModeHint span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakModeHint strong {
+  color: var(--theme-primary);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.breakModeHint span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.breakCopyGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.breakTimerConsole {
+  display: grid;
+  grid-template-columns: 72px 72px minmax(120px, 1fr) 84px 72px;
+  gap: 8px;
+  align-items: end;
+  margin-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.09);
+  padding-top: 10px;
+}
+
+.breakTimerConsole button {
+  min-height: 34px;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.breakFeatureStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.breakFeatureStrip label,
+.breakVideoGrid label {
+  min-height: 34px;
+}
+
+.breakVideoGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 0.42fr);
+  gap: 9px;
+  align-items: end;
+}
+
+.breakSponsorGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.breakSponsorGrid label:last-child {
+  grid-column: 1 / -1;
+}
+
+.breakSchedulePanel {
+  align-self: start;
+}
+
+.breakScheduleHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 116px;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+
+.breakScheduleHeader > div {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 72%),
+    rgba(0,0,0,0.24);
+}
+
+.breakScheduleHeader strong,
+.breakScheduleHeader span {
+  overflow: hidden;
+  padding: 0 12px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakScheduleHeader strong {
+  color: var(--theme-primary);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.breakScheduleHeader span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.breakScheduleHeader button {
+  min-height: 38px;
+  padding: 0 10px;
+}
+
+.breakScheduleHeader button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.breakScheduleRows {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.breakScheduleSlot {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left: 3px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 9px;
+}
+
+.breakScheduleSlotHidden {
+  border-left-color: rgba(255,255,255,0.16);
+  opacity: 0.58;
+}
+
+.breakScheduleSlotHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 116px;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.breakScheduleSlotHeader > div {
+  min-width: 0;
+}
+
+.breakScheduleSlotHeader strong,
+.breakScheduleSlotHeader span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakScheduleSlotHeader strong {
+  color: var(--theme-text);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.breakScheduleSlotHeader span {
+  margin-top: 4px;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.breakScheduleSlotHeader label {
+  min-height: 34px;
+}
+
+.breakScheduleSummary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 70px minmax(0, 1fr) 140px;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.2);
+}
+
+.breakScheduleSummary strong,
+.breakScheduleSummary span,
+.breakScheduleSummary em {
+  overflow: hidden;
+  padding: 0 10px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakScheduleSummary strong {
+  color: var(--theme-text);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+}
+
+.breakScheduleSummary span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  background: var(--theme-primary);
+  color: #050505;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.breakScheduleSummary em {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-align: right;
+}
+
+.breakSchedulePrimaryGrid {
+  display: grid;
+  grid-template-columns: 72px minmax(90px, 1fr) 58px 58px minmax(120px, 1fr) minmax(120px, 1fr);
+  gap: 8px;
+}
+
+.breakScheduleAssetsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr) 54px;
+  gap: 8px;
+}
+
+.breakScheduleAssetsGrid input[type='color'] {
+  padding: 4px;
+}
+
+.breakEmptySchedule {
+  display: grid;
+  gap: 8px;
+  min-height: 118px;
+  place-items: center;
+  border: 1px dashed rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.18);
+  padding: 18px;
+  text-align: center;
+}
+
+.breakEmptySchedule strong,
+.breakEmptySchedule span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakEmptySchedule strong {
+  color: var(--theme-text);
+  font-size: 14px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.breakEmptySchedule span {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+/* === Break editor true final width override === */
+
+.breakEditorShell {
+  grid-template-columns: 432px minmax(0, 1fr);
+}
+
+.breakEditorShell .panel {
+  padding: 11px;
+}
+
+.breakEditorShell .panelTitle {
+  margin-bottom: 10px;
+  font-size: 11px;
+}
+
+.breakEditorShell .field {
+  gap: 6px;
+  margin-bottom: 9px;
+}
+
+.breakEditorShell .field span {
+  font-size: 11px;
+}
+
+.breakEditorShell .segmented {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.breakEditorShell .segmented button {
+  min-height: 35px;
+  padding: 7px 6px;
+  font-size: 11px;
+}
+
+.breakEditorShell input,
+.breakEditorShell select {
+  min-height: 32px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.breakCopyGrid {
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.breakIdentityGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.breakTimerConsole {
+  grid-template-columns: 54px 54px minmax(0, 1fr) 62px 52px;
+  gap: 7px;
+  align-items: start;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.breakTimerConsole button:first-of-type,
+.breakTimerConsole button:last-of-type {
+  grid-column: auto;
+}
+
+.breakTimerConsole button {
+  align-self: start;
+  margin-top: 20px;
+  min-height: 31px;
+  padding: 0 7px;
+  font-size: 11px;
+}
+
+.breakFeatureStrip {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.breakFeatureStrip label {
+  min-height: 31px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+.breakCleanVideoStatus {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 72%),
+    rgba(0,0,0,0.24);
+  padding: 9px 10px;
+}
+
+.breakCleanVideoStatus div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.breakCleanVideoStatus strong,
+.breakCleanVideoStatus span,
+.breakCleanVideoStatus em {
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breakCleanVideoStatus strong {
+  color: var(--theme-primary);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.breakCleanVideoStatus span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+.breakCleanVideoStatus em {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: 0.1em;
+}
+
+/* Match the collapsed schedule panel to Break Setup height. */
+.breakEditorControlStack > .panel,
+.breakSchedulePanel {
+  box-sizing: border-box;
+  min-height: 444px;
+}
+
+.breakIdentityGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.breakIdentityGrid .field {
+  min-width: 0;
+}

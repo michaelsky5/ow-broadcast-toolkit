@@ -1,0 +1,988 @@
+﻿/* === Stats capture modal === */
+
+.captureModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,0.82);
+  padding: 24px;
+  backdrop-filter: blur(8px);
+}
+
+.captureModal {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(1500px, 100%);
+  max-height: calc(100vh - 48px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-top: 2px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    linear-gradient(180deg, rgba(20,20,20,0.98), rgba(8,8,8,0.98));
+  box-shadow: 0 28px 90px rgba(0,0,0,0.62), var(--theme-shadow-primary);
+  color: var(--theme-text);
+}
+
+.captureHeader,
+.captureFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.09);
+  padding: 14px 18px;
+}
+
+.captureFooter {
+  border-top: 1px solid rgba(255,255,255,0.09);
+  border-bottom: 0;
+}
+
+.captureHeader span,
+.captureFooter span {
+  color: var(--theme-primary);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.captureHeader h3 {
+  margin: 5px 0 0;
+  color: var(--theme-text);
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.captureHeader button,
+.captureFooter button,
+.mutedActionButton {
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.captureHeader button:hover,
+.captureFooter button:hover,
+.mutedActionButton:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.mutedActionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.captureAutoOcrButton {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+  background: rgba(255,255,255,0.055);
+}
+
+.captureAutoOcrButton::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 0;
+  width: var(--ocr-progress, 0%);
+  background:
+    linear-gradient(90deg, rgba(75,210,176,0.92), rgba(75,210,176,0.58));
+  box-shadow: 0 0 18px var(--theme-primary-glow);
+  content: "";
+  transition: width 0.18s ease;
+}
+
+.captureAutoOcrButton span,
+.captureAutoOcrButton strong {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.captureAutoOcrButton span {
+  justify-self: center;
+}
+
+.captureAutoOcrButton strong {
+  min-width: 38px;
+  color: var(--theme-text);
+  font-size: 10px;
+  text-align: right;
+}
+
+.captureAutoOcrButtonActive:disabled {
+  border-color: var(--theme-primary-border);
+  color: var(--theme-text);
+  cursor: wait;
+  opacity: 1;
+}
+
+.captureWorkspace {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  padding: 12px;
+}
+
+.captureSourcePanel,
+.captureMainPanel,
+.captureTeamTable {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.25);
+}
+
+.captureSourcePanel {
+  display: grid;
+  align-content: start;
+  grid-template-rows: auto auto auto auto auto auto minmax(122px, 1fr);
+  gap: 9px;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+}
+
+.captureDropzone {
+  position: relative;
+  display: grid;
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+  place-items: center;
+  overflow: hidden;
+  border: 1px dashed rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.38);
+  color: var(--theme-muted-text);
+  padding: 0;
+  cursor: pointer;
+}
+
+.captureDropzoneActive {
+  border-color: var(--theme-primary);
+  background: var(--theme-primary-softer);
+}
+
+.captureDropzone img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.72;
+}
+
+.captureDropzone:hover img {
+  opacity: 0.92;
+}
+
+.captureDropzone span {
+  max-width: 210px;
+  color: var(--theme-muted-text);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.captureActionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.captureTimeCard {
+  display: grid;
+  gap: 7px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 48%),
+    rgba(0,0,0,0.26);
+  padding: 8px;
+}
+
+.captureTimeTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.captureTimeTitle span,
+.captureTimePreview span,
+.captureSummaryTime span,
+.captureSummaryTime em {
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.captureTimeTitle span,
+.captureSummaryTime span {
+  color: var(--theme-muted-text);
+}
+
+.captureSummaryTime em {
+  color: var(--theme-primary);
+  font-style: normal;
+}
+
+.captureTimePreview {
+  display: grid;
+  height: 46px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px dashed rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.46);
+  padding: 0;
+  cursor: zoom-in;
+}
+
+.captureTimePreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.captureTimePreview:disabled {
+  cursor: default;
+}
+
+.captureTimePreview span {
+  color: var(--theme-muted-text);
+}
+
+.captureSummaryTime input {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.11);
+  background: rgba(0,0,0,0.48);
+  color: var(--theme-text);
+  font-weight: 950;
+  outline: none;
+}
+
+.captureAdvancedCrop {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 42%),
+    rgba(0,0,0,0.18);
+  padding: 0;
+}
+
+.captureAdvancedCrop summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 116px;
+  gap: 8px;
+  align-items: center;
+  min-height: 34px;
+  color: var(--theme-muted-text);
+  padding: 0 9px;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  list-style: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.captureAdvancedCrop summary::-webkit-details-marker {
+  display: none;
+}
+
+.captureAdvancedCrop summary span,
+.captureAdvancedCrop summary strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.captureAdvancedCrop summary strong {
+  display: grid;
+  min-width: 76px;
+  min-height: 22px;
+  place-items: center;
+  justify-self: end;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+  color: var(--theme-primary);
+  font-style: normal;
+}
+
+.captureAdvancedCrop[open] {
+  padding-bottom: 6px;
+}
+
+.captureAdvancedCrop[open] summary {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 6px;
+}
+
+.captureAdvancedCrop .captureCropGrid {
+  padding: 0 8px;
+}
+
+.captureCalibrationDrawer .captureCropGrid {
+  grid-template-columns: repeat(7, minmax(74px, 1fr));
+  align-content: start;
+  align-items: stretch;
+  padding: 0;
+}
+
+.captureCalibrationDrawer .captureCropGrid label:last-child:nth-child(odd) {
+  grid-column: auto;
+}
+
+.captureCalibrationTabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0;
+}
+
+.captureCalibrationTabs button {
+  min-height: 38px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.045);
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.captureCalibrationTabs button:hover,
+.captureCalibrationTabs .captureCalibrationActive {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+}
+
+.captureCalibrationContent {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 8px;
+  align-items: end;
+  min-height: 42px;
+  padding: 0 8px;
+}
+
+.captureCropPreviewBlock {
+  display: grid;
+  gap: 7px;
+  padding: 8px 8px 0;
+}
+
+.captureCalibrationDrawer .captureCropPreviewBlock {
+  padding-top: 10px;
+}
+
+.captureCropPreviewBlock > span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.captureStatus {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  min-height: 36px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.captureStatus span,
+.captureStatus strong {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.captureStatus span {
+  background: rgba(255,255,255,0.04);
+  color: var(--theme-muted-text);
+  letter-spacing: 0.12em;
+}
+
+.captureStatus strong {
+  justify-content: flex-end;
+  color: var(--theme-primary);
+  letter-spacing: 0.08em;
+}
+
+.captureCropGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.captureCropGrid label {
+  display: grid;
+  grid-template-rows: 12px 28px;
+  gap: 2px;
+  min-width: 0;
+}
+
+.captureCropGrid label:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.captureCropGrid span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.captureCropGrid input,
+.captureTextPanel textarea,
+.capturePlayerRow input,
+.capturePlayerRow select {
+  border: 1px solid rgba(255,255,255,0.11);
+  background: rgba(0,0,0,0.48);
+  color: var(--theme-text);
+  font-weight: 850;
+  outline: none;
+}
+
+.captureCropGrid input,
+.capturePlayerRow input,
+.capturePlayerRow select {
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 0 7px;
+}
+
+.captureCropGrid input::-webkit-outer-spin-button,
+.captureCropGrid input::-webkit-inner-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.captureCropGrid input[type="number"] {
+  appearance: textfield;
+}
+
+.captureCropGrid input:focus,
+.captureTextPanel textarea:focus,
+.capturePlayerRow input:focus,
+.capturePlayerRow select:focus {
+  border-color: var(--theme-primary-border);
+  box-shadow: 0 0 0 1px var(--theme-primary-softer);
+}
+
+.captureZones {
+  display: grid;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.captureCalibrationDrawer .captureZones {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.captureZonePreview {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: zoom-in;
+}
+
+.captureZones img {
+  width: 100%;
+  height: 112px;
+  border: 1px solid rgba(255,255,255,0.11);
+  background: #fff;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.captureMainPanel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px;
+}
+
+.captureTopConsole {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.captureTopUtility {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 152px;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.captureTopStack {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.captureSummaryStrip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+
+.captureSummaryStrip div {
+  display: grid;
+  grid-template-columns: 68px 88px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.025);
+  padding: 0 10px;
+}
+
+.captureSummaryStrip .captureSummaryTotal {
+  grid-template-columns: minmax(98px, 0.8fr) 94px repeat(6, minmax(70px, 1fr));
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 8px;
+}
+
+.captureSummaryStrip span,
+.captureSummaryStrip strong,
+.captureSummaryStrip em,
+.captureSummaryTime input {
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.11em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.captureSummaryStrip span {
+  color: var(--theme-primary);
+}
+
+.captureSummaryStrip strong {
+  color: var(--theme-text);
+}
+
+.captureSummaryStrip em {
+  color: var(--theme-muted-text);
+  font-style: normal;
+}
+
+.captureSummaryTeams,
+.captureSummaryRows,
+.captureSummaryMetric {
+  display: grid;
+  align-items: center;
+  min-height: 26px;
+}
+
+.captureSummaryTeams {
+  padding: 0 8px;
+  background: rgba(0,0,0,0.18);
+}
+
+.captureSummaryRows {
+  place-items: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+}
+
+.captureSummaryMetric {
+  grid-template-columns: minmax(0, 1fr) minmax(34px, auto);
+  gap: 6px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+  padding: 0 7px;
+}
+
+.captureSummaryMetric span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+}
+
+.captureSummaryMetric strong {
+  justify-self: end;
+  color: var(--theme-text);
+}
+
+.captureSummaryTime {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  gap: 8px;
+  min-height: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 62%),
+    rgba(255,255,255,0.025);
+  padding: 10px;
+}
+
+.captureSummaryTime input {
+  height: 34px;
+  padding: 0 9px;
+}
+
+.captureTextPanel {
+  display: grid;
+  gap: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 42%),
+    rgba(0,0,0,0.18);
+  padding: 0;
+}
+
+.captureTextPanel[open] {
+  padding-bottom: 6px;
+}
+
+.captureTextPanel summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 116px;
+  gap: 8px;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 9px;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  list-style: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.captureTextPanel[open] summary {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 6px;
+}
+
+.captureTextPanel summary::-webkit-details-marker {
+  display: none;
+}
+
+.captureTextEditor {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr) 118px;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+  padding: 0 8px;
+}
+
+.captureTextPanel summary span,
+.captureTextPanel summary strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.captureTextPanel summary strong {
+  display: grid;
+  min-width: 76px;
+  min-height: 22px;
+  place-items: center;
+  justify-self: end;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+  color: var(--theme-primary);
+  font-style: normal;
+}
+
+.captureTextEditor span {
+  display: flex;
+  align-items: center;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.captureTextPanel textarea {
+  width: 100%;
+  min-width: 0;
+  height: 68px;
+  box-sizing: border-box;
+  resize: none;
+  padding: 9px 10px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.captureTextEditor .secondaryButton {
+  min-height: 68px;
+}
+
+.captureTables {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 0;
+  overflow: auto;
+}
+
+.captureTeamTable {
+  display: grid;
+  grid-template-rows: auto auto repeat(5, minmax(max-content, 1fr));
+  align-content: stretch;
+  gap: 6px;
+  min-height: 100%;
+  padding: 8px;
+}
+
+.captureTeamTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 8px;
+}
+
+.captureTeamTitle span,
+.captureTeamTitle strong {
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.captureTeamTitle span {
+  color: var(--theme-primary);
+}
+
+.captureTeamTitle strong {
+  color: var(--theme-text);
+}
+
+.captureTableHeader,
+.capturePlayerRow {
+  display: grid;
+  grid-template-columns: 32px minmax(92px, 1fr) 42px 42px 42px minmax(62px, 0.95fr) minmax(62px, 0.95fr) minmax(62px, 0.95fr);
+  gap: 4px;
+  align-items: center;
+}
+
+.captureTableHeader span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+.capturePlayerGroup {
+  display: grid;
+  grid-template-columns: 32px minmax(92px, 1fr) 42px 42px 42px minmax(62px, 0.95fr) minmax(62px, 0.95fr) minmax(62px, 0.95fr);
+  align-content: center;
+  gap: 3px 4px;
+  min-height: 0;
+}
+
+.capturePlayerRow {
+  grid-column: 1 / -1;
+}
+
+.capturePlayerRow strong {
+  display: grid;
+  height: 32px;
+  place-items: center;
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.capturePlayerRow input,
+.capturePlayerRow select {
+  min-width: 0;
+  height: 32px;
+  padding: 0 5px;
+  font-size: 11px;
+  text-align: center;
+}
+
+.capturePlayerRow select {
+  overflow: hidden;
+  font-weight: 950;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.captureSnippet {
+  display: block;
+  grid-column: 3 / -1;
+  width: 100%;
+  height: 36px;
+  margin-left: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-top: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  padding: 0;
+  cursor: zoom-in;
+  filter: brightness(1.16) contrast(1.14);
+}
+
+.capturePlayerSnippet {
+  display: block;
+  grid-column: 2 / 3;
+  width: 100%;
+  height: 36px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-top: 0;
+  background-color: rgba(0,0,0,0.34);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  padding: 0;
+  cursor: zoom-in;
+  filter: brightness(1.16) contrast(1.14);
+}
+
+.captureSidePreviewPanel {
+  display: grid;
+  align-self: stretch;
+  align-content: start;
+  gap: 7px;
+  min-height: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 46%),
+    rgba(0,0,0,0.22);
+  padding: 8px;
+}
+
+.captureSidePreviewTitle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 66px;
+  gap: 8px;
+  align-items: center;
+}
+
+.captureSidePreviewTitle span,
+.captureSidePreviewTitle strong,
+.captureSidePreviewEmpty {
+  overflow: hidden;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.captureSidePreviewTitle strong {
+  justify-self: end;
+  color: var(--theme-primary);
+}
+
+.captureSidePreviewStack {
+  display: grid;
+  gap: 7px;
+  min-height: 0;
+}
+
+.captureSideZonePreview {
+  display: grid;
+  height: 64px;
+  min-height: 46px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: #fff;
+  padding: 0;
+  cursor: zoom-in;
+}
+
+.captureSideZonePreview img {
+  width: 100%;
+  height: 100%;
+  max-height: 86px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.captureSidePreviewEmpty {
+  display: grid;
+  min-height: 86px;
+  place-items: center;
+  border: 1px dashed rgba(255,255,255,0.11);
+  background: rgba(0,0,0,0.28);
+  text-align: center;
+}
+
+.captureSnippet:hover,
+.capturePlayerSnippet:hover,
+.captureSideZonePreview:hover,
+.captureZonePreview:hover img {
+  border-color: var(--theme-primary-border);
+  filter: brightness(1.28) contrast(1.18);
+}
+
+.captureImageZoomBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1002;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: rgba(0,0,0,0.9);
+  padding: 32px;
+  cursor: zoom-out;
+}
+
+.captureImageZoomBackdrop img {
+  max-width: min(96vw, 1600px);
+  max-height: 92vh;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: #000;
+  object-fit: contain;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.72), 0 0 34px var(--theme-primary-softer);
+}

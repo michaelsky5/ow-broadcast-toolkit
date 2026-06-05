@@ -1,0 +1,172 @@
+﻿/* === Stats capture and metrics === */
+
+.statsDesk {
+  display: grid;
+  grid-template-columns: clamp(300px, 24vw, 380px) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.statsDeskStack {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.statsOutputModeBar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.26);
+  padding: 8px;
+}
+
+.statsOutputModeBar button {
+  min-height: 46px;
+}
+
+.statsWorkbench {
+  display: grid;
+  grid-template-columns: 300px minmax(620px, 1fr) 300px;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.statsWorkbench .panel {
+  border-color: rgba(255,255,255,0.09);
+  padding: 12px;
+}
+
+.statsWorkbench input,
+.statsWorkbench select,
+.statsWorkbench button {
+  box-sizing: border-box;
+  min-height: 40px;
+}
+
+.statsWorkbench .field {
+  margin-bottom: 0;
+}
+
+.statsSourcePanel,
+.statsMapPanel {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.statsWorkbench .statsImageDropzone {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px dashed rgba(255,255,255,0.18);
+  background:
+    linear-gradient(135deg, var(--theme-primary-softer), transparent 42%),
+    rgba(0,0,0,0.34);
+  color: var(--theme-muted-text);
+  padding: 0;
+  cursor: pointer;
+}
+
+.statsWorkbench .statsImageDropzoneCompact {
+  min-height: 104px;
+}
+
+.statsWorkbench .statsImageDropzoneReady {
+  min-height: 168px;
+}
+
+.statsImageDropzone:hover,
+.statsImageDropzoneActive {
+  border-color: var(--theme-primary-border);
+  background:
+    linear-gradient(135deg, var(--theme-primary-soft), transparent 44%),
+    rgba(0,0,0,0.36);
+}
+
+.statsImageDropzone img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #050505;
+}
+
+.statsImageDropzone span {
+  display: grid;
+  gap: 8px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.statsImageDropzone strong {
+  color: var(--theme-text);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.statsImageDropzone em {
+  color: var(--theme-primary);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+}
+
+.statsCropPanel,
+.statsAdvancedPanel {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.2);
+  padding: 9px;
+}
+
+.statsAdvancedPanel {
+  padding: 0;
+}
+
+.statsAdvancedPanel summary {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  color: var(--theme-muted-text);
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.statsAdvancedPanel summary:hover {
+  color: var(--theme-primary);
+}
+
+.statsAdvancedPanel .statsCropGrid {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 9px;
+}
+
+.statsCropGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.statsCropGrid .field span {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.statsCropGrid .field input {
+  min-height: 34px;
+  padding: 0 8px;
+  font-size: 11px;
+}

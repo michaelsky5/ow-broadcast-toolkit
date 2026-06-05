@@ -1,0 +1,307 @@
+.scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 28%, var(--theme-primary-softer), transparent 34%),
+    radial-gradient(circle at 88% 78%, rgba(255,255,255,0.055), transparent 28%),
+    var(--theme-background-gradient);
+  color: var(--theme-text);
+  font-family: var(--theme-font-family);
+  isolation: isolate;
+}
+
+.gridLayer,
+.scanLayer,
+.glowLayer,
+.sideRail {
+  position: absolute;
+  pointer-events: none;
+}
+
+.gridLayer {
+  inset: 0;
+  z-index: -6;
+  background:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 88px 88px;
+  opacity: 0.19;
+}
+
+.scanLayer {
+  inset: 0;
+  z-index: -5;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.028) 0 1px, transparent 1px 8px);
+  opacity: 0.2;
+}
+
+.glowLayer {
+  inset: 86px 100px 92px;
+  z-index: -3;
+  border: 1px solid var(--theme-primary-border);
+  box-shadow: var(--theme-shadow-primary-strong);
+  opacity: 0.5;
+  transform: skew(-7deg);
+}
+
+.sideRail {
+  top: 132px;
+  bottom: 132px;
+  left: 96px;
+  z-index: -2;
+  width: 8px;
+  background: linear-gradient(180deg, var(--theme-primary), transparent);
+  box-shadow: var(--theme-shadow-primary);
+}
+
+.topBar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 42px;
+  align-items: center;
+  height: 46px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.44);
+  padding: 0 32px;
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.brandMark {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 12px;
+  overflow: hidden;
+  color: var(--theme-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brandMark span {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  background: var(--theme-primary);
+  box-shadow: 0 0 18px var(--theme-primary);
+}
+
+.main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  gap: 24px;
+  height: 100%;
+  padding: 128px 122px 94px;
+}
+
+.closingPanel {
+  position: relative;
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  min-height: 640px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.54), rgba(0,0,0,0.18)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 24px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.035), 0 28px 82px rgba(0,0,0,0.42);
+  padding: 72px 74px;
+}
+
+.closingPanel::before,
+.closingPanel::after {
+  position: absolute;
+  content: '';
+}
+
+.closingPanel::before {
+  top: 36px;
+  right: 44px;
+  left: 44px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--theme-primary), transparent);
+  box-shadow: var(--theme-shadow-primary);
+}
+
+.closingPanel::after {
+  right: 52px;
+  bottom: 50px;
+  width: 290px;
+  height: 132px;
+  border-right: 2px solid var(--theme-primary);
+  border-bottom: 2px solid var(--theme-primary);
+  opacity: 0.55;
+}
+
+.eventBadge {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 22px;
+  align-items: center;
+  width: min(760px, 100%);
+  margin-bottom: 54px;
+}
+
+.eventLogo {
+  display: grid;
+  width: 104px;
+  height: 104px;
+  place-items: center;
+  border: 1px solid var(--theme-primary-border);
+  background: rgba(0,0,0,0.48);
+  box-shadow: var(--theme-shadow-primary);
+}
+
+.eventLogo img {
+  width: 76%;
+  height: 76%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(0,0,0,0.42));
+}
+
+.eventBadge div:last-child,
+.titleBlock,
+.eventSummaryDeck div,
+.creditDeck div {
+  min-width: 0;
+}
+
+.eventBadge span,
+.eventBadge strong,
+.kicker,
+.titleBlock h1,
+.titleBlock p,
+.eventSummaryDeck span,
+.eventSummaryDeck strong,
+.creditDeck span,
+.creditDeck strong,
+.footer span,
+.footer strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.eventBadge span {
+  display: block;
+  color: var(--theme-primary);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.22em;
+}
+
+.eventBadge strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--theme-text);
+  font-size: 24px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.titleBlock {
+  display: grid;
+  gap: 18px;
+}
+
+.kicker {
+  color: var(--theme-primary);
+  font-size: 17px;
+  font-weight: 950;
+  letter-spacing: 0.28em;
+}
+
+.titleBlock h1 {
+  max-width: 1400px;
+  margin: 0;
+  text-shadow: 0 0 40px var(--theme-primary-glow);
+  font-size: 104px;
+  font-weight: 950;
+  line-height: 0.9;
+  letter-spacing: 0;
+}
+
+.titleBlock p {
+  max-width: 980px;
+  margin: 0;
+  color: var(--theme-muted-text);
+  font-size: 25px;
+  font-weight: 850;
+  letter-spacing: 0.17em;
+}
+
+.eventSummaryDeck,
+.creditDeck {
+  display: grid;
+  gap: 14px;
+}
+
+.eventSummaryDeck {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.72fr) minmax(0, 0.72fr) minmax(0, 0.92fr);
+}
+
+.creditDeck {
+  grid-template-columns: minmax(0, 1fr) 220px;
+}
+
+.eventSummaryDeck div,
+.creditDeck div {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.42);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.035);
+  padding: 16px 18px;
+}
+
+.eventSummaryDeck span,
+.creditDeck span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+}
+
+.eventSummaryDeck strong,
+.creditDeck strong {
+  color: var(--theme-text);
+  font-size: 18px;
+  font-weight: 950;
+  letter-spacing: 0.05em;
+}
+
+.creditDeck strong {
+  color: var(--theme-primary);
+}
+
+.footer {
+  position: absolute;
+  right: 72px;
+  bottom: 42px;
+  left: 72px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.footer strong {
+  text-align: right;
+}

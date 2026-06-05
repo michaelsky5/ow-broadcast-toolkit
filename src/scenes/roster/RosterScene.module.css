@@ -1,0 +1,422 @@
+.scene {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--theme-background-gradient);
+  color: var(--theme-text);
+  font-family: var(--theme-font-family);
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+  background-size: 120px 120px;
+  opacity: 0.24;
+  pointer-events: none;
+}
+
+.diamondA,
+.diamondB {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border: 1px solid var(--theme-primary-softer);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.diamondA {
+  top: 70px;
+  left: 70px;
+}
+
+.diamondB {
+  right: -120px;
+  bottom: -120px;
+  border-color: rgba(255,255,255,0.04);
+}
+
+.topbar {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  padding: 0 30px;
+}
+
+.interfaceLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.interfaceLabel span {
+  width: 10px;
+  height: 10px;
+  background: var(--theme-primary);
+  box-shadow: 0 0 12px var(--theme-primary-border);
+}
+
+.interfaceLabel strong,
+.topbar em {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.topbar em {
+  color: rgba(255,255,255,0.38);
+  font-size: 10px;
+}
+
+.hero {
+  position: absolute;
+  z-index: 3;
+  top: 72px;
+  right: 80px;
+  left: 80px;
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: end;
+}
+
+.logoBox {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--team-color);
+  background: rgba(255,255,255,0.025);
+  box-shadow: 0 22px 50px rgba(0,0,0,0.36), 0 0 34px color-mix(in srgb, var(--team-color) 28%, transparent);
+  overflow: hidden;
+}
+
+.logoBox::before {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 22px;
+  height: 22px;
+  border-top: 2px solid var(--theme-primary);
+  border-left: 2px solid var(--theme-primary);
+  content: '';
+}
+
+.logoBox img {
+  width: 76%;
+  height: 76%;
+  object-fit: contain;
+}
+
+.heroCopy {
+  min-width: 0;
+}
+
+.heroCopy p {
+  margin: 0 0 7px;
+  color: var(--theme-primary);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.heroCopy h1 {
+  margin: 0;
+  color: var(--theme-text);
+  font-size: 56px;
+  font-weight: 950;
+  line-height: 0.9;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaLine {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 9px;
+}
+
+.metaLine span,
+.metaLine strong,
+.metaLine em {
+  display: block;
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.metaLine strong {
+  color: var(--theme-primary);
+}
+
+.metaLine::after {
+  flex: 1;
+  height: 8px;
+  background: linear-gradient(90deg, var(--team-color), transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--team-color) 26%, transparent);
+  content: '';
+}
+
+.rosterGrid {
+  position: absolute;
+  z-index: 2;
+  top: 208px;
+  right: 80px;
+  bottom: 126px;
+  left: 80px;
+  display: grid;
+  grid-template-columns: repeat(var(--player-count), minmax(0, 1fr));
+  gap: 14px;
+}
+
+.staffCards {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 10px;
+  max-width: 500px;
+  align-self: center;
+}
+
+.staffCard {
+  position: relative;
+  min-width: 210px;
+  max-width: 240px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    rgba(255,255,255,0.022);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.025), 0 18px 36px rgba(0,0,0,0.2);
+  padding: 10px 14px 12px;
+}
+
+.staffCard::before {
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin-bottom: 8px;
+  background: var(--team-color);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--team-color) 28%, transparent);
+  content: '';
+}
+
+.staffCard span {
+  display: block;
+  color: var(--team-color);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.staffCard strong {
+  display: block;
+  min-width: 0;
+  margin-top: 7px;
+  overflow: hidden;
+  color: var(--theme-text);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.playerCard {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-top: 3px solid var(--team-color);
+  background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012));
+  box-shadow: 0 18px 40px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(255,255,255,0.04);
+  opacity: 0;
+  transform: translateY(40px);
+  animation: cardIn 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(0.12s + var(--card-index) * 0.06s);
+}
+
+.playerCard::before {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px);
+  opacity: 0.18;
+  content: '';
+  pointer-events: none;
+}
+
+.cardNumber {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  right: 14px;
+  color: rgba(255,255,255,0.22);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+}
+
+.portrait {
+  position: absolute;
+  inset: 14px 14px 132px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: #050505;
+}
+
+.portrait::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 46%, rgba(0,0,0,0.72)),
+    radial-gradient(circle at 50% 25%, var(--theme-primary-soft), transparent 56%);
+  content: '';
+  pointer-events: none;
+}
+
+.portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--portrait-x, 50%) center;
+  filter: brightness(0.88) contrast(1.06) saturate(0.92);
+}
+
+.playerInfo {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 18px 18px 20px;
+  border-top: 2px solid var(--team-color);
+  background: linear-gradient(180deg, rgba(0,0,0,0.68), rgba(0,0,0,0.94));
+}
+
+.playerInfo span,
+.playerInfo em {
+  display: block;
+  color: var(--theme-primary);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.playerInfo strong {
+  display: block;
+  margin: 8px 0 10px;
+  color: var(--theme-text);
+  font-size: 30px;
+  font-weight: 950;
+  line-height: 0.95;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playerInfo strong:last-child {
+  margin-bottom: 0;
+}
+
+.playerInfo em {
+  color: var(--theme-muted-text);
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  align-self: center;
+  justify-self: center;
+  width: 760px;
+  border: 1px solid var(--theme-primary-border);
+  border-top: 3px solid var(--theme-primary);
+  background: rgba(255,255,255,0.04);
+  box-shadow: var(--theme-shadow-primary);
+  padding: 42px 48px;
+  text-align: center;
+}
+
+.emptyState span {
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: 0 auto 18px;
+  background: var(--theme-primary);
+  box-shadow: 0 0 18px var(--theme-primary);
+}
+
+.emptyState strong {
+  color: var(--theme-text);
+  font-size: 34px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.emptyState p {
+  margin: 14px 0 0;
+  color: var(--theme-muted-text);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.footer {
+  position: absolute;
+  z-index: 4;
+  right: 80px;
+  bottom: 48px;
+  left: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255,255,255,0.09);
+  padding-top: 18px;
+}
+
+.footer span,
+.footer strong {
+  color: rgba(255,255,255,0.34);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.footer strong {
+  color: var(--theme-primary);
+}
+
+@keyframes cardIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

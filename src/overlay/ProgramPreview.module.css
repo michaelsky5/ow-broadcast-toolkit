@@ -1,0 +1,463 @@
+.frame {
+  width: 100%;
+  box-sizing: border-box;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #000;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+}
+
+.canvas {
+  display: block;
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  transform-origin: top left;
+}
+
+.bareFrame {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: transparent;
+}
+
+.bareCanvas {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  transform-origin: top left;
+}
+
+.sceneMount {
+  width: 100%;
+  height: 100%;
+}
+
+.sceneMountActive {
+  animation: owbtSceneResolve var(--owbt-scene-resolve-duration, 520ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sceneTransition {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  animation: owbtTransitionMask var(--owbt-transition-duration, 620ms) cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+.sceneTransitionBrand {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 100%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 80px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 72px),
+    linear-gradient(90deg, #050606 0 34%, #181a19 34% 45%, #080908 45% 72%, #242625 72% 82%, #030404 82% 100%);
+  background-size: 240px 100%, 100% 216px, 80px 72px, 80px 72px, 100% 100%;
+}
+
+.sceneTransitionSimple {
+  background:
+    linear-gradient(90deg, transparent 0 7%, var(--theme-primary) 7% 7.4%, transparent 7.4% 100%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 96px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 72px),
+    #020504;
+  animation: owbtSimpleTransitionMask var(--owbt-transition-duration, 620ms) cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+.sceneTransition::before {
+  content: "";
+  position: absolute;
+  inset: -16% -42%;
+  width: 186%;
+  border-left: 18px solid var(--theme-primary);
+  border-right: 18px solid rgba(255,255,255,0.82);
+  background:
+    linear-gradient(108deg, transparent 0 26%, rgba(255,255,255,0.92) 26% 32%, #2a2c2b 32% 43%, var(--theme-primary) 43% 47%, #050606 47% 62%, rgba(255,255,255,0.28) 62% 65%, transparent 65% 100%),
+    repeating-linear-gradient(90deg, transparent 0 86px, rgba(255,255,255,0.1) 86px 88px, transparent 88px 160px);
+  box-shadow:
+    0 0 54px var(--theme-primary-soft),
+    0 0 120px rgba(255,255,255,0.14);
+  mix-blend-mode: screen;
+  opacity: 0.96;
+  z-index: 1;
+  transform: translateX(-64%) skewX(-9deg);
+  animation: owbtTransitionBlockSweep var(--owbt-transition-duration, 620ms) cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+.sceneTransitionSimple::before {
+  inset: 0 auto 0 -18%;
+  width: 28%;
+  border-left: 0;
+  border-right: 8px solid var(--theme-primary);
+  background:
+    linear-gradient(90deg, transparent, rgba(255,255,255,0.08), rgba(255,255,255,0.56), var(--theme-primary));
+  box-shadow:
+    36px 0 78px var(--theme-primary-soft),
+    100px 0 160px rgba(255,255,255,0.12);
+  mix-blend-mode: normal;
+  transform: none;
+  animation: owbtSimpleTransitionHead var(--owbt-transition-duration, 620ms) cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+.sceneTransition::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 7%, var(--theme-primary) 7% 7.65%, transparent 7.65% 48%, rgba(255,255,255,0.72) 48% 49%, transparent 49% 86%, var(--theme-primary) 86% 86.55%, transparent 86.55% 100%),
+    repeating-linear-gradient(0deg, transparent 0 34px, rgba(255,255,255,0.12) 34px 36px, transparent 36px 80px);
+  filter: drop-shadow(0 0 24px var(--theme-primary-soft));
+  opacity: 0;
+  z-index: 1;
+  animation: owbtTransitionSignal var(--owbt-transition-duration, 620ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sceneTransitionSimple::after {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent),
+    linear-gradient(180deg, transparent 0 42%, rgba(255,255,255,0.11) 42% 42.5%, transparent 42.5% 100%);
+  opacity: 0.8;
+  filter: none;
+  animation: owbtSimpleTransitionSignal var(--owbt-transition-duration, 620ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.transitionLogo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 620px;
+  height: 620px;
+  animation: owbtTransitionLogoLockup var(--owbt-transition-duration, 620ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.transitionLogoEvent {
+  box-sizing: border-box;
+  width: 560px;
+  height: 560px;
+  padding: 104px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(255,255,255,0.34);
+  background: linear-gradient(180deg, #fafafa 0%, #edf1ef 100%);
+  background-size: 100% 100%;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.56),
+    inset 0 0 0 12px rgba(0,0,0,0.08),
+    0 0 0 10px rgba(0,0,0,0.46),
+    0 30px 90px rgba(0,0,0,0.52),
+    0 0 52px var(--theme-primary-soft);
+}
+
+.transitionLogoEventWide {
+  width: 900px;
+  height: 500px;
+  padding: 88px 118px 96px;
+}
+
+.transitionLogoEventTall {
+  width: 520px;
+  height: 640px;
+  padding: 92px 96px 104px;
+}
+
+.transitionLogo::before {
+  content: "";
+  position: absolute;
+  left: -430px;
+  right: -430px;
+  top: 50%;
+  height: 154px;
+  background:
+    linear-gradient(90deg, transparent 0 14%, rgba(255,255,255,0.16) 14% 26%, var(--theme-primary) 26% 31%, #f7f7f7 31% 35%, #303332 35% 68%, var(--theme-primary) 68% 72%, rgba(255,255,255,0.2) 72% 83%, transparent 83% 100%);
+  box-shadow:
+    0 0 46px var(--theme-primary-soft),
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    inset 0 -1px 0 rgba(0,0,0,0.82);
+  opacity: 0.9;
+  transform: translateY(-50%) skewX(-12deg);
+  pointer-events: none;
+  z-index: 0;
+  animation: owbtTransitionLogoRail var(--owbt-transition-duration, 620ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.transitionLogoEvent::before {
+  inset: 0;
+  height: auto;
+  background:
+    linear-gradient(90deg, var(--theme-primary) 0 10px, transparent 10px calc(100% - 10px), rgba(0,0,0,0.24) calc(100% - 10px) 100%),
+    linear-gradient(116deg, transparent 0 84%, rgba(0,0,0,0.14) 84% 90%, #252827 90% 100%);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.22);
+  opacity: 1;
+  transform: none;
+  animation: owbtTransitionEventPlate var(--owbt-transition-duration, 620ms) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.transitionLogo::after {
+  content: "";
+  position: absolute;
+  left: -620px;
+  right: -620px;
+  top: 50%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--theme-primary), rgba(255,255,255,0.9), var(--theme-primary), transparent);
+  box-shadow:
+    0 -86px 0 rgba(255,255,255,0.16),
+    0 -42px 0 rgba(83, 228, 174, 0.2),
+    0 42px 0 rgba(83, 228, 174, 0.18),
+    0 86px 0 rgba(255,255,255,0.14);
+  opacity: 0.96;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.transitionLogoEvent::after {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: auto;
+  background:
+    linear-gradient(90deg, var(--theme-primary), rgba(255,255,255,0.94), var(--theme-primary)) top / 100% 12px no-repeat,
+    linear-gradient(90deg, var(--theme-primary), rgba(255,255,255,0.94), var(--theme-primary)) bottom / 100% 12px no-repeat,
+    linear-gradient(90deg, transparent 0 16%, rgba(0,0,0,0.28) 16% 16.5%, transparent 16.5% 100%) bottom / 100% 12px no-repeat;
+  box-shadow: none;
+  opacity: 0.9;
+  transform: none;
+}
+
+.transitionLogo img {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 92%;
+  height: 92%;
+  object-fit: contain;
+  filter:
+    contrast(1.08)
+    drop-shadow(0 20px 38px rgba(0,0,0,0.72))
+    drop-shadow(0 0 30px rgba(255,255,255,0.22))
+    drop-shadow(0 0 28px var(--theme-primary-soft));
+}
+
+.transitionLogoEvent img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  filter:
+    contrast(1.18)
+    saturate(1.08)
+    drop-shadow(0 0 2px rgba(255,255,255,0.96))
+    drop-shadow(0 0 3px rgba(0,0,0,0.96))
+    drop-shadow(0 10px 24px rgba(0,0,0,0.46));
+}
+
+@keyframes owbtSceneResolve {
+  0% {
+    filter: brightness(0.84) contrast(1.06);
+    transform: translate3d(8px, 0, 0);
+  }
+
+  100% {
+    filter: none;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes owbtTransitionMask {
+  0% {
+    opacity: 1;
+  }
+
+  82% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes owbtSimpleTransitionMask {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 1;
+  }
+
+  34% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  76% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  100% {
+    clip-path: inset(0 0 0 100%);
+    opacity: 1;
+  }
+}
+
+@keyframes owbtSimpleTransitionHead {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(2320px);
+  }
+}
+
+@keyframes owbtSimpleTransitionSignal {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+
+  32% {
+    opacity: 0.82;
+  }
+
+  78% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@keyframes owbtTransitionBlockSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-72%) skewX(-9deg);
+  }
+
+  14% {
+    opacity: 1;
+    transform: translateX(-44%) skewX(-9deg);
+  }
+
+  58% {
+    opacity: 1;
+    transform: translateX(7%) skewX(-9deg);
+  }
+
+  84% {
+    opacity: 0.92;
+    transform: translateX(46%) skewX(-9deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(74%) skewX(-9deg);
+  }
+}
+
+@keyframes owbtTransitionSignal {
+  0% {
+    opacity: 0;
+    transform: translateY(-22px);
+  }
+
+  18% {
+    opacity: 0.88;
+  }
+
+  72% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+
+@keyframes owbtTransitionLogoRail {
+  0% {
+    transform: translateY(-50%) skewX(-12deg) scaleX(0.34);
+  }
+
+  18% {
+    transform: translateY(-50%) skewX(-12deg) scaleX(1.06);
+  }
+
+  72% {
+    transform: translateY(-50%) skewX(-12deg) scaleX(1);
+  }
+
+  100% {
+    transform: translateY(-50%) skewX(-12deg) scaleX(0.42);
+  }
+}
+
+@keyframes owbtTransitionEventPlate {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.7);
+  }
+
+  14% {
+    opacity: 0.96;
+    transform: scaleX(1.04);
+  }
+
+  70% {
+    opacity: 0.96;
+    transform: scaleX(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scaleX(0.74);
+  }
+}
+
+@keyframes owbtTransitionLogoLockup {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(0.68);
+  }
+
+  12% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(1.12);
+  }
+
+  66% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(0.78);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sceneMountActive,
+  .sceneTransition,
+  .sceneTransition::before,
+  .sceneTransition::after,
+  .transitionLogo {
+    animation: none;
+  }
+
+  .sceneTransition {
+    display: none;
+  }
+}

@@ -1,0 +1,348 @@
+﻿/* === Shared panels and controls === */
+
+.twoPanelGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.panelGridWide {
+  grid-template-columns: 0.82fr minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.panel {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-top: 2px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.014));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.025);
+  padding: 14px;
+}
+
+.panelTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 13px;
+  color: var(--theme-text);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.panelTitle::before {
+  width: 7px;
+  height: 7px;
+  background: var(--theme-primary);
+  box-shadow: 0 0 12px var(--theme-primary);
+  content: '';
+}
+
+.widePanel {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 12px;
+  min-width: 0;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.field span {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
+  color: var(--theme-text);
+  padding: 10px 11px;
+  outline: none;
+}
+
+.field textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--theme-primary-border);
+}
+
+.field input[type="color"] {
+  height: 40px;
+  padding: 4px;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.toggleField {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 40px;
+  margin-top: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.26);
+  color: var(--theme-text);
+  padding: 0 11px;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.toggleField input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--theme-primary);
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
+  gap: 6px;
+}
+
+.segmented button,
+.primaryButton,
+.lineupActions button,
+.mapIndexButton,
+.liveActionGrid button,
+.liveTeamPresetRow button,
+.liveBanPanel button,
+.livePlayerActions button,
+.mapBanPanel button,
+.coreScoreControls button,
+.liveTriggerGrid button,
+.liveRouterGrid button,
+.liveHudGrid button,
+.liveFlowGrid button,
+.tickerGrid button,
+.casterLibrary button,
+.rosterPlayerList button,
+.countdownActions button,
+.postActionGrid button,
+.stepper button {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.segmented button:hover,
+.primaryButton:hover,
+.lineupActions button:hover,
+.mapIndexButton:hover,
+.liveActionGrid button:hover,
+.liveTeamPresetRow button:hover,
+.liveBanPanel button:hover,
+.livePlayerActions button:hover,
+.mapBanPanel button:hover,
+.coreScoreControls button:hover,
+.liveTriggerGrid button:hover,
+.liveRouterGrid button:hover,
+.liveHudGrid button:hover,
+.liveFlowGrid button:hover,
+.tickerGrid button:hover,
+.casterLibrary button:hover,
+.rosterPlayerList button:hover,
+.countdownActions button:hover,
+.postActionGrid button:hover,
+.stepper button:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}
+
+.segmented button:disabled {
+  cursor: not-allowed;
+  opacity: 0.34;
+}
+
+.segmented button:disabled:hover {
+  border-color: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+}
+
+.segmented .activeSegment,
+.primaryButton,
+.activeOutline,
+.lineupActions .primaryButton {
+  border-color: var(--theme-primary);
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.dangerButton {
+  border-color: rgba(255,77,77,0.36) !important;
+  background: rgba(255,77,77,0.11) !important;
+  color: #ff8585 !important;
+}
+
+.dangerActive {
+  border-color: rgba(255,77,77,0.88) !important;
+  background: rgba(255,77,77,0.92) !important;
+  color: #fff !important;
+}
+
+.tickerToggleButton {
+  border-color: var(--theme-primary-border) !important;
+  background: var(--theme-primary-soft) !important;
+  color: var(--theme-primary) !important;
+}
+
+.primaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.liveFlowGrid button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: 44px minmax(64px, 1fr) 44px;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.stepper strong {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
+  color: var(--theme-primary);
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.teamPanel {
+  border-left: 2px solid var(--theme-primary);
+}
+
+.editorDialogBackdrop {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,0.68);
+  backdrop-filter: blur(2px);
+  padding: 24px;
+}
+
+.editorDialog {
+  width: min(560px, calc(100vw - 48px));
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-top: 2px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    linear-gradient(180deg, rgba(42,42,42,0.98), rgba(18,18,18,0.98));
+  box-shadow: 0 28px 80px rgba(0,0,0,0.52), inset 0 0 0 1px rgba(255,255,255,0.025);
+}
+
+.editorDialogDanger {
+  border-top-color: rgba(255,77,77,0.86);
+}
+
+.editorDialogHeader,
+.editorDialogBody,
+.editorDialogActions {
+  padding: 12px;
+}
+
+.editorDialogHeader {
+  border-bottom: 1px solid rgba(255,255,255,0.09);
+}
+
+.editorDialogHeader span {
+  display: block;
+  color: var(--theme-primary);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.editorDialogDanger .editorDialogHeader span {
+  color: #ff8585;
+}
+
+.editorDialogHeader strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--theme-text);
+  font-size: 16px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.editorDialogBody {
+  border-bottom: 1px solid rgba(255,255,255,0.09);
+}
+
+.editorDialogBody p {
+  margin: 0;
+  color: var(--theme-text);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.editorDialogActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.editorDialogActions button:only-child {
+  grid-column: 1 / -1;
+}
+
+.editorDialogActions button {
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.editorDialogActions button:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}

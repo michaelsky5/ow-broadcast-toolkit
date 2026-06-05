@@ -1,0 +1,167 @@
+﻿/* === Stats data store === */
+
+.statsCaptureActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.statsExportGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.statsStoreTopGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  align-items: end;
+}
+
+.statsStoreTopGrid .field {
+  min-width: 0;
+}
+
+.statsStoreTopGrid .field span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statsStoreTopGrid .segmented {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.statsStoreTopGrid .segmented button {
+  padding: 0 6px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.statsStoreActionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.statsStoreActionGrid button {
+  min-width: 0;
+  padding: 0 8px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.statsStoreActionGrid button:disabled,
+.statsExportGrid button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.statsStoreActionGrid > .dangerButton {
+  grid-column: 1 / -1;
+}
+
+.statsStoreSummary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 0;
+}
+
+.statsStoreSummary div {
+  grid-template-columns: 1fr;
+  min-height: 42px;
+}
+
+.statsStoreSummary span,
+.statsStoreSummary strong {
+  min-height: 20px;
+  justify-content: center;
+  padding: 0 6px;
+  text-align: center;
+}
+
+.statsSnapshotList {
+  display: grid;
+  gap: 7px;
+  max-height: 190px;
+  overflow: hidden auto;
+}
+
+.statsSnapshotList > div,
+.statsSnapshotList > p {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 92px;
+  gap: 6px;
+  align-items: center;
+  min-height: 38px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.24);
+  margin: 0;
+  padding: 0 7px;
+}
+
+.statsSnapshotList > div > strong,
+.statsSnapshotList > div > span,
+.statsSnapshotList > div > em,
+.statsSnapshotList > p {
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statsSnapshotList > div > strong {
+  color: var(--theme-primary);
+}
+
+.statsSnapshotList > div > span {
+  color: var(--theme-text);
+}
+
+.statsSnapshotList > div > em,
+.statsSnapshotList > p {
+  color: var(--theme-muted-text);
+  font-style: normal;
+}
+
+.statsSnapshotList p {
+  grid-template-columns: 1fr;
+}
+
+.statsSnapshotActive {
+  border-color: var(--theme-primary-border) !important;
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 70%),
+    rgba(0,0,0,0.26) !important;
+}
+
+.statsSnapshotActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.statsSnapshotActions button {
+  min-width: 0;
+  min-height: 28px;
+  border: 1px solid rgba(255,255,255,0.11);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 0 4px;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.statsSnapshotActions button:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
