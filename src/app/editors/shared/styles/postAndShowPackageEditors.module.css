@@ -505,6 +505,21 @@
   padding: 8px;
 }
 
+.breakScheduleTools {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.breakScheduleTools button {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .breakSchedulePrimaryGrid {
   grid-template-columns: 72px minmax(110px, 0.72fr) 58px 58px minmax(120px, 1fr) minmax(120px, 1fr);
 }

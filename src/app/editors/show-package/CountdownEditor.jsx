@@ -9,11 +9,38 @@ const MAX_UPCOMING_MATCHES = 4
 
 const clean = value => String(value || '').trim()
 
+const SCHEDULE_MATCH_FIELDS = [
+  'time',
+  'stage',
+  'teamA',
+  'teamB',
+  'logoA',
+  'logoB',
+  'logoBgA',
+  'logoBgB',
+  'scoreA',
+  'scoreB'
+]
+
 const getDisplayMode = value => (
   ['standby', 'full', 'video'].includes(value) ? value : 'standby'
 )
 
 const isMatchVisible = match => match?.enabled !== false
+
+const isEmptyScheduleMatch = match => (
+  match?.enabled === false && SCHEDULE_MATCH_FIELDS.every(field => !clean(match?.[field]))
+)
+
+const trimTrailingEmptyMatches = matches => {
+  let endIndex = matches.length
+
+  while (endIndex > 0 && isEmptyScheduleMatch(matches[endIndex - 1])) {
+    endIndex -= 1
+  }
+
+  return matches.slice(0, endIndex)
+}
 
 const getAssetState = (value, text) => {
   const source = clean(value)
@@ -56,7 +83,21 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
     ? countdownText.obsSource
     : countdownText.toolkitPlayback
 
-  const createUpcomingMatch = (enabled = false) => ({
+  const createEmptyUpcomingMatch = (enabled = false) => ({
+    enabled,
+    time: '',
+    stage: '',
+    teamA: '',
+    teamB: '',
+    logoA: '',
+    logoB: '',
+    logoBgA: '',
+    logoBgB: '',
+    scoreA: '',
+    scoreB: ''
+  })
+
+  const createCurrentMatchSlot = (enabled = false) => ({
     enabled,
     time: '',
     stage: project?.currentMatch?.stage || '',
@@ -70,9 +111,11 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
     scoreB: ''
   })
 
-  const scheduleSlots = Array.from({ length: MAX_UPCOMING_MATCHES }, (_, index) => (
-    upcomingMatches[index] || createUpcomingMatch(false)
-  ))
+  const scheduleSlots = Array.from({ length: MAX_UPCOMING_MATCHES }, (_, index) => {
+    const storedMatch = upcomingMatches[index]
+    if (storedMatch && !isEmptyScheduleMatch(storedMatch)) return storedMatch
+    return index === 0 ? createCurrentMatchSlot(false) : createEmptyUpcomingMatch(false)
+  })
   const visibleMatchCount = scheduleSlots.filter(isMatchVisible).length
 
   const updateSetting = patch => {
@@ -124,10 +167,26 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
   }
 
   const updateUpcomingMatch = (index, patch) => {
-    const nextMatches = scheduleSlots.map((match, matchIndex) => (
-      matchIndex === index ? { ...match, ...patch } : match
+    const storedSlots = Array.from({ length: MAX_UPCOMING_MATCHES }, (_, matchIndex) => (
+      upcomingMatches[matchIndex] || createEmptyUpcomingMatch(false)
     ))
-    updateSetting({ upcomingMatches: nextMatches })
+    const storedTarget = upcomingMatches[index]
+    const targetBase = storedTarget && !isEmptyScheduleMatch(storedTarget)
+      ? storedTarget
+      : (index === 0 ? createCurrentMatchSlot(false) : createEmptyUpcomingMatch(false))
+    const nextMatches = storedSlots.map((match, matchIndex) => (
+      matchIndex === index ? { ...targetBase, ...patch } : match
+    ))
+
+    updateSetting({ upcomingMatches: trimTrailingEmptyMatches(nextMatches) })
+  }
+
+  const fillUpcomingMatchFromCurrent = index => {
+    updateUpcomingMatch(index, createCurrentMatchSlot(true))
+  }
+
+  const clearUpcomingMatch = index => {
+    updateUpcomingMatch(index, createEmptyUpcomingMatch(false))
   }
 
   return (
@@ -280,6 +339,9 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
             const scoreText = clean(match.scoreA) || clean(match.scoreB)
               ? `${clean(match.scoreA) || '0'} - ${clean(match.scoreB) || '0'}`
               : 'VS'
+            const teamALabel = clean(match.teamA) || countdownText.tbdTeam
+            const teamBLabel = clean(match.teamB) || countdownText.tbdTeam
+            const metaLabel = clean(match.time) || clean(match.stage) || countdownText.unconfiguredSlot
 
             return (
               <section className={`${styles.breakScheduleSlot} ${visible ? '' : styles.breakScheduleSlotHidden}`} key={index}>
@@ -291,10 +353,10 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
                     onClick={() => setExpandedSlot(expanded ? -1 : index)}
                   >
                     <span>{countdownText.matchSlot(index)}</span>
-                    <strong>{clean(match.teamA) || 'TEAM A'}</strong>
+                    <strong>{teamALabel}</strong>
                     <em>{scoreText}</em>
-                    <strong>{clean(match.teamB) || 'TEAM B'}</strong>
-                    <small>{clean(match.time) || clean(match.stage) || countdownText.scheduleSlot}</small>
+                    <strong>{teamBLabel}</strong>
+                    <small>{metaLabel}</small>
                   </button>
 
                   <div className={styles.breakScheduleVisibility}>
@@ -308,6 +370,15 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
 
                 {expanded && (
                   <div className={styles.breakScheduleDetails}>
+                    <div className={styles.breakScheduleTools}>
+                      <button type="button" className={styles.secondaryButton} onClick={() => fillUpcomingMatchFromCurrent(index)}>
+                        {countdownText.useCurrentMatch}
+                      </button>
+                      <button type="button" className={styles.secondaryButton} onClick={() => clearUpcomingMatch(index)}>
+                        {countdownText.clearSlot}
+                      </button>
+                    </div>
+
                     <div className={styles.breakSchedulePrimaryGrid}>
                       <Field label={text.time}>
                         <input value={match.time || ''} onChange={event => updateUpcomingMatch(index, { time: event.target.value })} placeholder="20:00" />

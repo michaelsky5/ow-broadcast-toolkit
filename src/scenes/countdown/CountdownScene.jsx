@@ -8,6 +8,18 @@ const clean = value => String(value || '').trim()
 const EMPTY_COUNTDOWN_SETTINGS = {}
 const STANDBY_TITLE = 'BROADCAST STANDBY'
 const COUNTDOWN_TITLE = 'BROADCAST BEGINS IN'
+const SCHEDULE_MATCH_FIELDS = [
+  'time',
+  'stage',
+  'teamA',
+  'teamB',
+  'logoA',
+  'logoB',
+  'logoBgA',
+  'logoBgB',
+  'scoreA',
+  'scoreB'
+]
 
 const handleImageFallback = event => {
   if (event.currentTarget.dataset.fallbackApplied) return
@@ -85,8 +97,14 @@ const buildFallbackMatch = (project, teamA, teamB) => ({
   scoreB: ''
 })
 
+const isEmptyConfiguredMatch = match => (
+  match?.enabled === false && SCHEDULE_MATCH_FIELDS.every(field => !clean(match?.[field]))
+)
+
 const getScheduleMatches = (settings, project, teamA, teamB) => {
-  const configured = Array.isArray(settings.upcomingMatches) ? settings.upcomingMatches : []
+  const configured = Array.isArray(settings.upcomingMatches)
+    ? settings.upcomingMatches.filter(match => match && !isEmptyConfiguredMatch(match))
+    : []
   const source = configured.length
     ? configured.filter(match => match?.enabled !== false)
     : [buildFallbackMatch(project, teamA, teamB)]
@@ -94,8 +112,8 @@ const getScheduleMatches = (settings, project, teamA, teamB) => {
   return source.slice(0, 4).map(match => ({
     time: clean(match.time),
     stage: clean(match.stage),
-    teamA: clean(match.teamA) || 'TEAM A',
-    teamB: clean(match.teamB) || 'TEAM B',
+    teamA: clean(match.teamA) || 'TBD',
+    teamB: clean(match.teamB) || 'TBD',
     logoA: clean(match.logoA),
     logoB: clean(match.logoB),
     logoBgA: clean(match.logoBgA) || '#101010',
