@@ -12,6 +12,9 @@
     <meta name="apple-mobile-web-app-title" content="OWBT" />
     <meta name="theme-color" content="#050806" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      document.documentElement.dataset.owbtSurface = window.location.hash.startsWith('#overlay') ? 'overlay' : 'console'
+    </script>
     <title>OWBT - Overwatch Broadcast Toolkit</title>
   </head>
   <body>

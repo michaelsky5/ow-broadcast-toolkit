@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createDefaultProject } from '../project/defaultProject'
 import { getCompetitionName } from '../project/branding'
 import { exportProjectAsJson, readProjectFile } from '../project/projectUtils'
@@ -68,6 +68,13 @@ const VALID_INTERFACE_LANGUAGES = ['zh', 'en']
 const isOverlayRoute = () => {
   if (typeof window === 'undefined') return false
   return window.location.hash.startsWith('#overlay')
+}
+
+const setDocumentSurface = showOverlay => {
+  if (typeof document === 'undefined') return
+  const surface = showOverlay ? 'overlay' : 'console'
+  document.documentElement.dataset.owbtSurface = surface
+  document.body.dataset.owbtSurface = surface
 }
 
 const normalizeMainKey = key => {
@@ -390,8 +397,16 @@ const swapGraphicTeamSettings = graphics => {
 export default function App() {
   const [showOverlay, setShowOverlay] = useState(isOverlayRoute)
 
+  useLayoutEffect(() => {
+    setDocumentSurface(showOverlay)
+  }, [showOverlay])
+
   useEffect(() => {
-    const handleHashChange = () => setShowOverlay(isOverlayRoute())
+    const handleHashChange = () => {
+      const nextShowOverlay = isOverlayRoute()
+      setDocumentSurface(nextShowOverlay)
+      setShowOverlay(nextShowOverlay)
+    }
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
