@@ -207,10 +207,22 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
                 />
               </Field>
 
-              <button type="button" className={styles.primaryButton} onClick={applyCountdownTime}>
+              <button
+                type="button"
+                className={styles.primaryButton}
+                title={countdownText.startTimerLabel}
+                aria-label={countdownText.startTimerLabel}
+                onClick={applyCountdownTime}
+              >
                 {countdownText.startTimer}
               </button>
-              <button type="button" className={styles.dangerButton} onClick={stopTimer}>
+              <button
+                type="button"
+                className={styles.dangerButton}
+                title={countdownText.stopTimerLabel}
+                aria-label={countdownText.stopTimerLabel}
+                onClick={stopTimer}
+              >
                 {countdownText.stopTimer}
               </button>
             </div>
