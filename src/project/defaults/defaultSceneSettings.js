@@ -189,19 +189,21 @@ export const createDefaultSceneSettings = () => ({
     cardTag: 'STAR PLAYER',
     displayMode: 'spotlight',
     statView: 'per10',
+    statsDataScope: 'current',
     heroOverrides: {
       A: {},
       B: {}
     }
   },
   mvp: {
-    title: 'MAP MVP',
+    title: '',
     subtitle: 'OVERWATCH COMMUNITY TOURNAMENT',
-    mvpType: 'map',
+    mvpType: 'match',
     teamSide: 'A',
     playerSlot: 0,
     heroOverride: '',
     statView: 'per10',
+    statsDataScope: 'follow',
     note: 'CLUTCH PERFORMANCE',
     statKeys: ['eliminations', 'damage', 'healing']
   },

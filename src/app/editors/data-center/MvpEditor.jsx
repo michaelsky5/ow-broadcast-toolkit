@@ -15,6 +15,7 @@ import { formatDurationMinutes } from './statsCaptureUtils'
 
 const TEAM_OPTIONS = ['A', 'B']
 const MVP_TYPE_OPTIONS = ['map', 'match']
+const MVP_DATA_SOURCE_OPTIONS = ['follow', 'current', 'cumulative']
 const STAT_VIEW_OPTIONS = ['per10', 'total']
 
 const HERO_ROLE_ORDER = ['tank', 'damage', 'support']
@@ -46,11 +47,37 @@ const getDisplayValue = (row, stat, minutes, statView) => (
   statView === 'per10' ? formatPer10(row?.[stat.rowKey], minutes) : formatStatNumber(row?.[stat.rowKey])
 )
 
+const normalizeMvpType = value => (value === 'map' ? 'map' : 'match')
+
+const normalizeMvpStatsDataScope = value => (
+  ['follow', 'current', 'cumulative'].includes(value) ? value : 'follow'
+)
+
+const getEffectiveMvpStatsDataScope = (mvpType, statsDataScope) => {
+  const scope = normalizeMvpStatsDataScope(statsDataScope)
+  if (scope !== 'follow') return scope
+  return normalizeMvpType(mvpType) === 'match' ? 'cumulative' : 'current'
+}
+
+const getStatsSourceStatus = (pageText, statsData, requestedScope) => {
+  if (requestedScope === 'cumulative') {
+    if (statsData.scope === 'cumulative') return `${pageText.mapTotal} / ${statsData.snapshots?.length || 0} MAPS`
+    return `${pageText.currentMap} / ${pageText.noSavedMapData}`
+  }
+
+  return pageText.currentMap
+}
+
+const isDefaultMvpTitle = value => ['MAP MVP', 'MATCH MVP'].includes(String(value || '').trim().toUpperCase())
+
 function MvpEditor({ project, language = 'en', onUpdateProject }) {
   const pageText = getPageEditorCopy(language)
   const settings = project.scenes?.settings?.mvp || {}
   const statsSettings = project.scenes?.settings?.stats || {}
-  const statsData = resolveStatsData(statsSettings, 'overall')
+  const mvpType = normalizeMvpType(settings.mvpType)
+  const statsDataScope = normalizeMvpStatsDataScope(settings.statsDataScope)
+  const effectiveStatsDataScope = getEffectiveMvpStatsDataScope(mvpType, statsDataScope)
+  const statsData = resolveStatsData({ ...statsSettings, statsDataScope: effectiveStatsDataScope }, 'overall')
   const rows = normalizeStatsRows(statsData.rows)
   const { teamA, teamB } = getCurrentTeams(project)
   const teamSide = settings.teamSide || 'A'
@@ -67,6 +94,10 @@ function MvpEditor({ project, language = 'en', onUpdateProject }) {
   const selectedHeroLabel = selectedHero ? getHeroLabel(selectedHero, language) : ''
   const teamOptions = TEAM_OPTIONS.map(value => ({ value, label: value === 'B' ? pageText.teamB : pageText.teamA }))
   const mvpTypeOptions = MVP_TYPE_OPTIONS.map(value => ({ value, label: value === 'match' ? pageText.matchMvp : pageText.mapMvp }))
+  const statsDataScopeOptions = MVP_DATA_SOURCE_OPTIONS.map(value => ({
+    value,
+    label: value === 'follow' ? pageText.followMvpType : value === 'cumulative' ? pageText.mapTotal : pageText.currentMap
+  }))
   const statViewOptions = STAT_VIEW_OPTIONS.map(value => ({ value, label: value === 'total' ? pageText.totals : pageText.per10 }))
 
   const updateMvpSettings = patch => {
@@ -82,6 +113,13 @@ function MvpEditor({ project, language = 'en', onUpdateProject }) {
     updateMvpSettings({ statKeys: next })
   }
 
+  const updateMvpType = value => {
+    updateMvpSettings({
+      mvpType: value,
+      ...(isDefaultMvpTitle(settings.title) ? { title: '' } : null)
+    })
+  }
+
   return (
     <div className={styles.mvpWorkbench}>
       <Panel title={pageText.mvpControl} className={styles.mvpSetupPanel}>
@@ -89,9 +127,18 @@ function MvpEditor({ project, language = 'en', onUpdateProject }) {
           <div className={styles.statsControlBlock}>
             <span>{pageText.mvpType}</span>
             <SegmentedControl
-              value={settings.mvpType || 'map'}
+              value={mvpType}
               options={mvpTypeOptions}
-              onChange={value => updateMvpSettings({ mvpType: value })}
+              onChange={updateMvpType}
+            />
+          </div>
+
+          <div className={styles.statsControlBlock}>
+            <span>{pageText.dataSource}</span>
+            <SegmentedControl
+              value={statsDataScope}
+              options={statsDataScopeOptions}
+              onChange={value => updateMvpSettings({ statsDataScope: value })}
             />
           </div>
 
@@ -112,7 +159,7 @@ function MvpEditor({ project, language = 'en', onUpdateProject }) {
             <Field label={pageText.title}>
               <input
                 value={settings.title || ''}
-                placeholder={settings.mvpType === 'match' ? 'MATCH MVP' : 'MAP MVP'}
+                placeholder={mvpType === 'match' ? 'MATCH MVP' : 'MAP MVP'}
                 onChange={event => updateMvpSettings({ title: event.target.value })}
               />
             </Field>
@@ -130,7 +177,7 @@ function MvpEditor({ project, language = 'en', onUpdateProject }) {
         <div className={styles.mvpStatusStrip}>
           <div>
             <span>{pageText.source}</span>
-            <strong>{pageText.statsDataLabel(statsData)}</strong>
+            <strong>{getStatsSourceStatus(pageText, statsData, effectiveStatsDataScope)}</strong>
           </div>
           <div>
             <span>{pageText.time}</span>
@@ -141,7 +188,7 @@ function MvpEditor({ project, language = 'en', onUpdateProject }) {
 
       <Panel title={pageText.playerBuilder} className={styles.mvpSelectPanel}>
         <div className={styles.mvpSelectedCard}>
-          <span>{settings.mvpType === 'match' ? pageText.matchMvp : pageText.mapMvp}</span>
+          <span>{mvpType === 'match' ? pageText.matchMvp : pageText.mapMvp}</span>
           <strong>{player?.name || `${pageText.player} ${playerSlot + 1}`}</strong>
           <em>{team?.shortName || teamSide} // {getRoleLabel(player, language)} // {selectedHeroLabel || pageText.rosterHero}</em>
         </div>

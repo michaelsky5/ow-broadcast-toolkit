@@ -46,6 +46,39 @@ const normalizeLegacyDefaultBrand = project => {
   }
 }
 
+const normalizeLegacyDefaultMvp = (project, source) => {
+  const sourceMvp = source?.scenes?.settings?.mvp || {}
+  const sourceTitle = clean(sourceMvp.title).toUpperCase()
+  const hasDefaultTitle = sourceTitle === '' || sourceTitle === 'MAP MVP'
+  const hasDefaultScope = (
+    !Object.prototype.hasOwnProperty.call(sourceMvp, 'statsDataScope')
+    || sourceMvp.statsDataScope === 'follow'
+  )
+  const isLegacyUntouchedMvp = (
+    sourceMvp.mvpType === 'map'
+    && hasDefaultTitle
+    && hasDefaultScope
+  )
+
+  if (!isLegacyUntouchedMvp) return project
+
+  return {
+    ...project,
+    scenes: {
+      ...(project.scenes || {}),
+      settings: {
+        ...(project.scenes?.settings || {}),
+        mvp: {
+          ...(project.scenes?.settings?.mvp || {}),
+          title: '',
+          mvpType: 'match',
+          statsDataScope: 'follow'
+        }
+      }
+    }
+  }
+}
+
 const normalizeSceneIdList = sceneIds => {
   const seen = new Set()
 
@@ -80,7 +113,7 @@ export const touchProject = project => ({
 export const normalizeProject = rawProject => {
   const fallback = createDefaultProject()
   const source = isPlainObject(rawProject) ? rawProject : {}
-  const merged = normalizeLegacyDefaultBrand(deepMerge(fallback, source))
+  const merged = normalizeLegacyDefaultMvp(normalizeLegacyDefaultBrand(deepMerge(fallback, source)), source)
 
   return {
     ...merged,

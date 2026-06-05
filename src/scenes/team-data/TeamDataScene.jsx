@@ -85,6 +85,8 @@ const getHeroIconCandidates = (player, heroId) => getHeroAssetCandidates(player,
 
 const getHeroOverride = (settings, side, slot) => settings?.heroOverrides?.[side]?.[slot] || ''
 
+const getTeamDataStatsScope = settings => (settings?.statsDataScope === 'cumulative' ? 'cumulative' : 'current')
+
 const getPlayerHeroId = (settings, side, slot, player) => (
   clean(getHeroOverride(settings, side, slot)) || (Array.isArray(player?.primaryHeroes) ? player.primaryHeroes[0] : '')
 )
@@ -357,7 +359,7 @@ function PlayerMatchupGraphic({ left, leftRows, right, rightRows, minutes, mode 
 export default function TeamDataScene({ project }) {
   const settings = project?.scenes?.settings?.teamData || {}
   const statsSettings = project?.scenes?.settings?.stats || {}
-  const statsData = resolveStatsData(statsSettings, 'overall')
+  const statsData = resolveStatsData({ ...statsSettings, statsDataScope: getTeamDataStatsScope(settings) }, 'overall')
   const rows = normalizeStatsRows(statsData.rows)
   const { teamA, teamB } = getCurrentTeams(project)
   const teamSide = settings.teamSide || 'A'

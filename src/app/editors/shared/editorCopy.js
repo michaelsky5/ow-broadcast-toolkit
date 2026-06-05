@@ -1104,6 +1104,10 @@ const PAGE_EDITOR_COPY = {
     screenshotOutput: '截图输出',
     teamBoardOutput: '队伍面板输出',
     dataFeed: '数据源',
+    dataSource: '数据来源',
+    currentMap: '当前地图',
+    mapTotal: '地图累计',
+    followMvpType: '跟随类型',
     statsDataLabel: data => (
       data?.scope === 'current'
         ? '当前数据'
@@ -1316,6 +1320,10 @@ const PAGE_EDITOR_COPY = {
     screenshotOutput: 'Screenshot output',
     teamBoardOutput: 'Team board output',
     dataFeed: 'Data Feed',
+    dataSource: 'Data Source',
+    currentMap: 'Current Map',
+    mapTotal: 'Map Total',
+    followMvpType: 'Follow Type',
     statsDataLabel: data => data?.label || '',
     captureData: 'Capture data',
     savedDataPreview: 'Saved data preview',

@@ -127,6 +127,14 @@ const getStatDisplay = (row, stat, minutes, mode) => (
   mode === 'per10' ? formatPer10(row?.[stat.rowKey], minutes) : formatStatNumber(row?.[stat.rowKey])
 )
 
+const getMvpType = settings => (settings?.mvpType === 'map' ? 'map' : 'match')
+
+const getMvpStatsDataScope = settings => {
+  const scope = String(settings?.statsDataScope || 'follow').toLowerCase()
+  if (scope === 'current' || scope === 'cumulative') return scope
+  return getMvpType(settings) === 'match' ? 'cumulative' : 'current'
+}
+
 const getFeaturedStats = (row, settings) => {
   const selected = Array.isArray(settings.statKeys) ? settings.statKeys : []
   const ordered = selected
@@ -150,9 +158,10 @@ const getFeaturedStats = (row, settings) => {
 export default function MvpScene({ project }) {
   const settings = project?.scenes?.settings?.mvp || {}
   const statsSettings = project?.scenes?.settings?.stats || {}
-  const statsData = resolveStatsData(statsSettings, 'overall')
+  const statsData = resolveStatsData({ ...statsSettings, statsDataScope: getMvpStatsDataScope(settings) }, 'overall')
   const rows = normalizeStatsRows(statsData.rows)
   const { teamA, teamB } = getCurrentTeams(project)
+  const mvpType = getMvpType(settings)
   const teamSide = settings.teamSide || 'A'
   const team = getTeamForSide(teamA, teamB, teamSide)
   const players = getPlayersForSide(project, team, teamSide, statsData.playerIds)
@@ -165,7 +174,7 @@ export default function MvpScene({ project }) {
   const heroLabel = hero?.en || clean(heroId) || 'Signature Hero'
   const playerImage = getPlayerArtCandidates(player, team, heroId)
   const eventName = getBroadcastCompetitionName(project)
-  const packageLabel = settings.mvpType === 'match' ? 'MATCH MVP' : 'MAP MVP'
+  const packageLabel = mvpType === 'match' ? 'MATCH MVP' : 'MAP MVP'
   const title = clean(settings.title) || packageLabel
   const subtitle = clean(settings.subtitle || project?.event?.subtitle) || eventName
   const note = clean(settings.note) || 'CLUTCH PERFORMANCE'

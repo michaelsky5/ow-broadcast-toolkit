@@ -15,6 +15,7 @@ import { formatDurationMinutes } from './statsCaptureUtils'
 
 const TEAM_OPTIONS = ['A', 'B']
 const STAT_VIEW_OPTIONS = ['per10', 'total']
+const TEAM_DATA_SOURCE_OPTIONS = ['current', 'cumulative']
 const DISPLAY_MODE_OPTIONS = ['spotlight', 'matchup']
 const CARD_TAG_OPTIONS = ['STAR PLAYER', 'FOCUS PLAYER', 'KEY PLAYER']
 
@@ -65,6 +66,8 @@ const normalizeTeamSide = value => (value === 'B' ? 'B' : 'A')
 
 const normalizeStatView = value => (value === 'total' ? 'total' : 'per10')
 
+const normalizeStatsDataScope = value => (value === 'cumulative' ? 'cumulative' : 'current')
+
 const normalizeCardTag = value => (value === 'MVP PLAYER' ? 'STAR PLAYER' : value || 'STAR PLAYER')
 
 const normalizeTeamDataSettings = settings => {
@@ -80,11 +83,21 @@ const normalizeTeamDataSettings = settings => {
       : teamSide === 'A' ? 'B' : 'A',
     compareSlot: clampSlot(settings?.compareSlot),
     cardTag: normalizeCardTag(settings?.cardTag),
+    statsDataScope: normalizeStatsDataScope(settings?.statsDataScope),
     heroOverrides: getHeroOverrides(settings || {})
   }
 }
 
 const getDisplayModeLabel = (mode, pageText) => (mode === 'matchup' ? pageText.matchup : pageText.spotlight)
+
+const getStatsSourceStatus = (pageText, statsData, requestedScope) => {
+  if (requestedScope === 'cumulative') {
+    if (statsData.scope === 'cumulative') return `${pageText.mapTotal} / ${statsData.snapshots?.length || 0} MAPS`
+    return `${pageText.currentMap} / ${pageText.noSavedMapData}`
+  }
+
+  return pageText.currentMap
+}
 
 const getActiveHero = (settings, teamSide, playerSlot, player, language, fallbackLabel) => {
   const override = getHeroOverride(settings, teamSide, playerSlot)
@@ -102,7 +115,7 @@ function TeamDataEditor({ project, language = 'en', onUpdateProject }) {
   const pageText = getPageEditorCopy(language)
   const settings = normalizeTeamDataSettings(project.scenes?.settings?.teamData)
   const statsSettings = project.scenes?.settings?.stats || {}
-  const statsData = resolveStatsData(statsSettings, 'overall')
+  const statsData = resolveStatsData({ ...statsSettings, statsDataScope: settings.statsDataScope }, 'overall')
   const rows = normalizeStatsRows(statsData.rows)
   const { teamA, teamB } = getCurrentTeams(project)
   const displayMode = normalizeDisplayMode(settings.displayMode)
@@ -128,6 +141,10 @@ function TeamDataEditor({ project, language = 'en', onUpdateProject }) {
   const compareHero = getActiveHero(settings, compareTeamSide, compareSlot, comparePlayer, language, pageText.rosterHero)
   const teamOptions = TEAM_OPTIONS.map(value => ({ value, label: value === 'B' ? pageText.teamB : pageText.teamA }))
   const statViewOptions = STAT_VIEW_OPTIONS.map(value => ({ value, label: value === 'total' ? pageText.totals : pageText.per10 }))
+  const statsDataScopeOptions = TEAM_DATA_SOURCE_OPTIONS.map(value => ({
+    value,
+    label: value === 'cumulative' ? pageText.mapTotal : pageText.currentMap
+  }))
   const displayModeOptions = DISPLAY_MODE_OPTIONS.map(value => ({ value, label: value === 'matchup' ? pageText.matchup : pageText.spotlight }))
   const cardTagOptions = CARD_TAG_OPTIONS.map(value => ({
     value,
@@ -312,6 +329,15 @@ function TeamDataEditor({ project, language = 'en', onUpdateProject }) {
         <Panel title={pageText.graphicControl} className={styles.teamDataSetupPanel}>
           <div className={styles.teamDataControlStack}>
             <div className={styles.statsControlBlock}>
+              <span>{pageText.dataSource}</span>
+              <SegmentedControl
+                value={settings.statsDataScope}
+                options={statsDataScopeOptions}
+                onChange={value => updateTeamDataSettings({ statsDataScope: value })}
+              />
+            </div>
+
+            <div className={styles.statsControlBlock}>
               <span>{pageText.valueMode}</span>
               <SegmentedControl
                 value={statView}
@@ -358,7 +384,7 @@ function TeamDataEditor({ project, language = 'en', onUpdateProject }) {
             </div>
             <div>
               <span>{pageText.source}</span>
-              <strong>{pageText.statsDataLabel(statsData)}</strong>
+              <strong>{getStatsSourceStatus(pageText, statsData, settings.statsDataScope)}</strong>
             </div>
           </div>
         </Panel>
