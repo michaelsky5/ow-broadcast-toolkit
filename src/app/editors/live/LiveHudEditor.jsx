@@ -814,6 +814,8 @@ function LiveHudEditor({ project, copy, text, language, activeSection = 'match',
               <button
                 type="button"
                 className={resetArmed ? styles.dangerActive : styles.dangerButton}
+                title={liveText.resetScoreLabel}
+                aria-label={liveText.resetScoreLabel}
                 onClick={resetScoresAndMapResults}
               >
                 {resetArmed ? liveText.resetConfirm : liveText.resetScore}
