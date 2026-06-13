@@ -112,7 +112,7 @@
   text-shadow: 0 0 38px var(--theme-primary-glow);
   font-size: 72px;
   font-weight: 950;
-  line-height: 0.95;
+  line-height: 1.12;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -250,7 +250,7 @@
   color: var(--theme-text);
   font-size: 56px;
   font-weight: 950;
-  line-height: 0.9;
+  line-height: 1.12;
   letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
@@ -262,6 +262,7 @@
   font-size: 18px;
   font-weight: 900;
   letter-spacing: 0.2em;
+  line-height: 1.12;
   text-transform: uppercase;
 }
 
@@ -363,6 +364,7 @@
   color: var(--theme-text);
   font-size: 22px;
   font-weight: 950;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;

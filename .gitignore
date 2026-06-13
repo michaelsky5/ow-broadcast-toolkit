@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .codex-snapshots
 owbt-*.png
+!public/brand/icon/owbt-transition-mono.png
 
 # Editor directories and files
 .vscode/*

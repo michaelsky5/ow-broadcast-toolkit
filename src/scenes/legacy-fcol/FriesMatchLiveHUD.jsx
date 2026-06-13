@@ -164,6 +164,7 @@ const teamNameTextStyle = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+  lineHeight: 1.12,
   padding: '0 10px'
 };
 
@@ -227,7 +228,7 @@ const getTeamMetaBadgeStyle = (isLeft, mode, label) => ({
   fontSize: '10px',
   fontWeight: '900',
   letterSpacing: '0.55px',
-  lineHeight: 1.1,
+  lineHeight: 1.12,
   textAlign: 'center',
   textOverflow: 'ellipsis',
   textTransform: 'uppercase',
@@ -267,7 +268,8 @@ const playerSlotStyle = {
   borderBottom: `2px solid ${COLORS.yellow}`,
   transition: 'color 0.3s',
   textTransform: 'uppercase',
-  letterSpacing: '0.2px'
+  letterSpacing: '0.2px',
+  lineHeight: 1.12
 };
 
 const subBadgeStyle = {
@@ -441,13 +443,13 @@ const KeyPlayerCard = React.memo(({ show, phase, data, matchData }) => {
 
         <div style={{ position: 'absolute', [isLeft ? 'left' : 'right']: '52px', top: '52px', zIndex: 6, display: 'grid', gap: '12px', justifyItems: isLeft ? 'start' : 'end', maxWidth: '500px' }}>
           <div style={{ background: COLORS.yellow, color: COLORS.black, padding: '8px 14px', fontSize: '13px', fontWeight: '900', letterSpacing: '2.2px', textTransform: 'uppercase', boxShadow: '0 10px 18px rgba(0,0,0,0.24)' }}>KEY PLAYER</div>
-          <div style={{ position: 'relative', color: COLORS.white, fontSize: '65px', fontWeight: '900', lineHeight: 0.88, letterSpacing: '1px', textTransform: 'uppercase', textAlign: isLeft ? 'left' : 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 12px 28px rgba(0,0,0,0.40)' }}>
+          <div style={{ position: 'relative', color: COLORS.white, fontSize: '65px', fontWeight: '900', lineHeight: 1.12, letterSpacing: '1px', textTransform: 'uppercase', textAlign: isLeft ? 'left' : 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 12px 28px rgba(0,0,0,0.40)' }}>
             {data.name || 'PLAYER'}
-            <div style={{ position: 'absolute', top: '8px', [isLeft ? 'left' : 'right']: '6px', color: 'rgba(255,255,255,0.05)', fontSize: '118px', fontWeight: '900', lineHeight: 0.9, letterSpacing: '1px', pointerEvents: 'none' }}>
+            <div style={{ position: 'absolute', top: '8px', [isLeft ? 'left' : 'right']: '6px', color: 'rgba(255,255,255,0.05)', fontSize: '118px', fontWeight: '900', lineHeight: 1.12, letterSpacing: '1px', pointerEvents: 'none' }}>
               {data.name || 'PLAYER'}
             </div>
           </div>
-          {!!data.battleTag && <div style={{ color: 'rgba(255,255,255,0.82)', fontSize: '24px', fontWeight: '700', letterSpacing: '0.6px', textAlign: isLeft ? 'left' : 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.battleTag}</div>}
+          {!!data.battleTag && <div style={{ color: 'rgba(255,255,255,0.82)', fontSize: '24px', fontWeight: '700', lineHeight: 1.12, letterSpacing: '0.6px', textAlign: isLeft ? 'left' : 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.battleTag}</div>}
         </div>
 
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '52px', background: `linear-gradient(180deg, ${COLORS.panelDark} 0%, ${COLORS.panelDeep} 100%)`, borderTop: `2px solid ${COLORS.yellow}` }} />
@@ -748,7 +750,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                             fontSize: isBo7Compact ? '7px' : '8px',
                             fontWeight: '900',
                             letterSpacing: isBo7Compact ? '0.25px' : '0.35px',
-                            lineHeight: 1,
+                            lineHeight: 1.12,
                             color: COLORS.yellow,
                             whiteSpace: 'nowrap',
                             flexShrink: 0
@@ -903,7 +905,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
               }}
               title={topEventTitle}
             >
-              <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <span style={{ minWidth: 0, overflow: 'hidden', lineHeight: 1.12, textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {topEventTitle || 'LIVE'}
               </span>
             </div>
@@ -917,6 +919,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                 padding: '0 16px',
                 fontSize: '13px',
                 fontWeight: '900',
+                lineHeight: 1.12,
                 letterSpacing: '1px',
                 textTransform: 'uppercase',
                 display: 'flex',
@@ -1012,6 +1015,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                           textAlign: 'center',
                           fontSize: '10px',
                           fontWeight: '900',
+                          lineHeight: 1.12,
                           letterSpacing: '0.8px',
                           textTransform: 'uppercase',
                           color: COLORS.white
@@ -1026,6 +1030,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                           textAlign: 'center',
                           fontSize: '10px',
                           fontWeight: '900',
+                          lineHeight: 1.12,
                           letterSpacing: '0.8px',
                           textTransform: 'uppercase',
                           color: COLORS.yellow,
@@ -1043,6 +1048,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                           textAlign: 'center',
                           fontSize: '10px',
                           fontWeight: '900',
+                          lineHeight: 1.12,
                           letterSpacing: '0.8px',
                           textTransform: 'uppercase',
                           color: COLORS.gray,

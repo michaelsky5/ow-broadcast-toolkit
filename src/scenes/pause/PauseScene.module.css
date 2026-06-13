@@ -82,6 +82,7 @@
   color: var(--theme-primary);
   font-size: 15px;
   font-weight: 950;
+  line-height: 1.12;
   letter-spacing: 0.18em;
   text-overflow: ellipsis;
   text-transform: uppercase;
@@ -104,6 +105,7 @@
   padding: 12px 18px;
   font-size: 16px;
   font-weight: 950;
+  line-height: 1.12;
   letter-spacing: 0.22em;
 }
 
@@ -153,7 +155,7 @@
   text-shadow: 0 0 42px var(--theme-primary-glow);
   font-size: 122px;
   font-weight: 950;
-  line-height: 0.9;
+  line-height: 1.12;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -241,7 +243,7 @@
   color: var(--theme-text);
   font-size: 30px;
   font-weight: 950;
-  line-height: 0.95;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -293,6 +295,7 @@
   color: var(--theme-primary);
   font-size: 28px;
   font-weight: 950;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;

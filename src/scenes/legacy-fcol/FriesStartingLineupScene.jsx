@@ -175,7 +175,7 @@ const PlayerCard = ({ player, index, entrance = false, large = false }) => {
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
             <div style={{ height: '3px', background: isEmpty ? COLORS.faintWhite : `linear-gradient(90deg, ${COLORS.white} 0 10%, ${COLORS.yellow} 10% 100%)` }} />
             <div style={{ position: 'relative', padding: large ? '18px 18px 20px' : '14px 14px 15px', background: 'linear-gradient(180deg, rgba(42,42,42,0.18) 0%, rgba(42,42,42,0.94) 100%)', borderTop: `1px solid ${COLORS.line}` }}>
-              <div className={entrance ? 'lineup-name-callout' : ''} style={{ fontSize: large ? '27px' : '20px', fontWeight: '900', color: isEmpty ? COLORS.faintWhite : COLORS.white, lineHeight: 0.94, textTransform: 'uppercase', letterSpacing: '0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div className={entrance ? 'lineup-name-callout' : ''} style={{ fontSize: large ? '27px' : '20px', fontWeight: '900', color: isEmpty ? COLORS.faintWhite : COLORS.white, lineHeight: 1.12, textTransform: 'uppercase', letterSpacing: '0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {displayPrimaryName(player)}
               </div>
               {!isEmpty && !!displaySecondaryName(player) && (
@@ -210,7 +210,7 @@ const MiniTeamSection = ({ data, align }) => {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: isLeft ? 'flex-start' : 'flex-end', minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isLeft ? 'row' : 'row-reverse', minWidth: 0 }}>
             <div style={{ width: '24px', height: '24px', backgroundColor: COLORS.yellow, boxShadow: '0 0 16px var(--theme-primary-soft)', flex: '0 0 auto' }} />
-            <span style={{ fontSize: '42px', fontWeight: '900', color: COLORS.white, letterSpacing: '4px', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '620px' }}>{data.teamName}</span>
+            <span style={{ fontSize: '42px', fontWeight: '900', color: COLORS.white, letterSpacing: '4px', lineHeight: 1.12, textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '620px' }}>{data.teamName}</span>
           </div>
           <div style={{ width: '400px', height: '4px', background: `linear-gradient(${isLeft ? '90deg' : '270deg'}, ${COLORS.yellow} 0%, var(--theme-primary-soft) 100%)`, marginTop: '8px' }} />
         </div>
@@ -246,7 +246,7 @@ const EntranceTeamSection = ({ data, triggerKey }) => (
           <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div style={{ width: '26px', height: '26px', backgroundColor: COLORS.yellow, boxShadow: '0 0 16px var(--theme-primary-soft)', flex: '0 0 auto' }} />
-              <div style={{ fontSize: '78px', fontWeight: '900', color: COLORS.white, letterSpacing: '5px', textTransform: 'uppercase', lineHeight: 0.92, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '1260px' }}>
+              <div style={{ fontSize: '78px', fontWeight: '900', color: COLORS.white, letterSpacing: '5px', textTransform: 'uppercase', lineHeight: 1.12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '1260px' }}>
                 {data.teamName}
               </div>
             </div>
@@ -291,7 +291,7 @@ const CalloutTeamSection = ({ data, calloutIndex, triggerKey }) => {
 
             <div style={{ position: 'absolute', left: '28px', right: '28px', bottom: '32px' }}>
               <div style={{ fontSize: '14px', fontWeight: '900', letterSpacing: '3px', color: COLORS.yellow, textTransform: 'uppercase' }}>TEAM {data.side} CALLOUT</div>
-              <div style={{ marginTop: '14px', fontSize: '54px', fontWeight: '900', color: COLORS.white, letterSpacing: '4px', lineHeight: 0.96, textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.teamName}</div>
+              <div style={{ marginTop: '14px', fontSize: '54px', fontWeight: '900', color: COLORS.white, letterSpacing: '4px', lineHeight: 1.12, textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.teamName}</div>
               <div className="lineup-title-line" style={{ marginTop: '18px', width: '100%', height: '4px', background: `linear-gradient(90deg, ${COLORS.yellow}, var(--theme-primary-softer))` }} />
               <div style={{ marginTop: '16px', fontSize: '11px', fontWeight: '900', color: COLORS.faintWhite, letterSpacing: '2.2px', textTransform: 'uppercase' }}>STARTING FIVE // MANUAL CALL-IN</div>
             </div>
@@ -323,7 +323,7 @@ const CalloutTeamSection = ({ data, calloutIndex, triggerKey }) => {
             <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '154px', background: 'linear-gradient(180deg, rgba(42,42,42,0.42), rgba(42,42,42,0.98))', borderTop: `1px solid ${COLORS.lineStrong}`, padding: '22px 28px', boxSizing: 'border-box' }}>
               <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '24px' }}>
                 <div style={{ minWidth: 0 }}>
-                  <div className="callout-name" style={{ fontSize: '56px', fontWeight: '900', color: COLORS.white, lineHeight: 0.9, textTransform: 'uppercase', letterSpacing: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{playerName}</div>
+                  <div className="callout-name" style={{ fontSize: '56px', fontWeight: '900', color: COLORS.white, lineHeight: 1.12, textTransform: 'uppercase', letterSpacing: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{playerName}</div>
                   {secondaryName && <div style={{ marginTop: '12px', fontSize: '14px', fontWeight: '900', color: COLORS.faintWhite, letterSpacing: '1.8px', textTransform: 'uppercase' }}>{secondaryName}</div>}
                 </div>
                 <div style={{ flex: '0 0 auto', textAlign: 'right' }}>
@@ -363,7 +363,7 @@ const CalloutTeamSection = ({ data, calloutIndex, triggerKey }) => {
                   <div style={{ fontSize: '11px', color: isActive ? COLORS.yellow : COLORS.faintWhite, fontWeight: '900', letterSpacing: '1.6px' }}>{String(idx + 1).padStart(2, '0')}</div>
                   <div style={{ width: '10px', height: '10px', background: isCalled ? COLORS.yellow : 'rgba(255,255,255,0.12)' }} />
                 </div>
-                <div style={{ marginTop: '18px', fontSize: '22px', color: isCalled ? COLORS.white : COLORS.faintWhite, fontWeight: '900', letterSpacing: '0.8px', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{displayPrimaryName(p)}</div>
+                <div style={{ marginTop: '18px', fontSize: '22px', color: isCalled ? COLORS.white : COLORS.faintWhite, fontWeight: '900', letterSpacing: '0.8px', lineHeight: 1.12, textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{displayPrimaryName(p)}</div>
                 <div style={{ marginTop: '10px', fontSize: '10px', color: isCalled ? COLORS.yellow : COLORS.faintWhite, fontWeight: '900', letterSpacing: '1.8px', textTransform: 'uppercase' }}>{p ? normalizeRole(p.role) : 'TBD'}</div>
               </div>
             );

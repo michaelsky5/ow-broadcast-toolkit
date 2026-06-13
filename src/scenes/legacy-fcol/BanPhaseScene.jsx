@@ -256,7 +256,7 @@ function TeamBanCard({ side = 'left', order = 1, teamName, banInfo, reveal = fal
           <div style={{ color: 'rgba(255,255,255,0.72)', fontSize: 11, fontWeight: 900, letterSpacing: 1.4, textTransform: 'uppercase' }}>
             {isTbd ? 'Ban Status' : roleLabel}
           </div>
-          <div style={{ color: '#fff', fontSize: 42, fontWeight: 950, lineHeight: 0.94, letterSpacing: 0.45, textTransform: 'uppercase', textAlign: isLeft ? 'left' : 'right' }}>
+          <div style={{ color: '#fff', fontSize: 42, fontWeight: 950, lineHeight: 1.12, letterSpacing: 0.45, textTransform: 'uppercase', textAlign: isLeft ? 'left' : 'right' }}>
             {isTbd ? 'Pending' : heroName}
           </div>
         </div>

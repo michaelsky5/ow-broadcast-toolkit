@@ -79,7 +79,7 @@ function TeamBlock({ logo, name, align = 'left', phase }) {
             color: '#fff',
             fontSize: 34,
             fontWeight: 950,
-            lineHeight: 1,
+            lineHeight: 1.12,
             letterSpacing: 0.4,
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',

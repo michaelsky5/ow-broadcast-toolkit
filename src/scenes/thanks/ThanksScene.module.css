@@ -208,6 +208,7 @@
   font-size: 24px;
   font-weight: 950;
   letter-spacing: 0.08em;
+  line-height: 1.12;
 }
 
 .titleBlock {
@@ -228,7 +229,7 @@
   text-shadow: 0 0 40px var(--theme-primary-glow);
   font-size: 104px;
   font-weight: 950;
-  line-height: 0.9;
+  line-height: 1.12;
   letter-spacing: 0;
 }
 
@@ -239,6 +240,7 @@
   font-size: 25px;
   font-weight: 850;
   letter-spacing: 0.17em;
+  line-height: 1.12;
 }
 
 .eventSummaryDeck,
@@ -281,6 +283,7 @@
   font-size: 18px;
   font-weight: 950;
   letter-spacing: 0.05em;
+  line-height: 1.12;
 }
 
 .creditDeck strong {

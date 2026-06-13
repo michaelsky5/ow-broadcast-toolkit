@@ -63,6 +63,13 @@ const loadArrayExport = (relativePath, exportName) => {
 const OW_HEROES = loadArrayExport('src/data/overwatch/heroes.js', 'OW_HEROES')
 const OW_MAPS = loadArrayExport('src/data/overwatch/maps.js', 'OW_MAPS')
 const OW_GAME_MODES = loadArrayExport('src/data/overwatch/gameModes.js', 'OW_GAME_MODES')
+const REQUIRED_APP_ASSETS = [
+  {
+    label: 'brand transition mark',
+    itemId: 'owbt-transition-mono',
+    path: fromRoot('public', 'brand', 'icon', 'owbt-transition-mono.png')
+  }
+]
 
 const missing = []
 
@@ -91,6 +98,10 @@ for (const mode of OW_GAME_MODES) {
   checkFile('mode icon', mode.id, fromRoot('public', 'modes', `${mode.assetKey}.${extension}`))
 }
 
+for (const asset of REQUIRED_APP_ASSETS) {
+  checkFile(asset.label, asset.itemId, asset.path)
+}
+
 if (missing.length > 0) {
   console.error(`[check:assets] ${missing.length} missing asset reference(s):`)
   for (const item of missing) {
@@ -99,4 +110,4 @@ if (missing.length > 0) {
   process.exit(1)
 }
 
-console.log('[check:assets] OK - all Overwatch asset references exist.')
+console.log('[check:assets] OK - all required asset references exist.')

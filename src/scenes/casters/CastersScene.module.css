@@ -135,7 +135,7 @@
   color: var(--theme-text);
   font-size: 42px;
   font-weight: 950;
-  line-height: 0.95;
+  line-height: 1.12;
   text-transform: uppercase;
 }
 
@@ -196,7 +196,7 @@
   color: var(--theme-text);
   font-size: 24px;
   letter-spacing: 0.06em;
-  line-height: 1;
+  line-height: 1.12;
 }
 
 .matchContext {
@@ -272,6 +272,7 @@
   font-size: 18px;
   font-weight: 950;
   letter-spacing: 0.08em;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -342,6 +343,7 @@
   overflow: hidden;
   color: var(--theme-primary);
   letter-spacing: 0.08em;
+  line-height: 1.12;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -565,7 +567,7 @@
   margin: 8px 0 13px;
   font-size: 45px;
   font-weight: 950;
-  line-height: 0.95;
+  line-height: 1.12;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -712,7 +714,7 @@
   overflow: hidden;
   font-size: 40px;
   font-weight: 950;
-  line-height: 0.92;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -761,7 +763,7 @@
   color: var(--theme-text);
   font-size: 40px;
   font-weight: 950;
-  line-height: 0.95;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;

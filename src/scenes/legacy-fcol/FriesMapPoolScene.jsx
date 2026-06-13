@@ -495,7 +495,7 @@ const MapCard = React.memo(({
             fontWeight: '900',
             color: isTBD || !map.name ? '#666' : titleColor,
             textTransform: 'uppercase',
-            lineHeight: '1.08',
+            lineHeight: '1.12',
             letterSpacing: '0.6px',
             position: 'relative',
             zIndex: 1,
@@ -537,7 +537,7 @@ const OverviewMapCard = React.memo(({ type, name, image, delay, isPlayed, isCurr
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', boxShadow: 'inset 0 0 60px rgba(0,0,0,0.16), inset 0 0 0 1px rgba(255,255,255,0.04)' }} />
       <div style={{ position: 'absolute', top: '12px', left: '12px', width: '18px', height: '18px', borderTop: `2px solid ${isCurrent ? COLORS.white : 'rgba(255,255,255,0.10)'}`, borderLeft: `2px solid ${isCurrent ? COLORS.white : 'rgba(255,255,255,0.10)'}`, zIndex: 3 }} />
       <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', backgroundColor: bgBarColor, borderTop: `2px solid ${borderColor}`, padding: '10px 14px', boxSizing: 'border-box', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ color: textColor, fontWeight: '900', fontSize: '14px', letterSpacing: '1.6px', textTransform: 'uppercase', textDecoration: isPlayed ? 'line-through' : 'none' }}>{name}</span>
+        <span style={{ minWidth: 0, overflow: 'hidden', color: textColor, fontWeight: '900', fontSize: '14px', lineHeight: 1.12, letterSpacing: '1.6px', textOverflow: 'ellipsis', textTransform: 'uppercase', textDecoration: isPlayed ? 'line-through' : 'none', whiteSpace: 'nowrap' }}>{name}</span>
         {isPlayed && <span style={{ color: 'rgba(255,255,255,0.28)', fontSize: '10px', fontWeight: '900', letterSpacing: '1.2px', textTransform: 'uppercase' }}>PLAYED</span>}
         {isCurrent && <span style={{ color: COLORS.black, fontSize: '11px', fontWeight: '900', letterSpacing: '1px', textTransform: 'uppercase' }}>CURRENT</span>}
       </div>
@@ -619,7 +619,7 @@ export default function MapPoolScene({ matchData = {} }) {
       <div style={{ position: 'absolute', top: '60px', left: '80px', display: 'flex', flexDirection: 'column', animation: 'slideUpBounce 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s forwards', opacity: 0, zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           <div style={{ width: '30px', height: '30px', backgroundColor: COLORS.yellow, boxShadow: '0 0 16px var(--theme-primary-soft)' }} />
-          <span style={{ fontSize: '32px', fontWeight: '900', color: COLORS.white, letterSpacing: '4px', textTransform: 'uppercase' }}>{eventName}</span>
+          <span style={{ fontSize: '32px', fontWeight: '900', lineHeight: 1.12, color: COLORS.white, letterSpacing: '4px', textTransform: 'uppercase' }}>{eventName}</span>
         </div>
         <span style={{ fontSize: '18px', fontWeight: '900', color: COLORS.yellow, marginTop: '8px', letterSpacing: '2px', textTransform: 'uppercase' }}>
           {displayMode === 'MATCH' ? matchData.info : 'OFFICIAL MAP POOL'}

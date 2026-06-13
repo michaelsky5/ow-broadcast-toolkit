@@ -187,6 +187,7 @@
   color: var(--theme-primary);
   font-size: 16px;
   font-weight: 950;
+  line-height: 1.12;
   letter-spacing: 0.18em;
   text-overflow: ellipsis;
   text-transform: uppercase;
@@ -260,7 +261,7 @@
   margin: 0;
   font-size: 36px;
   font-weight: 950;
-  line-height: 0.96;
+  line-height: 1.12;
   text-transform: uppercase;
 }
 
@@ -278,7 +279,7 @@
   margin-top: 12px;
   font-size: 74px;
   font-weight: 950;
-  line-height: 0.9;
+  line-height: 1.12;
   text-transform: uppercase;
 }
 
@@ -296,6 +297,7 @@
   padding: 18px;
   font-size: 24px;
   font-weight: 950;
+  line-height: 1.12;
   text-align: center;
   text-transform: uppercase;
   overflow: hidden;
@@ -336,7 +338,7 @@
   margin: 12px 0;
   font-size: 62px;
   font-weight: 950;
-  line-height: 0.9;
+  line-height: 1.12;
   text-transform: uppercase;
 }
 

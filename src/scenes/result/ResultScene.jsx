@@ -124,7 +124,7 @@ export default function ResultScene({ project }) {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
           <div style={{ width: 10, height: 10, background: PRIMARY, boxShadow: '0 0 12px color-mix(in srgb, var(--theme-primary) 28%, transparent)', flexShrink: 0 }} />
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 950, letterSpacing: 2, color: 'rgba(255,255,255,0.72)' }}>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, fontWeight: 950, lineHeight: 1.12, letterSpacing: 2, color: 'rgba(255,255,255,0.72)' }}>
             {eventName || 'OWBT_WINNER_INTERFACE'}
           </span>
         </div>
@@ -197,7 +197,7 @@ export default function ResultScene({ project }) {
             <div style={{ position: 'absolute', top: 28, right: 22, width: 18, height: 2, background: 'rgba(255,255,255,0.10)' }} />
             <div style={{ position: 'absolute', left: 22, top: 22, bottom: 22, width: 1, background: 'linear-gradient(180deg, color-mix(in srgb, var(--theme-primary) 30%, transparent) 0%, rgba(255,255,255,0.02) 100%)' }} />
 
-            <div style={{ position: 'relative', zIndex: 2, fontSize: 13, fontWeight: 950, color: 'rgba(255,255,255,0.72)', letterSpacing: 2.4, textTransform: 'uppercase', opacity: 0, animation: 'owbtWinnerTextUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 300ms forwards' }}>
+            <div style={{ position: 'relative', zIndex: 2, fontSize: 13, fontWeight: 950, color: 'rgba(255,255,255,0.72)', letterSpacing: 2.4, lineHeight: 1.12, textTransform: 'uppercase', opacity: 0, animation: 'owbtWinnerTextUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 300ms forwards' }}>
               {topLabel}
             </div>
             <div style={{ position: 'relative', zIndex: 2, fontSize: 88, fontWeight: 950, color: PRIMARY, lineHeight: 0.9, letterSpacing: 2, textTransform: 'uppercase', textShadow: '0 0 20px color-mix(in srgb, var(--theme-primary) 18%, transparent)', opacity: 0, animation: 'owbtWinnerTextUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 400ms forwards' }}>
@@ -224,7 +224,7 @@ export default function ResultScene({ project }) {
                 style={{ width: '78%', height: '78%', objectFit: 'contain', display: 'block' }}
               />
             </div>
-            <div style={{ position: 'relative', zIndex: 2, maxWidth: '100%', fontSize: 56, fontWeight: 950, color: '#fff', lineHeight: 1.02, letterSpacing: 0.6, textTransform: 'uppercase', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 4px 18px rgba(0,0,0,0.25)', opacity: 0, animation: 'owbtWinnerTextUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 600ms forwards' }}>
+            <div style={{ position: 'relative', zIndex: 2, maxWidth: '100%', fontSize: 56, fontWeight: 950, color: '#fff', lineHeight: 1.12, letterSpacing: 0.6, textTransform: 'uppercase', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 4px 18px rgba(0,0,0,0.25)', opacity: 0, animation: 'owbtWinnerTextUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 600ms forwards' }}>
               {winnerName}
             </div>
             <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: 10, marginTop: 2, opacity: 0, animation: 'owbtWinnerTextUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 700ms forwards' }}>

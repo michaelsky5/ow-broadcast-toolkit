@@ -91,6 +91,7 @@ npm run preview:web
 
 Deployment notes are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 The release checklist is in [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md).
+Machine-specific behavior notes are in [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 
 ## OBS Setup
 

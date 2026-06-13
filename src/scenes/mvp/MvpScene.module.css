@@ -280,7 +280,7 @@
   font-size: 116px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.84;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-shadow: 0 12px 34px rgba(0,0,0,0.72);
   text-transform: uppercase;
@@ -389,7 +389,7 @@
   margin-top: 7px;
   color: var(--theme-text);
   font-size: 32px;
-  line-height: 0.95;
+  line-height: 1.12;
 }
 
 .featuredStats {

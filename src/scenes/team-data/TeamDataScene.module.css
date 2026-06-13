@@ -147,7 +147,7 @@
   font-size: 82px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.9;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -286,7 +286,7 @@
   color: var(--theme-text);
   font-size: 30px;
   font-weight: 950;
-  line-height: 1;
+  line-height: 1.12;
 }
 
 .playerIdentity span {
@@ -402,7 +402,7 @@
   font-size: 84px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.84;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -437,7 +437,7 @@
   font-size: 86px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.84;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -492,7 +492,7 @@
   font-size: 78px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.88;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -800,7 +800,7 @@
   font-size: 58px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.9;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1024,7 +1024,7 @@
   color: var(--theme-text);
   font-size: 52px;
   font-weight: 950;
-  line-height: 0.9;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1131,7 +1131,7 @@
   font-size: 78px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.86;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1236,7 +1236,7 @@
   color: var(--theme-text);
   font-size: 24px;
   font-weight: 950;
-  line-height: 0.95;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1304,7 +1304,7 @@
   color: var(--theme-text);
   font-size: 22px;
   font-weight: 950;
-  line-height: 0.94;
+  line-height: 1.12;
 }
 
 .starListRow em {

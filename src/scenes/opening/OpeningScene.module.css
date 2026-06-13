@@ -198,7 +198,7 @@
   color: var(--theme-text);
   font-size: 210px;
   font-weight: 950;
-  line-height: 0.78;
+  line-height: 1.12;
   letter-spacing: 0;
   text-align: center;
   text-transform: uppercase;
@@ -288,7 +288,7 @@
   color: var(--theme-text);
   font-size: 156px;
   font-weight: 950;
-  line-height: 0.84;
+  line-height: 1.12;
   letter-spacing: 0;
   text-shadow: 0 0 42px var(--theme-primary-glow);
   text-transform: uppercase;
@@ -320,6 +320,7 @@
   font-size: 18px;
   font-style: normal;
   font-weight: 900;
+  line-height: 1.12;
   letter-spacing: 0.18em;
 }
 

@@ -31,7 +31,9 @@ If the preview server selects a different port, use that origin for both routes.
 - Open startup setup and confirm event identity, logo controls, theme color, output settings, Overlay URL, transparent overlay, and the preflight panel appear.
 - Enter the Console and confirm Scene Selector, Workspace, Preview, Program, editor, Quick Actions, Real-Time Status, and Operation Log appear.
 - Select a scene, press TAKE, and confirm Program updates.
+- Set Scene Transition to Brand Stinger, press TAKE between two different scenes, and confirm the transition is visible.
 - Open `/#overlay` and confirm it renders the current Program scene.
+- Test Chinese event, team, short-name, player, caster, staff, map, title, and subtitle text across all broadcast scenes, including legacy FCOL outputs; confirm glyphs are not vertically cropped.
 - Confirm Data Center remains visible in the primary Scene Selector and includes OCR plus JSON/CSV export entry points.
 - Open Toolbox and confirm cover, matchup, result, assets, and scene PNG export modes are present.
 - Open Console Settings and confirm language, startup workspace, log rows, hotkeys, transition settings, and desktop-only placeholders are present.

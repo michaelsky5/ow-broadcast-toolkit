@@ -153,7 +153,7 @@
   font-size: 240px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.78;
+  line-height: 1.12;
   opacity: 0.038;
   text-align: center;
   text-transform: uppercase;
@@ -241,7 +241,7 @@
   font-size: 112px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.9;
+  line-height: 1.12;
   text-shadow: 0 0 42px var(--theme-primary-glow);
   text-transform: uppercase;
 }
@@ -250,6 +250,7 @@
 .standbyCopy em {
   max-width: 1000px;
   overflow: hidden;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -375,7 +376,7 @@
   font-size: 40px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.95;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -743,7 +744,7 @@
   font-size: 40px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 1.02;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -952,6 +953,7 @@
   font-size: 24px;
   font-weight: 950;
   letter-spacing: 0;
+  line-height: 1.12;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;

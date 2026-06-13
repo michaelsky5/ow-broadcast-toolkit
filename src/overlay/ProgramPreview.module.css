@@ -449,15 +449,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sceneMountActive,
-  .sceneTransition,
-  .sceneTransition::before,
-  .sceneTransition::after,
-  .transitionLogo {
+  .sceneMountActive {
     animation: none;
-  }
-
-  .sceneTransition {
-    display: none;
   }
 }
