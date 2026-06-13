@@ -24,13 +24,31 @@ The web version focuses on the core console:
 - Startup setup
 - Current A/B matchup control
 - Preview / Program operation
-- Basic scene editing
+- Scene editing for live, match setup, roster, casters, break, media, show flow, and data outputs
 - Data Center / OCR workflow
 - Toolbox graphics and asset configuration
 - Local browser autosave
 - Project import and export
 
 The future Windows desktop version can unlock local filesystem paths, larger asset libraries, OBS scene file export, and deeper production workflows.
+
+## Scene Packages
+
+- Core: Live HUD, Map Setup, Team Roster, and Caster Desk.
+- Data Center: Match Stats, Player Data, MVP, OCR-assisted stat capture, and JSON/CSV stat export.
+- Break Desk: Countdown and Technical Pause.
+- Media: Highlight/lower-third media output and sponsor media.
+- Show Flow: Up Next, Starting Five, Result, and Thanks.
+- Toolbox: Stream cover, static matchup, static result, asset setup, and scene PNG export.
+
+## Live URLs
+
+```text
+Console: https://owbt.fries-cup.com/
+Overlay: https://owbt.fries-cup.com/#overlay
+```
+
+Use the Console and Overlay from the same origin. For example, the live Console should pair with the live Overlay above, and a local development Console should pair with `http://localhost:5173/#overlay`.
 
 ## Main Routes
 
@@ -40,6 +58,21 @@ The future Windows desktop version can unlock local filesystem paths, larger ass
 ```
 
 The Overlay renders the current Program state only. It does not show editing UI.
+
+## Runtime Notes
+
+- OWBT is a static Vite React app.
+- Project state is saved in browser `localStorage`.
+- Console and Overlay sync through same-origin browser storage/events and `BroadcastChannel` when available.
+- Export project JSON before clearing browser data or moving to another machine.
+- Uploaded assets are stored with the project as browser data URLs. URL assets can be used too, but same-origin or uploaded assets are safest for PNG export.
+- The web app does not read arbitrary local filesystem paths; that workflow is reserved for the future Windows desktop version.
+
+## Requirements
+
+- Node.js `^20.19.0` or `>=22.12.0`
+- npm
+- A modern Chromium-based browser is recommended for production operation and OBS Browser Source testing.
 
 ## Quick Start
 
@@ -89,17 +122,20 @@ Preview the built site locally:
 npm run preview:web
 ```
 
-Deployment notes are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-Update notes are in [docs/UPDATE_NOTES.md](docs/UPDATE_NOTES.md).
-The release checklist is in [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md).
-Machine-specific behavior notes are in [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+## Documentation
+
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): static hosting, Vercel, Netlify, and local production preview.
+- [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md): web release smoke test and guardrails.
+- [docs/UPDATE_NOTES.md](docs/UPDATE_NOTES.md): current release notes and validation history.
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md): machine-specific transition, storage, and browser checks.
+- [docs/ASSETS.md](docs/ASSETS.md): bundled Overwatch asset conventions.
 
 ## OBS Setup
 
 Add a Browser Source in OBS and use the Overlay URL:
 
 ```text
-http://localhost:5173/#overlay
+https://owbt.fries-cup.com/#overlay
 ```
 
 Recommended Browser Source settings:
@@ -107,8 +143,10 @@ Recommended Browser Source settings:
 - Width: `1920`
 - Height: `1080`
 - Enable transparent background when using transparent overlay mode
+- Use `3840 x 2160` instead if the project output is set to 4K
 - Keep the Console open in a separate browser window or monitor
 - Use TAKE to push Preview to Program
+- If testing locally, use the same local origin as the Console, for example `http://localhost:5173/#overlay`
 
 ## Project Structure
 
@@ -120,22 +158,29 @@ src/project      Project model, storage, sync, import/export helpers
 src/match        Match defaults and match option data
 src/data         Built-in Overwatch data and asset path helpers
 src/theme        Theme tokens and color utilities
+scripts          Asset validation scripts
 public           Static heroes, roster, maps, modes, and app assets
 docs             Deployment, development notes, and asset conventions
 ```
 
-## Checks
+## Script Reference
 
 ```bash
+npm run dev
+npm run build:web
+npm run preview:web
 npm run check:assets
 npm run lint
 npm run build
+npm run check
 ```
 
-`npm run check` runs all three.
+`npm run check` runs asset validation, ESLint, and a production build.
 
 ## Usage Notice
 
 OWBT is made by michaelsky5 and provided free for Overwatch community tournament broadcasts.
 
-Please keep the creator credit unless separate permission is granted. Do not resell, paywall, relicense, or redistribute it for profit.
+OWBT is not an official Blizzard or Overwatch product and does not imply official authorization or endorsement.
+
+Please keep the creator credit unless separate permission is granted. Do not resell, paywall, relicense, or redistribute it for profit. Permission and compliance for event logos, team logos, sponsor marks, gameplay footage, and other third-party assets are the user's responsibility.
