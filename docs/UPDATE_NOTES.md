@@ -6,6 +6,7 @@
 
 - TAKE now keeps the Brand Stinger transition layer visible when the browser or operating system reports `prefers-reduced-motion: reduce`.
 - Reduced-motion mode still suppresses the scene mount animation, but no longer skips the actual TAKE transition.
+- TAKE transitions now have an explicit trigger token, so same-scene content updates can still play the selected transition instead of updating as a direct cut.
 - CJK text rendering has been hardened across broadcast scenes and legacy FCOL overlays to reduce vertical glyph clipping with Chinese event, team, player, caster, staff, map, title, and subtitle text.
 
 ### Changed

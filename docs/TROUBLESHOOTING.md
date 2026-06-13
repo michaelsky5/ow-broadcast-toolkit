@@ -15,6 +15,10 @@ Check these first:
 
 OWBT keeps TAKE transition output visible even when the operating system or browser reports `prefers-reduced-motion: reduce`. Reduced motion may still disable small scene resolve motion, but it should not hide the transition layer.
 
+Each TAKE also carries a transition trigger, so the transition should run even when Preview and Program use the same scene but the scene content changed.
+
+If `Transition Logo` is set to `Event Logo`, the event logo layer only appears when the project has an event logo or organizer logo configured. With no event logo configured, the Brand Stinger line animation still runs, but no event logo plate is rendered.
+
 ## Chinese Text Looks Cropped
 
 Broadcast scenes use fixed 1920x1080 layouts and bold display text. When testing a release, include Chinese event names, team names, short names, player names, caster names, staff names, map names, titles, and subtitles across all broadcast outputs:

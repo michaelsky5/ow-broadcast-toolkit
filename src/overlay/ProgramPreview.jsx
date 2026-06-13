@@ -23,6 +23,11 @@ const normalizeTransitionMode = mode => {
   return mode || 'scan'
 }
 
+const getTransitionIdentity = project => [
+  project?.scenes?.activeSceneId || '',
+  project?.scenes?.takeTransitionId || ''
+].join(':')
+
 const getTransitionLogoShape = (width, height) => {
   if (!width || !height) return 'square'
   const ratio = width / height
@@ -43,7 +48,8 @@ export default function ProgramPreview({
   transitionLogo = 'off'
 }) {
   const frameRef = useRef(null)
-  const previousSceneIdRef = useRef(project.scenes.activeSceneId)
+  const transitionIdentity = getTransitionIdentity(project)
+  const previousTransitionIdentityRef = useRef(transitionIdentity)
   const [scale, setScale] = useState(1)
   const [transitionKey, setTransitionKey] = useState(0)
   const [transitionLogoProbe, setTransitionLogoProbe] = useState({ source: '', shape: 'square' })
@@ -110,13 +116,12 @@ export default function ProgramPreview({
     }
   }, [configuredTransitionLogoSource, transitionLogo])
 
-  useEffect(() => {
-    const activeSceneId = project.scenes.activeSceneId
-    if (previousSceneIdRef.current === activeSceneId) return
+  useLayoutEffect(() => {
+    if (previousTransitionIdentityRef.current === transitionIdentity) return
 
-    previousSceneIdRef.current = activeSceneId
+    previousTransitionIdentityRef.current = transitionIdentity
     setTransitionKey(key => key + 1)
-  }, [project.scenes.activeSceneId])
+  }, [transitionIdentity])
 
   const handleTransitionLogoLoad = event => {
     if (transitionLogo !== 'event') return

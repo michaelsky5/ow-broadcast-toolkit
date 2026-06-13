@@ -32,6 +32,7 @@ If the preview server selects a different port, use that origin for both routes.
 - Enter the Console and confirm Scene Selector, Workspace, Preview, Program, editor, Quick Actions, Real-Time Status, and Operation Log appear.
 - Select a scene, press TAKE, and confirm Program updates.
 - Set Scene Transition to Brand Stinger, press TAKE between two different scenes, and confirm the transition is visible.
+- Press TAKE again while Preview and Program are on the same scene after a content edit, and confirm the selected transition still plays.
 - Open `/#overlay` and confirm it renders the current Program scene.
 - Test Chinese event, team, short-name, player, caster, staff, map, title, and subtitle text across all broadcast scenes, including legacy FCOL outputs; confirm glyphs are not vertically cropped.
 - Confirm Data Center remains visible in the primary Scene Selector and includes OCR plus JSON/CSV export entry points.

@@ -65,6 +65,16 @@ const DEFAULT_CONSOLE_SETTINGS = {
 }
 const VALID_INTERFACE_LANGUAGES = ['zh', 'en']
 
+const createTakeTransitionId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+
+const markTakeTransition = project => ({
+  ...project,
+  scenes: {
+    ...(project?.scenes || {}),
+    takeTransitionId: createTakeTransitionId()
+  }
+})
+
 const isOverlayRoute = () => {
   if (typeof window === 'undefined') return false
   return window.location.hash.startsWith('#overlay')
@@ -578,7 +588,7 @@ function ConsoleApp() {
   }
 
   const autoTakeProgramScene = scene => {
-    setProgramProject(prev => ({
+    setProgramProject(prev => markTakeTransition({
       ...prev,
       scenes: {
         ...prev.scenes,
@@ -591,7 +601,7 @@ function ConsoleApp() {
 
   const takePreviewToProgram = () => {
     pushUndoSnapshot('TAKE')
-    setProgramProject(structuredClone(previewProject))
+    setProgramProject(markTakeTransition(structuredClone(previewProject)))
     pushLog(copy.logTake(getSceneName(previewScene, language)))
   }
 
