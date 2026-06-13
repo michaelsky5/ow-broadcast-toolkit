@@ -12,6 +12,7 @@
 ### Changed
 
 - Scene typography now uses safer line-height values for user-facing CJK-capable text while preserving tight numeric and decorative labels where appropriate.
+- The OWBT transition mark is smaller so the Brand Stinger reads as a transition accent instead of a full-screen logo card.
 - The transition mark asset is now treated as a required app asset by the asset checker.
 - Release checklist coverage now includes Brand Stinger TAKE transition and full CJK broadcast smoke tests.
 
