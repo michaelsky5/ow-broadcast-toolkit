@@ -667,33 +667,55 @@
 .scheduleMetaTag {
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
+  width: 100%;
   max-width: 100%;
-  min-height: 34px;
+  min-height: 38px;
   overflow: hidden;
   border: 1px solid var(--theme-primary-border);
-  background: var(--theme-primary);
-  box-shadow: var(--theme-shadow-primary);
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18)),
+    var(--theme-primary);
+  box-shadow: 0 0 18px var(--theme-primary-soft);
   color: #050505;
 }
 
 .scheduleMetaTag span,
 .scheduleMetaTag em {
-  display: block;
+  align-self: stretch;
+  display: grid;
+  align-items: center;
   overflow: hidden;
-  padding: 0 14px;
+  padding: 0 18px;
   font-size: 12px;
   font-style: normal;
   font-weight: 950;
   letter-spacing: 0.1em;
+  line-height: 1;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
+.scheduleMetaTag span {
+  box-sizing: border-box;
+  min-width: 100px;
+  justify-content: center;
+  border-right: 1px solid rgba(0,0,0,0.22);
+  background: rgba(255,255,255,0.08);
+  box-shadow: inset -1px 0 rgba(255,255,255,0.1);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  text-align: center;
+}
+
 .scheduleMetaTag em {
-  max-width: 280px;
-  border-left: 1px solid rgba(0,0,0,0.18);
+  flex: 1;
+  min-width: 0;
+  max-width: none;
   color: rgba(0,0,0,0.62);
+  font-size: 12px;
 }
 
 .scheduleSingleCard {
@@ -844,7 +866,7 @@
 .scheduleList {
   display: grid;
   gap: 18px;
-  width: 690px;
+  width: 720px;
   max-width: 100%;
 }
 
@@ -863,24 +885,40 @@
 }
 
 .scheduleListCompact .scheduleMetaTag {
-  min-height: 28px;
+  min-height: 34px;
 }
 
 .scheduleListCompact .scheduleMetaTag span,
 .scheduleListCompact .scheduleMetaTag em {
-  padding: 0 10px;
-  font-size: 10px;
+  padding: 0 12px;
   letter-spacing: 0.08em;
 }
 
+.scheduleListCompact .scheduleMetaTag span {
+  min-width: 90px;
+  font-size: 19px;
+}
+
+.scheduleListCompact .scheduleMetaTag em {
+  font-size: 11px;
+}
+
 .scheduleListDense .scheduleMetaTag {
-  min-height: 24px;
+  min-height: 30px;
 }
 
 .scheduleListDense .scheduleMetaTag span,
 .scheduleListDense .scheduleMetaTag em {
-  padding: 0 8px;
-  font-size: 9px;
+  padding: 0 10px;
+}
+
+.scheduleListDense .scheduleMetaTag span {
+  min-width: 78px;
+  font-size: 16px;
+}
+
+.scheduleListDense .scheduleMetaTag em {
+  font-size: 10px;
 }
 
 .scheduleItemRow {

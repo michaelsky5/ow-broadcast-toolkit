@@ -9,6 +9,12 @@ const MAX_UPCOMING_MATCHES = 4
 
 const clean = value => String(value || '').trim()
 
+const getDisplayGroupLabel = language => (language === 'zh' ? '显示' : 'Show')
+
+const getShortDisplayLabel = label => clean(label)
+  .replace(/^显示\s*/u, '')
+  .replace(/^Show\s+/i, '')
+
 const SCHEDULE_MATCH_FIELDS = [
   'time',
   'stage',
@@ -82,6 +88,7 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
   const cleanVideoRenderMode = mediaSettings.videoRenderMode === 'OBS_LOCAL'
     ? countdownText.obsSource
     : countdownText.toolkitPlayback
+  const displayGroupLabel = getDisplayGroupLabel(language)
 
   const createEmptyUpcomingMatch = (enabled = false) => ({
     enabled,
@@ -287,25 +294,26 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
             </div>
           )}
 
-          <div className={styles.breakFeatureStrip}>
+          <div className={`${styles.breakFeatureStrip} ${isStandbyMode ? styles.breakFeatureStripStandby : ''}`}>
+            <span className={styles.breakFeatureLabel}>{displayGroupLabel}</span>
             <ToggleField
-              label={countdownText.showLogo}
+              label={getShortDisplayLabel(countdownText.showLogo)}
               checked={settings.showEventLogo !== false}
               onChange={checked => updateSetting({ showEventLogo: checked })}
             />
             <ToggleField
-              label={countdownText.showEvent}
+              label={getShortDisplayLabel(countdownText.showEvent)}
               checked={settings.showEventName !== false}
               onChange={checked => updateSetting({ showEventName: checked })}
             />
             <ToggleField
-              label={countdownText.showStatus}
+              label={getShortDisplayLabel(countdownText.showStatus)}
               checked={settings.showStatus !== false}
               onChange={checked => updateSetting({ showStatus: checked })}
             />
             {!isStandbyMode && (
               <ToggleField
-                label={countdownText.showSchedule}
+                label={getShortDisplayLabel(countdownText.showSchedule)}
                 checked={settings.showSchedule !== false}
                 onChange={checked => updateSetting({ showSchedule: checked })}
               />

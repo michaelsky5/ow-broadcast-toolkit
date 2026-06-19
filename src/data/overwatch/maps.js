@@ -28,6 +28,7 @@ export const OW_MAPS = [
   { id: 'kings-row', zh: '国王大道', en: "King's Row", mode: 'hybrid', assetKey: 'kings-row' },
   { id: 'numbani', zh: '努巴尼', en: 'Numbani', mode: 'hybrid', assetKey: 'numbani' },
   { id: 'midtown', zh: '中城', en: 'Midtown', mode: 'hybrid', assetKey: 'midtown' },
+  { id: 'neon-junction', zh: '霓虹枢纽', en: 'Neon Junction', mode: 'hybrid', assetKey: 'neon-junction' },
   { id: 'paraiso', zh: '帕拉伊苏', en: 'Paraíso', mode: 'hybrid', assetKey: 'paraiso' },
 
   // Push

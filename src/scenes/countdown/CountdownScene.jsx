@@ -192,12 +192,14 @@ function ScheduleBoard({ matches, compact = false, dense = false, featured = fal
     <section className={`${styles.scheduleList} ${compact ? styles.scheduleListCompact : ''} ${dense ? styles.scheduleListDense : ''}`}>
       {matches.map((match, index) => {
         const hasScore = match.scoreA !== '' && match.scoreB !== ''
+        const stageLabel = match.stage || 'NEXT MATCH'
+        const timeLabel = match.time || 'UPCOMING'
 
         return (
           <article className={styles.scheduleItem} key={`${index}-${match.teamA}-${match.teamB}`}>
             <div className={styles.scheduleMetaTag}>
-              <span>{match.time || 'UPCOMING'}</span>
-              {match.stage && <em>{match.stage}</em>}
+              <span>{timeLabel}</span>
+              <em>{stageLabel}</em>
             </div>
 
             <div className={styles.scheduleItemRow}>
