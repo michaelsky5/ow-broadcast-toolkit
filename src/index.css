@@ -1,3 +1,51 @@
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Thin.ttf") format("truetype");
+  font-weight: 100 250;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Light.ttf") format("truetype");
+  font-weight: 251 350;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Regular.ttf") format("truetype");
+  font-weight: 351 450;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Medium.ttf") format("truetype");
+  font-weight: 451 650;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Bold.ttf") format("truetype");
+  font-weight: 651 849;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Black.ttf") format("truetype");
+  font-weight: 850 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   font-family: "HarmonyOS Sans SC", "HarmonyOS Sans", "MiSans", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #fff;
