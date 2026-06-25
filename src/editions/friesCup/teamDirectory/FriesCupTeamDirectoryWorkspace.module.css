@@ -1,0 +1,365 @@
+.directory {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.header,
+.statusGrid > div,
+.listPanel,
+.detailPanel {
+  border: 1px solid rgba(255,255,255,0.1);
+  border-top: 2px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.025);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.header span,
+.statusGrid span,
+.searchField span,
+.teamHero span,
+.sectionTitle,
+.playerRow span,
+.staffRow span {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.header h3,
+.teamHero h4 {
+  margin: 5px 0 0;
+  color: var(--theme-text);
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.header h3 {
+  font-size: 24px;
+}
+
+.headerActions,
+.applyActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.headerActions button,
+.applyActions button,
+.teamList button {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  cursor: pointer;
+  font-weight: 950;
+}
+
+.headerActions button {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.headerActions button:disabled {
+  color: rgba(255,255,255,0.36);
+  cursor: default;
+}
+
+.headerActions button:hover:not(:disabled),
+.applyActions button:hover,
+.teamList button:hover,
+.selectedTeam {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.primaryButton {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.statusGrid > div {
+  min-width: 0;
+  padding: 11px;
+}
+
+.statusGrid strong,
+.statusGrid em,
+.teamList span,
+.teamList em,
+.playerRow strong,
+.playerRow em,
+.staffRow strong,
+.staffRow em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusGrid strong {
+  display: block;
+  margin-top: 7px;
+  color: var(--theme-primary);
+  font-size: 14px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.statusGrid em {
+  display: block;
+  margin-top: 5px;
+  color: rgba(255,255,255,0.48);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.listPanel,
+.detailPanel {
+  min-width: 0;
+  padding: 14px;
+}
+
+.searchField {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.searchField input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
+  color: var(--theme-text);
+  padding: 10px 11px;
+  outline: none;
+}
+
+.searchField input:focus {
+  border-color: var(--theme-primary-border);
+}
+
+.teamList {
+  display: grid;
+  gap: 8px;
+  max-height: min(62vh, 640px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.teamList button {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) 58px;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  min-height: 46px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.teamList strong {
+  color: var(--theme-primary);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.teamList span {
+  color: var(--theme-text);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.teamList em {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 850;
+  text-align: right;
+}
+
+.teamHero {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 14px;
+}
+
+.teamLogo {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border: 1px solid var(--theme-primary-border);
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 13px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 13px),
+    #050505;
+}
+
+.teamLogo img {
+  display: block;
+  max-width: 82%;
+  max-height: 82%;
+  object-fit: contain;
+}
+
+.teamLogo strong {
+  color: var(--theme-primary);
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.teamHero h4 {
+  overflow: hidden;
+  font-size: 28px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.teamHero p {
+  margin: 8px 0 0;
+  color: var(--theme-primary);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.applyActions {
+  min-width: 158px;
+}
+
+.applyActions button {
+  min-height: 38px;
+  padding: 0 12px;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  color: var(--theme-primary);
+}
+
+.sectionTitle::before {
+  width: 7px;
+  height: 7px;
+  background: var(--theme-primary);
+  box-shadow: 0 0 12px var(--theme-primary);
+  content: '';
+}
+
+.playerList,
+.staffList {
+  display: grid;
+  gap: 7px;
+}
+
+.playerRow,
+.staffRow {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr) minmax(120px, 0.7fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 38px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.22);
+  padding: 0 10px;
+}
+
+.playerRow strong,
+.staffRow strong {
+  color: var(--theme-text);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.playerRow em,
+.staffRow em {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.emptyState,
+.emptyDetail {
+  display: grid;
+  place-items: center;
+  min-height: 72px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.22);
+  color: var(--theme-muted-text);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.emptyDetail {
+  min-height: 360px;
+}
+
+@media (max-width: 1180px) {
+  .statusGrid,
+  .body,
+  .detailGrid,
+  .teamHero {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .headerActions,
+  .applyActions {
+    justify-content: stretch;
+  }
+}
+

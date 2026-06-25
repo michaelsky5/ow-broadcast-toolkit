@@ -24,7 +24,7 @@ function OpeningEditor({ project, copy, text, onUpdateProject }) {
               ensureSceneSettings(draft, 'opening').competitionNameEn = value
               draft.event.nameEn = value
               draft.event.name = value
-              draft.meta.name = value || 'OWBT Project'
+              draft.meta.name = value || 'FriesCup Project'
             })}
           />
         </Field>

@@ -1,5 +1,6 @@
 ﻿import { OW_MAP_OPTIONS } from '../../../data/overwatch'
 import { useState } from 'react'
+import { FRIES_CUP_CONFIG } from '../../../editions/friesCup/config'
 import { FT_OPTIONS } from '../../../match/defaultMatch'
 import { DEFAULT_THEME } from '../../../theme/defaultTheme'
 import styles from '../shared/SceneEditor.styles.js'
@@ -120,7 +121,7 @@ function MatchupTeamPanel({ side, title, project, copy, text, isExpanded, onTogg
           </div>
 
           <Field label={text.teamLogo}>
-            <input value={team?.logo || ''} onChange={updateTeam('logo')} placeholder="/OW.svg" />
+            <input value={team?.logo || ''} onChange={updateTeam('logo')} placeholder={FRIES_CUP_CONFIG.defaultLogo} />
           </Field>
         </div>
       ) : null}

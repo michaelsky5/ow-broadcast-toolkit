@@ -1,4 +1,5 @@
 import { OW_HERO_BY_ID, OW_ROLE_BY_ID } from '../../data/overwatch'
+import { FRIES_CUP_CONFIG } from '../../editions/friesCup/config'
 import { getBroadcastCompetitionName } from '../../project/branding'
 import { getCurrentTeams, getTeamPlayers } from '../../project/projectUtils'
 import styles from './RosterScene.module.css'
@@ -21,7 +22,7 @@ const getRoleLabel = role => {
 
 const getHeroImage = player => {
   const hero = OW_HERO_BY_ID[player?.primaryHeroes?.[0]]
-  return clean(player?.avatar) || clean(hero?.rosterIcon || hero?.icon) || '/OW.svg'
+  return clean(player?.avatar) || clean(hero?.rosterIcon || hero?.icon) || FRIES_CUP_CONFIG.defaultLogo
 }
 
 const getTeamForSide = (project, side) => {
@@ -51,7 +52,7 @@ const getRosterOutputPlayers = (project, team, side) => {
 const handleImageFallback = event => {
   if (event.currentTarget.dataset.fallbackApplied) return
   event.currentTarget.dataset.fallbackApplied = 'true'
-  event.currentTarget.src = '/OW.svg'
+  event.currentTarget.src = FRIES_CUP_CONFIG.defaultLogo
 }
 
 export default function RosterScene({ project }) {
@@ -64,7 +65,7 @@ export default function RosterScene({ project }) {
   const subtitle = clean(project.event?.subtitle || settings.subtitle) || eventName
   const teamName = clean(team?.name) || `Team ${side}`
   const teamShort = clean(team?.shortName) || `T${side}`
-  const teamLogo = clean(team?.logo) || '/OW.svg'
+  const teamLogo = clean(team?.logo) || FRIES_CUP_CONFIG.defaultLogo
   const teamColor = clean(team?.primaryColor) || 'var(--theme-primary)'
   const managerName = clean(team?.manager)
   const coachName = clean(team?.coach)
@@ -81,7 +82,7 @@ export default function RosterScene({ project }) {
       <header className={styles.topbar}>
         <div className={styles.interfaceLabel}>
           <span />
-          <strong>OWBT_ROSTER_INTERFACE</strong>
+          <strong>FRIES_CUP_ROSTER_INTERFACE</strong>
         </div>
         <em>TEAM_ROSTER // READY</em>
       </header>

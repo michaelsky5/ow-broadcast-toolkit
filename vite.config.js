@@ -6,6 +6,20 @@ const normalizePath = id => id.replace(/\\/g, '/')
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      '/api/admin-public': {
+        target: 'https://admin.fries-cup.com',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/admin-public/, '/api/public')
+      },
+      '/api/stats-data': {
+        target: 'https://stats.fries-cup.com',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/stats-data/, '/data')
+      }
+    }
+  },
   build: {
     rollupOptions: {
       output: {

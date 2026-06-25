@@ -3,6 +3,18 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/api/admin-public/*"
+  to = "https://admin.fries-cup.com/api/public/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/stats-data/*"
+  to = "https://stats.fries-cup.com/data/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

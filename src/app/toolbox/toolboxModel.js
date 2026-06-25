@@ -1,4 +1,5 @@
 import { OW_MAP_BY_ID } from '../../data/overwatch'
+import { FRIES_CUP_CONFIG } from '../../editions/friesCup/config'
 import { getCompetitionName, getEventLogo, getEventLogoSource } from '../../project/branding'
 import { getCurrentTeams, getTeamById } from '../../project/projectUtils'
 import { BASE_SCENE_HEIGHT, BASE_SCENE_WIDTH } from './toolboxConfig'
@@ -30,7 +31,7 @@ export const getEventLogoSourceLabel = source => {
   if (source === 'event') return 'Event Logo'
   if (source === 'organizer') return 'Organizer Logo'
 
-  return 'Fallback OW'
+  return 'Fallback FC'
 }
 
 export const getTeamLabel = team => clean(team?.name || team?.shortName) || 'TBD'
@@ -184,8 +185,8 @@ export const buildBaseContext = ({ language, programScene, project }) => {
     eventName: getCompetitionName(project, language),
     eventLogo: getEventLogo(project),
     eventLogoSource: getEventLogoSource(project),
-    eventSubtitle: clean(project.event?.subtitle) || 'OVERWATCH COMMUNITY TOURNAMENT',
-    themeColor: clean(project.theme?.primary) || '#4CD3B5',
+    eventSubtitle: clean(project.event?.subtitle) || FRIES_CUP_CONFIG.editionName.toUpperCase(),
+    themeColor: clean(project.theme?.primary) || FRIES_CUP_CONFIG.primaryColor,
     teamA: toTeamSnapshot(teamA),
     teamB: toTeamSnapshot(teamB),
     score: project.currentMatch?.score || { teamA: 0, teamB: 0 },

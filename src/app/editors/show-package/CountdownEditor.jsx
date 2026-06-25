@@ -161,7 +161,7 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
 
       if (field === 'nameEn') {
         draft.event.name = value
-        draft.meta.name = value || draft.event.nameZh || 'OWBT Project'
+        draft.meta.name = value || draft.event.nameZh || 'FriesCup Project'
       }
     })
   }

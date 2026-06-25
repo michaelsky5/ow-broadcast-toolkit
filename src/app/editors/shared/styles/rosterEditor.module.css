@@ -606,10 +606,21 @@
 
 .teamDbToolbar {
   display: grid;
-  grid-template-columns: 112px 96px minmax(300px, 1fr) 108px 108px 120px 112px;
+  grid-template-columns: 112px 96px minmax(260px, 1fr) 104px 104px 104px 98px 112px;
   gap: 8px;
   align-items: stretch;
   margin-bottom: 12px;
+}
+
+.teamDbDesk .teamDbToolbarDanger {
+  border-color: var(--theme-danger-border);
+  background: rgba(255, 82, 82, 0.08);
+  color: var(--theme-danger);
+}
+
+.teamDbDesk .teamDbToolbarDanger:hover {
+  border-color: var(--theme-danger);
+  background: rgba(255, 82, 82, 0.14);
 }
 
 .teamDbMetric,
@@ -664,7 +675,7 @@
 .teamDbListHeader,
 .teamDbListRow {
   display: grid;
-  grid-template-columns: 34px 58px minmax(142px, 1fr) 72px 50px 162px;
+  grid-template-columns: 34px 42px 58px minmax(118px, 1fr) 72px 50px 162px;
   gap: 6px;
   min-width: 0;
 }
@@ -697,8 +708,8 @@
 .teamDbListRow {
   align-items: stretch;
   grid-template-areas:
-    "index short name status roster actions"
-    "index short roles staff staff actions";
+    "index logo short name status roster actions"
+    "index logo short roles staff staff actions";
   border: 1px solid rgba(255,255,255,0.08);
   border-left: 2px solid rgba(255,255,255,0.16);
   background:
@@ -727,6 +738,37 @@
 
 .teamDbListRow > span:nth-of-type(5) {
   grid-area: status;
+}
+
+.teamDbLogoMark {
+  display: grid;
+  grid-area: logo;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    radial-gradient(circle at 50% 50%, var(--theme-primary-softer), transparent 62%),
+    rgba(0,0,0,0.24);
+  overflow: hidden;
+}
+
+.teamDbLogoMark img {
+  display: block;
+  max-width: 78%;
+  max-height: 78%;
+  object-fit: contain;
+}
+
+.teamDbLogoMark span {
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .teamDbListRow > strong {
@@ -765,6 +807,14 @@
 
 .teamDbListRow > em {
   color: var(--theme-text);
+}
+
+.teamDbListRow > .teamDbSourceBadge {
+  color: var(--theme-primary);
+}
+
+.teamDbCardStale > .teamDbSourceBadge {
+  color: var(--theme-danger);
 }
 
 .teamDbListActions {
@@ -848,6 +898,10 @@
     linear-gradient(90deg, var(--theme-primary-softer), transparent 46%),
     repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
     rgba(0,0,0,0.22);
+}
+
+.teamDbCardStale {
+  border-left-color: var(--theme-danger);
 }
 
 .teamDbCardHeader {

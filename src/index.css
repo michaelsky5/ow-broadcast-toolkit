@@ -93,6 +93,6 @@ select option {
 }
 
 select option:checked {
-  background: var(--theme-primary, #4ed1ad);
+  background: var(--theme-primary);
   color: #050505;
 }

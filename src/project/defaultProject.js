@@ -1,4 +1,6 @@
 import { OW_DATA_VERSION } from '../data/overwatch'
+import { applyFriesCupProjectDefaults } from '../editions/friesCup/defaultProject'
+import { FRIES_CUP_CONFIG } from '../editions/friesCup/config'
 import { createDefaultMatch } from '../match/defaultMatch'
 import { DEFAULT_THEME } from '../theme/defaultTheme'
 import { createDefaultCasters, createDefaultPlayers, createDefaultStaff, createDefaultTeams } from './defaults/defaultParticipants'
@@ -53,25 +55,25 @@ const createDefaultAssetSettings = () => ({
   }
 })
 
-export const createDefaultProject = () => ({
+export const createDefaultProject = () => applyFriesCupProjectDefaults({
   schemaVersion: PROJECT_SCHEMA_VERSION,
 
   meta: {
-    id: 'owbt-project-default',
-    name: 'OWBT Project',
+    id: 'fries-cup-project-default',
+    name: 'FriesCup Project',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
 
   event: {
-    name: 'OWBT',
-    nameZh: 'OWBT',
-    nameEn: 'OWBT',
-    subtitle: 'Overwatch Community Tournament',
-    logo: '',
+    name: FRIES_CUP_CONFIG.brandName,
+    nameZh: FRIES_CUP_CONFIG.brandName,
+    nameEn: FRIES_CUP_CONFIG.brandName,
+    subtitle: FRIES_CUP_CONFIG.editionName,
+    logo: FRIES_CUP_CONFIG.defaultLogo,
     logoBackdrop: 'auto',
     organizerLogo: '',
-    language: 'zh',
+    language: FRIES_CUP_CONFIG.defaultLocale,
     overlayLanguage: 'en',
     startupMotion: 'full',
     outputResolution: '1920x1080',

@@ -1,5 +1,8 @@
 import { createDefaultProject, PROJECT_SCHEMA_VERSION } from './defaultProject'
 import { DEFAULT_COMPETITION_NAME_EN, DEFAULT_COMPETITION_NAME_ZH } from './branding'
+import { FRIES_CUP_CONFIG } from '../editions/friesCup/config'
+import { applyFriesCupProjectDefaults } from '../editions/friesCup/defaultProject'
+import { convertLegacyFriesCupProject } from '../editions/friesCup/legacy/legacyImportAdapter'
 
 export const isPlainObject = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 
@@ -24,7 +27,7 @@ const normalizeLegacyDefaultBrand = project => {
     ...project,
     meta: {
       ...(project.meta || {}),
-      name: 'OWBT Project'
+      name: 'FriesCup Project'
     },
     event: {
       ...(project.event || {}),
@@ -113,7 +116,11 @@ export const touchProject = project => ({
 export const normalizeProject = rawProject => {
   const fallback = createDefaultProject()
   const source = isPlainObject(rawProject) ? rawProject : {}
-  const merged = normalizeLegacyDefaultMvp(normalizeLegacyDefaultBrand(deepMerge(fallback, source)), source)
+  const legacyConversion = convertLegacyFriesCupProject(source, fallback)
+  const sourceProject = legacyConversion.project || source
+  const merged = applyFriesCupProjectDefaults(
+    normalizeLegacyDefaultMvp(normalizeLegacyDefaultBrand(deepMerge(fallback, sourceProject)), sourceProject)
+  )
 
   return {
     ...merged,
@@ -142,7 +149,8 @@ export const safeParseProject = jsonText => {
 }
 
 export const createProjectFileName = project => {
-  const name = String(project?.meta?.name || project?.event?.name || 'owbt-project')
+  const prefix = project?.editionData?.friesCup?.projectExportPrefix || FRIES_CUP_CONFIG.projectExportPrefix
+  const name = String(prefix || project?.meta?.name || project?.event?.name || 'fries-cup-project')
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9\u4e00-\u9fa5]+/gi, '-')

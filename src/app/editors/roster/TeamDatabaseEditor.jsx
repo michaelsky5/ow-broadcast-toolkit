@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
 import { OW_ROLE_OPTIONS } from '../../../data/overwatch'
+import { FRIES_CUP_CONFIG } from '../../../editions/friesCup/config'
+import { clearProjectFcSystemTeams, isProjectTeamFromFcSystem } from '../../../editions/friesCup/teamDirectory/syncPublishedTeamsIntoProject'
 import { downloadTextFile, getTeamPlayers } from '../../../project/projectUtils'
 import styles from '../shared/SceneEditor.styles.js'
 import { EditorDialog, Field, Panel } from '../shared/editorControls'
@@ -26,7 +28,7 @@ const isSupportedLogoFile = file => (
   )
 )
 
-function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdateProject }) {
+function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdateProject, onPushLog }) {
   const importInputRef = useRef(null)
   const teamLogoInputRef = useRef(null)
   const [editingTeamId, setEditingTeamId] = useState('')
@@ -56,8 +58,13 @@ function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdat
       team.id === teamBId ? 'B' : ''
     ].filter(Boolean)
     const staffCount = [team.manager, team.coach].filter(Boolean).length
+    const isFcSystemTeam = isProjectTeamFromFcSystem(team)
+    const sourceLabel = isFcSystemTeam ? 'FC SYSTEM' : 'MANUAL'
+    const logoStatus = team.editionData?.friesCup?.logo?.status || (team.logo ? 'manual' : 'missing')
     const searchText = [
       team.id,
+      team.source,
+      team.sourceTeamId,
       team.name,
       team.shortName,
       team.logo,
@@ -76,14 +83,19 @@ function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdat
       players,
       roleCounts,
       searchText,
+      sourceLabel,
       staffCount,
       team,
-      teamIndex
+      teamIndex,
+      logoStatus
     }
   })
   const visibleTeamRows = searchNeedle
     ? teamRows.filter(row => row.searchText.includes(searchNeedle))
     : teamRows
+  const fcSystemRows = teamRows.filter(row => isProjectTeamFromFcSystem(row.team))
+  const activeFcSystemRows = fcSystemRows.filter(row => row.activeSlots.length)
+  const removableFcSystemCount = Math.max(0, fcSystemRows.length - activeFcSystemRows.length)
 
   const updateTeam = (teamId, field) => event => {
     const value = event.target.value
@@ -127,6 +139,37 @@ function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdat
     onUpdateProject(draft => {
       draft.currentMatch[`${side}Id`] = teamId
       draft.currentMatch.startingFive[side] = getStartingFiveForTeam(draft, teamId)
+    }, { undoReason: `LOAD ${side.toUpperCase()} TEAM` })
+    const team = teams.find(item => item.id === teamId)
+    const sideLabel = side === 'teamB' ? 'B' : 'A'
+    onPushLog?.(`设置 ${team?.shortName || team?.name || teamId} 为 ${sideLabel} 队`)
+  }
+
+  const requestLoadMatchTeam = (side, teamId) => {
+    const currentTeamId = project.currentMatch?.[`${side}Id`] || ''
+    if (!currentTeamId || currentTeamId === teamId) {
+      loadMatchTeam(side, teamId)
+      return
+    }
+
+    const team = teams.find(item => item.id === teamId)
+    const currentTeam = teams.find(item => item.id === currentTeamId)
+    const sideLabel = side === 'teamB' ? 'B' : 'A'
+    const teamLabel = team?.shortName || team?.name || teamId
+    const currentLabel = currentTeam?.shortName || currentTeam?.name || currentTeamId
+
+    setDialog({
+      kicker: rosterText.teamDbKicker,
+      title: `设置 ${sideLabel} 队`,
+      message: `将 ${teamLabel} 设置为 ${sideLabel} 队，当前 ${sideLabel} 队为 ${currentLabel}。继续？`,
+      tone: 'danger',
+      confirmLabel: side === 'teamB' ? rosterText.loadB : rosterText.loadA,
+      cancelLabel: rosterText.cancel,
+      onCancel: closeDialog,
+      onConfirm: () => {
+        loadMatchTeam(side, teamId)
+        closeDialog()
+      }
     })
   }
 
@@ -175,6 +218,33 @@ function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdat
           draft.currentMatch.startingFive.teamB = (draft.currentMatch.startingFive.teamB || []).filter(id => !removedPlayerIds.has(id))
         })
         if (editingTeamId === teamId) setEditingTeamId('')
+        closeDialog()
+      }
+    })
+  }
+
+  const requestClearFcSystemTeams = () => {
+    if (!removableFcSystemCount) return
+
+    setDialog({
+      kicker: 'FC SYSTEM',
+      title: '清理 FC System 队伍',
+      message: `将删除 ${removableFcSystemCount} 支非当前 A/B 的 FC System 队伍及其选手。手动队伍和当前 A/B 队会保留。继续？`,
+      tone: 'danger',
+      confirmLabel: '清理',
+      cancelLabel: rosterText.cancel,
+      onCancel: closeDialog,
+      onConfirm: () => {
+        let cleanupReport = null
+
+        onUpdateProject(draft => {
+          cleanupReport = clearProjectFcSystemTeams(draft, { preserveCurrentMatch: true })
+        }, { undoReason: 'CLEAR FC SYSTEM TEAMS' })
+
+        if (editingTeam && isProjectTeamFromFcSystem(editingTeam) && editingActiveSlots.length === 0) {
+          setEditingTeamId('')
+        }
+        onPushLog?.(`清理 FC System 队伍 ${cleanupReport?.deletedTeams || removableFcSystemCount} 支`)
         closeDialog()
       }
     })
@@ -359,6 +429,15 @@ function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdat
             {rosterText.sortTeams}
           </button>
 
+          <button
+            type="button"
+            className={styles.teamDbToolbarDanger}
+            onClick={requestClearFcSystemTeams}
+            disabled={!removableFcSystemCount}
+          >
+            清理 FC
+          </button>
+
           <button type="button" className={styles.primaryButton} onClick={addTeam}>
             {rosterText.addTeam}
           </button>
@@ -378,9 +457,11 @@ function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdat
         <div className={styles.teamDbList}>
           {visibleTeamRows.map(({
             activeSlots,
+            logoStatus,
             players,
             roleCounts,
             staffCount,
+            sourceLabel,
             team,
             teamIndex
           }) => {
@@ -390,26 +471,40 @@ function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdat
               <div
                 className={[
                   styles.teamDbListRow,
-                  activeSlots.length ? styles.teamDbCardActive : ''
+                  activeSlots.length ? styles.teamDbCardActive : '',
+                  team.stale ? styles.teamDbCardStale : ''
                 ].filter(Boolean).join(' ')}
                 key={team.id}
               >
                 <span>{teamIndex + 1}</span>
+                <div className={styles.teamDbLogoMark} title={`Logo: ${logoStatus}`}>
+                  {team.logo ? (
+                    <img
+                      src={team.logo}
+                      alt=""
+                      onError={event => {
+                        event.currentTarget.hidden = true
+                      }}
+                    />
+                  ) : (
+                    <span>{team.shortName || '-'}</span>
+                  )}
+                </div>
                 <strong>{team.shortName || '-'}</strong>
                 <em>{team.name || team.id}</em>
                 <span>{players.length} / {MAX_ROSTER_PLAYERS}</span>
                 <span>{rosterText.roleSummary(roleCounts)}</span>
                 <span>{staffCount ? rosterText.staffCount(staffCount) : '-'}</span>
-                <span>{activeSlots.length ? rosterText.matchSlot(activeSlots) : rosterText.library}</span>
+                <span className={styles.teamDbSourceBadge}>{team.stale ? `${sourceLabel} / STALE` : sourceLabel}</span>
 
                 <div className={styles.teamDbListActions}>
                   <button type="button" onClick={() => setEditingTeamId(team.id)}>
                     {rosterText.edit}
                   </button>
-                  <button type="button" onClick={() => loadMatchTeam('teamA', team.id)}>
+                  <button type="button" onClick={() => requestLoadMatchTeam('teamA', team.id)}>
                     A
                   </button>
-                  <button type="button" onClick={() => loadMatchTeam('teamB', team.id)}>
+                  <button type="button" onClick={() => requestLoadMatchTeam('teamB', team.id)}>
                     B
                   </button>
                   <button type="button" className={styles.dangerButton} disabled={!canDeleteTeam} onClick={() => deleteTeam(team.id)}>
@@ -488,7 +583,7 @@ function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdat
 
                 <Field label={text.teamLogo}>
                   <div className={styles.teamLogoInputRow}>
-                    <input value={editingTeam.logo || ''} onChange={updateTeam(editingTeam.id, 'logo')} placeholder="/OW.svg" />
+                    <input value={editingTeam.logo || ''} onChange={updateTeam(editingTeam.id, 'logo')} placeholder={FRIES_CUP_CONFIG.defaultLogo} />
                     <button type="button" onClick={() => teamLogoInputRef.current?.click()}>
                       {text.uploadLogo}
                     </button>
@@ -570,10 +665,10 @@ function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdat
             </div>
 
             <footer className={styles.teamDbModalActions}>
-              <button type="button" onClick={() => loadMatchTeam('teamA', editingTeam.id)}>
+              <button type="button" onClick={() => requestLoadMatchTeam('teamA', editingTeam.id)}>
                 {rosterText.loadA}
               </button>
-              <button type="button" onClick={() => loadMatchTeam('teamB', editingTeam.id)}>
+              <button type="button" onClick={() => requestLoadMatchTeam('teamB', editingTeam.id)}>
                 {rosterText.loadB}
               </button>
               <button type="button" onClick={() => sortTeamPlayersByRole(editingTeam.id)}>

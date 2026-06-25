@@ -1,4 +1,5 @@
 import { OW_MAP_BY_ID } from '../../data/overwatch'
+import { FRIES_CUP_CONFIG } from '../../editions/friesCup/config'
 import { getCurrentTeams } from '../../project/projectUtils'
 import { getBroadcastCompetitionName } from '../../project/branding'
 import styles from './MatchupScene.module.css'
@@ -36,12 +37,12 @@ const getTeamInitials = team => {
   return String(source).slice(0, 4).toUpperCase()
 }
 
-const getTeamLogo = team => String(team?.logo || '').trim() || '/OW.svg'
+const getTeamLogo = team => String(team?.logo || '').trim() || FRIES_CUP_CONFIG.defaultLogo
 
 const handleImageFallback = event => {
   if (event.currentTarget.dataset.fallbackApplied) return
   event.currentTarget.dataset.fallbackApplied = 'true'
-  event.currentTarget.src = '/OW.svg'
+  event.currentTarget.src = FRIES_CUP_CONFIG.defaultLogo
 }
 
 function TeamPanel({ team, side, score }) {
@@ -131,7 +132,7 @@ export default function MatchupScene({ project }) {
         <div className={styles.titleBlock}>
           <div className={styles.kicker}>{copy.matchInfo}</div>
           <h1>{title}</h1>
-          <p>{project.event?.subtitle || 'Broadcast Toolkit'}</p>
+          <p>{project.event?.subtitle || FRIES_CUP_CONFIG.editionName}</p>
         </div>
 
         <div className={styles.matchCard}>
@@ -149,7 +150,7 @@ export default function MatchupScene({ project }) {
       </main>
 
       <footer className={styles.footer}>
-        <span>OWBT // SHOW FLOW // UP NEXT</span>
+        <span>{FRIES_CUP_CONFIG.brandName} // SHOW FLOW // UP NEXT</span>
       </footer>
     </div>
   )

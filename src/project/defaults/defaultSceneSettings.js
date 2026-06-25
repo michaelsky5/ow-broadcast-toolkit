@@ -1,3 +1,5 @@
+import { createDefaultEnabledMapTypes, createDefaultEventMapPool } from '../../data/overwatch'
+
 export const DEFAULT_SCENE_ORDER = [
   'live-hud',
   'current-map',
@@ -141,7 +143,9 @@ export const createDefaultSceneSettings = () => ({
     displayMode: 'MATCH',
     mapMetaDisplayMode: 'RESULT',
     mapBanDisplayMode: 'HIDE',
-    showOverviewCurrent: false
+    showOverviewCurrent: false,
+    eventMapPool: createDefaultEventMapPool(),
+    enabledMapTypes: createDefaultEnabledMapTypes()
   },
   countdown: {
     displayMode: 'standby',

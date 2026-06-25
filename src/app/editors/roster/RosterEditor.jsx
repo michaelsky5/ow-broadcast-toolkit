@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { OW_ROLE_OPTIONS } from '../../../data/overwatch'
+import { FRIES_CUP_CONFIG } from '../../../editions/friesCup/config'
 import { getTeamPlayers } from '../../../project/projectUtils'
 import styles from '../shared/SceneEditor.styles.js'
 import { getRosterEditorCopy } from '../shared/editorCopy'
@@ -33,7 +34,7 @@ const isSupportedLogoFile = file => (
   )
 )
 
-function RosterEditor({ project, copy, text, language, activeSection = 'roster', onUpdateProject }) {
+function RosterEditor({ project, copy, text, language, activeSection = 'roster', onUpdateProject, onPushLog }) {
   const avatarInputRef = useRef(null)
   const teamLogoInputRef = useRef(null)
   const pendingAvatarSlotRef = useRef(null)
@@ -50,6 +51,7 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
         language={language}
         rosterText={rosterText}
         onUpdateProject={onUpdateProject}
+        onPushLog={onPushLog}
       />
     )
   }
@@ -376,7 +378,7 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
             <div className={styles.teamLogoSaveRow}>
               <Field label={text.teamLogo}>
                 <div className={styles.teamLogoInputRow}>
-                  <input value={team?.logo || ''} onChange={updateTeam('logo')} placeholder="/OW.svg" />
+                  <input value={team?.logo || ''} onChange={updateTeam('logo')} placeholder={FRIES_CUP_CONFIG.defaultLogo} />
                   <button type="button" onClick={() => teamLogoInputRef.current?.click()}>
                     {text.uploadLogo}
                   </button>

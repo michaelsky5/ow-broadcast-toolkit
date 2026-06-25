@@ -21,6 +21,13 @@ export {
 } from './maps'
 
 export {
+  DEFAULT_EVENT_MAP_POOL,
+  DEFAULT_ENABLED_MAP_TYPES,
+  createDefaultEventMapPool,
+  createDefaultEnabledMapTypes
+} from './defaultMapPool'
+
+export {
   OW_HEROES,
   OW_HERO_OPTIONS,
   OW_HERO_BY_ID,

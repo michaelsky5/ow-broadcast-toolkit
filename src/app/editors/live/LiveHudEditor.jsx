@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react'
 import { OW_MAP_BY_ID, needsAttackDefense } from '../../../data/overwatch'
+import { FRIES_CUP_CONFIG } from '../../../editions/friesCup/config'
 import { getBroadcastCompetitionName, getEventLogo } from '../../../project/branding'
 import { getStartingPlayers, getTeamPlayers } from '../../../project/projectUtils'
 import styles from '../shared/SceneEditor.styles.js'
@@ -192,7 +193,7 @@ function LiveTeamControlPanel({
           <input value={team?.shortName || ''} disabled={!teamInfoUnlocked} onChange={updateTeamField('shortName')} />
         </Field>
         <Field label={text.teamLogo}>
-          <input value={team?.logo || ''} disabled={!teamInfoUnlocked} onChange={updateTeamField('logo')} placeholder="/OW.svg" />
+          <input value={team?.logo || ''} disabled={!teamInfoUnlocked} onChange={updateTeamField('logo')} placeholder={FRIES_CUP_CONFIG.defaultLogo} />
         </Field>
         <button
           type="button"
@@ -473,7 +474,7 @@ function LiveHudPackagePanel({ project, hud, liveText, updateHud }) {
                 value={hud.topEventLogo || ''}
                 disabled={!topEventLogoVisible}
                 onChange={event => updateHud({ topEventLogo: event.target.value })}
-                placeholder={eventLogo || '/OW.svg'}
+                placeholder={eventLogo || FRIES_CUP_CONFIG.defaultLogo}
               />
             </PackageActionField>
             <PackageActionField

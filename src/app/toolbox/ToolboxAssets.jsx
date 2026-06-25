@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { FRIES_CUP_CONFIG } from '../../editions/friesCup/config'
 import { getCurrentTeams } from '../../project/projectUtils'
 import {
   clean,
@@ -219,14 +220,14 @@ function SponsorAssetsTable({ sponsors, text, onUpdateSponsor, onRemoveSponsor }
 }
 
 function ColorAssetField({ label, value, fallback, onChange }) {
-  const colorValue = clean(value || fallback || '#4CD3B5')
+  const colorValue = clean(value || fallback || FRIES_CUP_CONFIG.primaryColor)
 
   return (
     <label className={styles.assetColorField}>
       <span>{label}</span>
       <div>
         <input type="color" value={colorValue} onChange={event => onChange(event.target.value)} />
-        <input value={value || ''} placeholder={fallback || '#4CD3B5'} onChange={event => onChange(event.target.value)} />
+        <input value={value || ''} placeholder={fallback || FRIES_CUP_CONFIG.primaryColor} onChange={event => onChange(event.target.value)} />
       </div>
     </label>
   )
@@ -421,7 +422,7 @@ function TeamAssetLibrary({ project, text, themePrimary, onUpdateTeamField }) {
 export function AssetsWorkspace({ assetSettings, project, text, onUpdateProject }) {
   const { teamA, teamB } = getCurrentTeams(project)
   const sponsorLogos = assetSettings.sponsors.logos
-  const themePrimary = project.theme?.primary || '#4CD3B5'
+  const themePrimary = project.theme?.primary || FRIES_CUP_CONFIG.primaryColor
   const [showEventAssets, setShowEventAssets] = useState(false)
   const [showMatchAssets, setShowMatchAssets] = useState(true)
   const [showSponsorTools, setShowSponsorTools] = useState(false)
@@ -513,7 +514,7 @@ export function AssetsWorkspace({ assetSettings, project, text, onUpdateProject 
             label={text.eventLogo}
             previewVariant="logo"
             value={project.event?.logo || ''}
-            placeholder="/OW.svg"
+            placeholder={FRIES_CUP_CONFIG.defaultLogo}
             text={text}
             onChange={value => updateEventField('logo', value)}
             onClear={() => updateEventField('logo', '')}

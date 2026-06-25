@@ -13,6 +13,7 @@ import { applyThemeTokens } from '../theme/themeTokens'
 import { OW_MAP_OPTIONS } from '../data/overwatch'
 import { CONSOLE_SELECTOR_ITEMS, SCENE_REGISTRY, getConsoleSceneById, getSceneById } from '../scenes/registry'
 import { getBundleDisplay, getSceneDisplay } from '../scenes/sceneCopy'
+import { FRIES_CUP_CONFIG } from '../editions/friesCup/config'
 import OverlayPage from '../overlay/OverlayPage'
 import ProgramPreview from '../overlay/ProgramPreview'
 import { getAppCopy, getAppLanguage } from './appCopy'
@@ -805,6 +806,8 @@ function ConsoleApp() {
         consoleLanguage={language}
         onUpdateConsoleLanguage={updateConsoleLanguage}
         onUpdateProject={updateProject}
+        onExportProject={() => exportProjectAsJson(project)}
+        onImportProject={() => importInputRef.current?.click()}
         onEnterConsole={enterWorkspace}
       />
     )
@@ -815,10 +818,10 @@ function ConsoleApp() {
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
           <div className={styles.logo}>
-            <img src="/OWBT.svg" alt="OWBT" />
+            <img src={FRIES_CUP_CONFIG.defaultLogo} alt={FRIES_CUP_CONFIG.brandName} />
           </div>
           <div className={styles.brandText}>
-            <h1>Broadcast Toolkit</h1>
+            <h1>{copy.brandTitle || FRIES_CUP_CONFIG.brandName}</h1>
             <p className={styles.brandSubtitle}>{copy.brandSubtitle}</p>
             <p className={styles.brandCredit}>
               <span>Designed by</span>
@@ -914,7 +917,7 @@ function ConsoleApp() {
       <main className={styles.workspace}>
         <header className={styles.topbar}>
           <div>
-            <div className={styles.kicker}>OWBT CONSOLE</div>
+            <div className={styles.kicker}>{copy.consoleKicker || FRIES_CUP_CONFIG.consoleTitle}</div>
             <h2>{competitionName}</h2>
           </div>
 
@@ -1019,6 +1022,7 @@ function ConsoleApp() {
                 onTakeToProgram={takePreviewToProgram}
                 sceneModeHints={sceneModeHints}
                 onSceneModeHintChange={updateSceneModeHint}
+                onPushLog={pushLog}
                 canTakeToProgram
               />
             </div>

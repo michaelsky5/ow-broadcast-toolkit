@@ -4,6 +4,14 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/api/admin-public/:path*",
+      "destination": "https://admin.fries-cup.com/api/public/:path*"
+    },
+    {
+      "source": "/api/stats-data/:path*",
+      "destination": "https://stats.fries-cup.com/data/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

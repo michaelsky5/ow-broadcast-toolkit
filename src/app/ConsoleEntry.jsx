@@ -5,6 +5,11 @@ import {
   getCompetitionNamePair,
   getEventLogo
 } from '../project/branding'
+import { FRIES_CUP_CONFIG } from '../editions/friesCup/config'
+import { createFriesCupTheme } from '../editions/friesCup/theme'
+import FriesCupSystemSourcePanel from '../editions/friesCup/teamDirectory/FriesCupSystemSourcePanel'
+import { isProjectPlayerFromFcSystem, isProjectTeamFromFcSystem } from '../editions/friesCup/teamDirectory/syncPublishedTeamsIntoProject'
+import { getTeamDirectoryCache } from '../editions/friesCup/teamDirectory/teamDirectoryCache'
 import { getAppCopy, getAppLanguage } from './appCopy'
 import { EditorDialog } from './editors/shared/editorControls'
 import { getOverlayUrl } from './overlayUrl'
@@ -19,12 +24,21 @@ const isSupportedLogoFile = file => (
   )
 )
 
+const formatEntryDateTime = value => {
+  if (!value) return '-'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return String(value)
+  return date.toLocaleString()
+}
+
 export default function ConsoleEntry({
   project,
   consoleLanguage = '',
   onUpdateConsoleLanguage,
   onUpdateProject,
-  onEnterConsole
+  onEnterConsole,
+  onExportProject,
+  onImportProject
 }) {
   const logoInputRef = useRef(null)
   const [entryDialog, setEntryDialog] = useState(null)
@@ -32,6 +46,7 @@ export default function ConsoleEntry({
   const language = getAppLanguage(project, consoleLanguage)
   const names = getCompetitionNamePair(project)
   const overlayUrl = getOverlayUrl(project)
+  const consoleUrl = typeof window === 'undefined' ? '' : window.location.href
   const outputWidth = project.output?.width || 1920
   const outputHeight = project.output?.height || 1080
   const outputSize = `${outputWidth} x ${outputHeight}`
@@ -54,6 +69,59 @@ export default function ConsoleEntry({
     { value: 'light', label: copy.logoBackdropLight },
     { value: 'none', label: copy.logoBackdropNone }
   ]
+  const teamDirectoryCache = getTeamDirectoryCache(project)
+  const fcSystemTeamCount = (project.teams || []).filter(isProjectTeamFromFcSystem).length
+  const fcSystemPlayerCount = (project.players || []).filter(isProjectPlayerFromFcSystem).length
+  const brandReady = Boolean((names.en || names.zh) && eventLogoSource)
+  const dataReady = teamDirectoryCache.status === 'READY' && fcSystemTeamCount > 0 && fcSystemPlayerCount > 0
+  const sourceSeasonId = teamDirectoryCache.seasonId || FRIES_CUP_CONFIG.teamDirectory.seasonId
+  const dataUpdatedAtText = formatEntryDateTime(teamDirectoryCache.updatedAt || teamDirectoryCache.fetchedAt)
+  const dataSourceStatusText = dataReady
+    ? '已同步'
+    : teamDirectoryCache.status === 'ERROR' && fcSystemTeamCount > 0
+      ? '使用缓存'
+      : ({
+          READY: '等待同步',
+          LOADING: '读取中',
+          ERROR: '读取失败',
+          IDLE: '未同步'
+        }[teamDirectoryCache.status] || '未同步')
+  const obsReady = Boolean(overlayUrl)
+  const preflightItems = [
+    { label: '品牌配置', value: brandReady ? '就绪' : '待配置', ready: brandReady },
+    { label: '赛事数据', value: dataReady ? '已同步' : dataSourceStatusText, ready: dataReady },
+    { label: 'OBS 输出', value: obsReady ? '已就绪' : '待配置', ready: obsReady },
+    { label: '导播流程', value: 'Preview / TAKE 已就绪', ready: true },
+    { label: '自动保存', value: '已启用', ready: true },
+    { label: '同步服务', value: '本地模式', ready: true }
+  ]
+  const preflightReady = preflightItems.every(item => item.ready)
+  const openingCheckItems = [
+    {
+      label: '赛事身份',
+      value: brandReady ? '就绪' : '待配置',
+      detail: '名称 / Logo / 语言已配置',
+      ready: brandReady
+    },
+    {
+      label: '赛事数据',
+      value: dataReady ? dataUpdatedAtText : dataSourceStatusText,
+      detail: dataReady ? `${sourceSeasonId} / ${fcSystemTeamCount} 队 / ${fcSystemPlayerCount} 选手` : '等待 FC System 同步',
+      ready: dataReady
+    },
+    {
+      label: 'OBS 输出',
+      value: obsReady ? outputSize : '待配置',
+      detail: obsReady ? 'Overlay 地址可用' : '等待 Overlay URL',
+      ready: obsReady
+    },
+    {
+      label: '导播流程',
+      value: 'Preview / TAKE',
+      detail: 'Preview / TAKE 已就绪',
+      ready: true
+    }
+  ]
 
   useEffect(() => {
     if (project.event.overlayLanguage !== 'en') {
@@ -68,7 +136,7 @@ export default function ConsoleEntry({
 
     onUpdateProject(draft => {
       draft.event[field] = value
-      if (field === 'name' || field === 'nameEn') draft.meta.name = value || 'OWBT Project'
+      if (field === 'name' || field === 'nameEn') draft.meta.name = value || 'FriesCup Project'
     })
   }
 
@@ -81,7 +149,7 @@ export default function ConsoleEntry({
       draft.scenes.settings.opening[settingsField] = value
       if (field === 'nameEn') {
         draft.event.name = value
-        draft.meta.name = value || draft.event.nameZh || 'OWBT Project'
+        draft.meta.name = value || draft.event.nameZh || 'FriesCup Project'
       }
     })
   }
@@ -103,7 +171,7 @@ export default function ConsoleEntry({
     const value = event.target.value
 
     onUpdateProject(draft => {
-      draft.theme.primary = value
+      draft.theme.primary = value || FRIES_CUP_CONFIG.primaryColor
     })
   }
 
@@ -163,14 +231,15 @@ export default function ConsoleEntry({
       draft.event.name = DEFAULT_COMPETITION_NAME_EN
       draft.event.nameEn = DEFAULT_COMPETITION_NAME_EN
       draft.event.nameZh = DEFAULT_COMPETITION_NAME_ZH
-      draft.event.subtitle = 'Overwatch Community Tournament'
-      draft.event.logo = ''
+      draft.event.subtitle = FRIES_CUP_CONFIG.editionName
+      draft.event.logo = FRIES_CUP_CONFIG.defaultLogo
       draft.event.logoBackdrop = 'auto'
-      draft.meta.name = 'OWBT Project'
+      draft.meta.name = 'FriesCup Project'
+      draft.theme = createFriesCupTheme()
       draft.scenes.settings.opening.competitionNameEn = DEFAULT_COMPETITION_NAME_EN
       draft.scenes.settings.opening.competitionNameZh = DEFAULT_COMPETITION_NAME_ZH
       draft.scenes.settings.opening.title = ''
-      draft.scenes.settings.opening.subtitle = 'OVERWATCH COMMUNITY TOURNAMENT'
+      draft.scenes.settings.opening.subtitle = FRIES_CUP_CONFIG.editionName.toUpperCase()
     })
   }
 
@@ -195,7 +264,7 @@ export default function ConsoleEntry({
 
   const openUpdateNotes = () => {
     setEntryDialog({
-      kicker: 'OWBT V0.1',
+      kicker: 'FRIES CUP V0.1',
       title: copy.changelogTitle,
       message: copy.updateNotesFull,
       confirmLabel: copy.ok,
@@ -209,27 +278,27 @@ export default function ConsoleEntry({
 
       <header className={styles.topbar}>
         <div className={styles.titleBlock}>
-          <span>{copy.startupKicker}</span>
+          <span>FCUP 启动</span>
           <h1>{copy.consoleTitle}</h1>
         </div>
 
         <div className={styles.topStatus}>
           <div>
-            <span>{copy.project}</span>
-            <strong>{project.meta?.name || names.en}</strong>
+            <span>会话</span>
+            <strong>LOCAL</strong>
           </div>
           <div>
-            <span>{copy.status}</span>
-            <strong>{copy.statusStandby}</strong>
+            <span>同步</span>
+            <strong>{dataReady ? '同步就绪' : dataSourceStatusText}</strong>
           </div>
-          <button className={styles.enterButton} onClick={onEnterConsole}>
+          <button className={styles.topEnterButton} onClick={onEnterConsole}>
             {copy.enterConsole}
           </button>
         </div>
       </header>
 
       <section className={styles.workspace}>
-        <section className={styles.setupColumn}>
+        <section className={`${styles.setupColumn} ${styles.leftColumn}`}>
           <section className={`${styles.panel} ${styles.eventPanel}`}>
             <div className={styles.panelTitle}>
               <span>{copy.eventIdentity}</span>
@@ -250,16 +319,26 @@ export default function ConsoleEntry({
                   </label>
                 </div>
 
-                <label className={styles.field}>
-                  <span>{copy.eventSubtitle}</span>
-                  <input value={project.event.subtitle || ''} onChange={updateEventField('subtitle')} />
-                </label>
+                <div className={styles.twoCol}>
+                  <label className={styles.field}>
+                    <span>{copy.eventSubtitle}</span>
+                    <input value={project.event.subtitle || ''} onChange={updateEventField('subtitle')} />
+                  </label>
+
+                  <label className={styles.field}>
+                    <span>{copy.language}</span>
+                    <select value={language} onChange={updateLanguage}>
+                      <option value="zh">{copy.zhShort}</option>
+                      <option value="en">{copy.enShort}</option>
+                    </select>
+                  </label>
+                </div>
 
                 <div className={styles.eventAssetRow}>
                   <label className={styles.field}>
                     <span>{copy.eventLogo}</span>
                     <div className={styles.inputActionRow}>
-                      <input value={project.event.logo || ''} onChange={updateEventField('logo')} placeholder="/OW.svg" />
+                      <input value={project.event.logo || ''} onChange={updateEventField('logo')} placeholder={FRIES_CUP_CONFIG.defaultLogo} />
                       <button type="button" onClick={() => logoInputRef.current?.click()}>{copy.uploadLogo}</button>
                       <button type="button" onClick={clearLogo}>{copy.clearLogo}</button>
                     </div>
@@ -277,7 +356,7 @@ export default function ConsoleEntry({
 
                   <label className={styles.field}>
                     <span>{copy.themePrimary}</span>
-                    <input type="color" value={project.theme.primary} onChange={updateThemePrimary} />
+                    <input type="color" value={project.theme.primary} onChange={updateThemePrimary} disabled readOnly title={copy.fixedThemeLabel} />
                   </label>
                 </div>
 
@@ -374,94 +453,36 @@ export default function ConsoleEntry({
               </label>
             </div>
 
-            <div className={styles.outputStateGrid}>
-              <div className={styles.stateTile}>
-                <span>{copy.overlayLanguage}</span>
-                <strong>{copy.overlayLanguageLocked}</strong>
-                <em>{copy.overlayLanguagePending}</em>
-              </div>
-
-              <div className={styles.stateTile}>
-                <span>{copy.autosave}</span>
-                <strong>{copy.active}</strong>
-                <em>{copy.statusLocal}</em>
-              </div>
-            </div>
-
-            <div className={styles.outputChecklist}>
-              <div className={styles.outputChecklistTitle}>{copy.outputChecklist}</div>
-              <div>
-                <span>{copy.browserSource}</span>
-                <strong>{outputSize}</strong>
-              </div>
-              <div>
-                <span>{copy.transparentBg}</span>
-                <strong>{isTransparentOverlay ? copy.settingOn : copy.settingOff}</strong>
-              </div>
-              <div>
-                <span>{copy.outputMode}</span>
-                <strong>{copy.statusLocal}</strong>
-              </div>
-            </div>
-          </section>
-        </section>
-
-        <section className={styles.setupColumn}>
-          <section className={styles.panel}>
-            <div className={styles.panelTitle}>
-              <span>{copy.consoleStartup}</span>
-              <strong>{copy.statusConfigured}</strong>
-            </div>
-
-            <div className={styles.twoCol}>
-              <label className={styles.field}>
-                <span>{copy.language}</span>
-                <select value={language} onChange={updateLanguage}>
-                  <option value="zh">{copy.zhShort}</option>
-                  <option value="en">{copy.enShort}</option>
-                </select>
-              </label>
-
-              <label className={styles.field}>
-                <span>{copy.startupMotion}</span>
-                <select value={project.event.startupMotion || 'full'} onChange={updateEventField('startupMotion')}>
-                  <option value="full">{copy.motionFull}</option>
-                  <option value="reduced">{copy.motionReduced}</option>
-                </select>
-              </label>
-            </div>
-
-            <div className={styles.startupStateGrid}>
-              <div className={styles.stateTile}>
-                <span>{copy.project}</span>
-                <strong>{project.meta?.name || names.en}</strong>
-                <em>{copy.statusConfigured}</em>
-              </div>
-            </div>
           </section>
 
-          <section className={`${styles.panel} ${styles.checkPanel}`}>
+          <section className={`${styles.panel} ${styles.projectToolsPanel}`}>
             <div className={styles.panelTitle}>
-              <span>{copy.notes}</span>
+              <span>项目工具</span>
+              <strong>{copy.versionNumber}</strong>
             </div>
-            <div className={styles.noteGrid}>
-              <article>
-                <strong>{copy.flowConfigTitle}</strong>
-                <p>{copy.flowConfigBody}</p>
-              </article>
-              <article>
-                <strong>{copy.flowRosterTitle}</strong>
-                <p>{copy.flowRosterBody}</p>
-              </article>
-              <article>
-                <strong>{copy.flowObsTitle}</strong>
-                <p>{copy.flowObsBody}</p>
-              </article>
-              <article>
-                <strong>{copy.flowLiveTitle}</strong>
-                <p>{copy.flowLiveBody}</p>
-              </article>
+
+            <div className={styles.projectToolGrid}>
+              <div className={styles.stateTile}>
+                <span>控制台地址</span>
+                <strong>{consoleUrl ? '本地控制台' : '-'}</strong>
+                <em>{consoleUrl || '-'}</em>
+              </div>
+              <div className={styles.stateTile}>
+                <span>同步服务</span>
+                <strong>本地模式</strong>
+                <em>项目文件保留缓存</em>
+              </div>
             </div>
+
+            <div className={styles.projectActionGrid}>
+              <button type="button" onClick={onExportProject} disabled={!onExportProject}>
+                {copy.exportProject}
+              </button>
+              <button type="button" onClick={onImportProject} disabled={!onImportProject}>
+                {copy.importProject}
+              </button>
+            </div>
+
             <button type="button" className={styles.updateNotesStrip} onClick={openUpdateNotes}>
               <span>{copy.versionNotes}</span>
               <strong>{copy.versionNumber}</strong>
@@ -471,50 +492,106 @@ export default function ConsoleEntry({
           </section>
         </section>
 
-        <aside className={styles.preflightRail}>
-          <section className={styles.statusPanel}>
+        <section className={`${styles.setupColumn} ${styles.middleColumn}`}>
+          <section className={`${styles.panel} ${styles.checkPanel}`}>
             <div className={styles.panelTitle}>
-              <span>{copy.previewLabel}</span>
-              <strong>{copy.statusReady}</strong>
+              <span>开播检查</span>
+              <strong>{preflightReady ? 'READY' : 'CHECK'}</strong>
             </div>
 
-            <div className={styles.brandPlate}>
-              <div className={`${styles.brandPlateLogo} ${logoBackdropClass}`}>
+            <div className={styles.openingChecklist}>
+              {openingCheckItems.map((item, index) => (
+                <div key={item.label} className={item.ready ? styles.openingCheckReady : styles.openingCheckPending}>
+                  <span className={styles.checkNumber}>{String(index + 1).padStart(2, '0')}</span>
+                  <div>
+                    <strong>{item.label}</strong>
+                    <em>{item.detail}</em>
+                  </div>
+                  <b>{item.value}</b>
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.openingActionStrip}>
+              <div>
+                <span>建议动作</span>
+                <strong>{preflightReady ? '开播检查完成' : '先刷新并同步赛事数据'}</strong>
+              </div>
+              <em>{preflightReady ? '就绪' : '待检查'}</em>
+            </div>
+          </section>
+
+          <FriesCupSystemSourcePanel
+            project={project}
+            onUpdateProject={onUpdateProject}
+            compact
+          />
+        </section>
+
+        <aside className={styles.preflightRail}>
+          <section className={`${styles.statusPanel} ${styles.preflightPanel}`}>
+            <div className={styles.panelTitle}>
+              <span>预检</span>
+              <strong>{preflightReady ? copy.statusReady : copy.statusPending}</strong>
+            </div>
+
+            <div className={styles.preflightBrandCard}>
+              <div className={`${styles.preflightLogoBox} ${logoBackdropClass}`}>
                 <img src={eventLogoSource} alt="" />
               </div>
-              <span>OWBT</span>
-              <strong>{names.en}</strong>
-              <em>{names.zh || project.event.subtitle}</em>
+              <span>{FRIES_CUP_CONFIG.brandName}</span>
+              <strong>{names.en || FRIES_CUP_CONFIG.brandName}</strong>
+              <em>{names.zh || project.event.subtitle || FRIES_CUP_CONFIG.editionName}</em>
             </div>
 
-            <div className={styles.statusStack}>
+            <div className={styles.preflightOutputSummary}>
+              <div className={styles.preflightOutputStateGrid}>
+                <div className={styles.stateTile}>
+                  <span>控制台自适应</span>
+                  <strong>{outputWidth >= 3840 ? 'AUTO 4K' : 'AUTO 1080P'}</strong>
+                  <em>{outputSize} / {isTransparentOverlay ? copy.transparentBg : copy.settingOff}</em>
+                </div>
+
+                <div className={styles.stateTile}>
+                  <span>同步模式</span>
+                  <strong>本地模式</strong>
+                  <em>项目文件保留缓存</em>
+                </div>
+              </div>
+
+              <div className={styles.preflightOutputMetricGrid}>
+                <div>
+                  <span>画布</span>
+                  <strong>{outputWidth >= 3840 ? '4K' : '1080'}</strong>
+                </div>
+                <div>
+                  <span>背景</span>
+                  <strong>{isTransparentOverlay ? '透明' : '实底'}</strong>
+                </div>
+                <div>
+                  <span>保存</span>
+                  <strong>ON</strong>
+                </div>
+                <div>
+                  <span>同步</span>
+                  <strong>LOCAL</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.preflightStatusCards}>
               <div>
-                <span>{copy.eventLogoPreview}</span>
-                <strong>{eventLogoStatus}</strong>
+                <span>Overlay</span>
+                <strong>{obsReady ? '就绪' : '待配置'}</strong>
               </div>
               <div>
-                <span>{names.zh ? copy.eventNameZh : copy.eventSubtitle}</span>
-                <strong>{names.zh || project.event.subtitle || '-'}</strong>
+                <span>赛事数据源</span>
+                <strong>{dataReady ? '发布就绪' : dataSourceStatusText}</strong>
               </div>
               <div>
-                <span>{copy.language}</span>
-                <strong>{language === 'zh' ? copy.zhShort : copy.enShort}</strong>
-              </div>
-              <div>
-                <span>{copy.output}</span>
-                <strong>{outputSize}</strong>
-              </div>
-              <div>
-                <span>{copy.transparentOverlay}</span>
-                <strong>{isTransparentOverlay ? copy.settingOn : copy.settingOff}</strong>
-              </div>
-              <div>
-                <span>{copy.overlay}</span>
-                <strong>{copy.statusLocal}</strong>
-              </div>
-              <div>
-                <span>{copy.autosave}</span>
-                <strong>{copy.active}</strong>
+                <span>数据源</span>
+                <strong>{teamDirectoryCache.source === 'static-fallback' ? '使用缓存' : '线上发布'}</strong>
+                <em>{dataUpdatedAtText}</em>
               </div>
             </div>
           </section>

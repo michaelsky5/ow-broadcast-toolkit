@@ -1,3 +1,4 @@
+import { FRIES_CUP_CONFIG } from '../../editions/friesCup/config'
 import { getBroadcastCompetitionName, getEventLogo } from '../../project/branding'
 import { getCasterById } from '../../project/projectUtils'
 import styles from './ThanksScene.module.css'
@@ -7,7 +8,7 @@ const clean = value => String(value || '').trim()
 const handleImageFallback = event => {
   if (event.currentTarget.dataset.fallbackApplied) return
   event.currentTarget.dataset.fallbackApplied = 'true'
-  event.currentTarget.src = '/OW.svg'
+  event.currentTarget.src = FRIES_CUP_CONFIG.defaultLogo
 }
 
 export default function ThanksScene({ project }) {
@@ -46,7 +47,7 @@ export default function ThanksScene({ project }) {
         <section className={styles.closingPanel}>
           <div className={styles.eventBadge}>
             <div className={styles.eventLogo}>
-              <img src={eventLogo || '/OW.svg'} alt="" onError={handleImageFallback} />
+              <img src={eventLogo || FRIES_CUP_CONFIG.defaultLogo} alt="" onError={handleImageFallback} />
             </div>
             <div>
               <span>Broadcast Complete</span>
@@ -90,14 +91,14 @@ export default function ThanksScene({ project }) {
             </div>
             <div>
               <span>Broadcast</span>
-              <strong>OWBT</strong>
+              <strong>{FRIES_CUP_CONFIG.brandName}</strong>
             </div>
           </section>
         )}
       </main>
 
       <footer className={styles.footer}>
-        <span>OWBT // SHOW FLOW // THANKS</span>
+        <span>{FRIES_CUP_CONFIG.brandName} // SHOW FLOW // THANKS</span>
         <strong>{eventName}</strong>
       </footer>
     </div>

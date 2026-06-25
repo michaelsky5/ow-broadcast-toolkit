@@ -1,9 +1,9 @@
 import { createDefaultProject } from './defaultProject'
 import { normalizeProject, safeParseProject, touchProject } from './projectUtils'
 
-export const OWBT_STORAGE_KEY = 'owbt.currentProject.v0.1'
-export const OWBT_BACKUP_KEY = 'owbt.lastBackupProject.v0.1'
-export const OWBT_PROGRAM_STORAGE_KEY = 'owbt.programProject.v0.1'
+export const OWBT_STORAGE_KEY = 'fries-cup.currentProject.v0.1'
+export const OWBT_BACKUP_KEY = 'fries-cup.lastBackupProject.v0.1'
+export const OWBT_PROGRAM_STORAGE_KEY = 'fries-cup.programProject.v0.1'
 
 let storageAvailability = null
 

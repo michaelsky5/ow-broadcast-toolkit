@@ -41,6 +41,7 @@ export default function SceneEditor({
   onTakeToProgram,
   sceneModeHints,
   onSceneModeHintChange,
+  onPushLog,
   canTakeToProgram
 }) {
   const [casterEditorMode, setCasterEditorMode] = useState(() => getCasterEditorMode(project))
@@ -268,6 +269,7 @@ export default function SceneEditor({
           language={language}
           activeSection={rosterEditorMode}
           onUpdateProject={onUpdateProject}
+          onPushLog={onPushLog}
         />
       )}
 

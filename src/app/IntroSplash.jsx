@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
+import { FRIES_CUP_CONFIG } from '../editions/friesCup/config'
 import { getAppCopy } from './appCopy'
 import styles from './IntroSplash.module.css'
 
-const USAGE_NOTICE_KEY = 'owbt-usage-notice-accepted'
+const USAGE_NOTICE_KEY = 'fries-cup-usage-notice-accepted'
 
 export default function IntroSplash({ project, languageOverride = '', duration = 1450, onFinish }) {
   const onFinishRef = useRef(onFinish)
@@ -66,7 +67,7 @@ export default function IntroSplash({ project, languageOverride = '', duration =
 
       <section className={styles.bootPanel}>
         <div className={styles.topRail}>
-          <span>OWBT STARTUP / v0.1</span>
+          <span>{copy.startupRail}</span>
           <strong>
             <span>{copy.statusReady}</span>
             <em>{copy.startupReadyMeta}</em>
@@ -76,11 +77,11 @@ export default function IntroSplash({ project, languageOverride = '', duration =
         <div className={styles.launchGrid}>
           <div className={styles.identity}>
             <div className={styles.logoFrame}>
-              <img src="/OWBT.svg" alt="OWBT" />
+              <img src={FRIES_CUP_CONFIG.defaultLogo} alt={FRIES_CUP_CONFIG.brandName} />
             </div>
             <div className={styles.identityText}>
-              <h1>OWBT</h1>
-              <p>Overwatch Broadcast Toolkit</p>
+              <h1>{copy.productName}</h1>
+              <p>{copy.productSubtitle}</p>
               <em>{copy.startupCreditLine}</em>
             </div>
           </div>
@@ -130,7 +131,7 @@ export default function IntroSplash({ project, languageOverride = '', duration =
           <section className={styles.noticeModal} role="dialog" aria-modal="true" aria-labelledby="usage-notice-title">
             <div className={styles.modalHeader}>
               <div>
-                <span>OWBT // MICHAELSKY5</span>
+                <span>FRIES CUP // MICHAELSKY5</span>
                 <h2 id="usage-notice-title">{copy.usageNoticeTitle}</h2>
                 <p>{copy.communityLicense}</p>
               </div>

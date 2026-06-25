@@ -1,3 +1,4 @@
+import { FRIES_CUP_CONFIG } from '../../editions/friesCup/config'
 import { getBroadcastCompetitionName } from '../../project/branding'
 import { getCurrentTeams } from '../../project/projectUtils'
 import {
@@ -68,7 +69,7 @@ const getDisplayMetrics = (settings, statsData) => {
 
 const getTeamColor = (team, fallback) => clean(team?.primaryColor) || fallback || 'var(--theme-primary)'
 
-const getTeamLogo = team => clean(team?.logo) || '/OW.svg'
+const getTeamLogo = team => clean(team?.logo) || FRIES_CUP_CONFIG.defaultLogo
 
 function LogoImage({ team }) {
   return (
@@ -78,7 +79,7 @@ function LogoImage({ team }) {
       onError={event => {
         if (event.currentTarget.dataset.fallbackApplied) return
         event.currentTarget.dataset.fallbackApplied = 'true'
-        event.currentTarget.src = '/OW.svg'
+        event.currentTarget.src = FRIES_CUP_CONFIG.defaultLogo
       }}
     />
   )
@@ -244,7 +245,7 @@ export default function StatsScene({ project }) {
       <header className={styles.topbar}>
         <div className={styles.interfaceLabel}>
           <span />
-          <strong>OWBT // DATA REPORT</strong>
+          <strong>{FRIES_CUP_CONFIG.brandName} // DATA REPORT</strong>
         </div>
         <em>{statsData.label} // Overall{hasDataMinutes ? ` // ${dataMinutesLabel} MIN` : ''}</em>
       </header>

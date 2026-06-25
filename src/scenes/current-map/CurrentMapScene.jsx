@@ -1,5 +1,5 @@
 import FriesMapPoolScene from '../legacy-fcol/FriesMapPoolScene'
-import { OW_MAP_BY_ID, OW_MAPS_BY_MODE } from '../../data/overwatch'
+import { DEFAULT_ENABLED_MAP_TYPES, DEFAULT_EVENT_MAP_POOL, OW_MAP_BY_ID, OW_MAPS_BY_MODE } from '../../data/overwatch'
 import { getCurrentTeams } from '../../project/projectUtils'
 import { getBroadcastCompetitionName } from '../../project/branding'
 
@@ -66,6 +66,16 @@ const normalizeLegacyMapEntry = entry => {
   }
 }
 
+const getDefaultMapPoolForMode = modeId => {
+  const eventPool = DEFAULT_EVENT_MAP_POOL[modeId]
+  if (Array.isArray(eventPool) && eventPool.length) return [...eventPool]
+  return (OW_MAPS_BY_MODE[modeId] || []).map(map => map.id)
+}
+
+const getMapTypeEnabled = (settings, modeId) => (
+  settings?.enabledMapTypes?.[modeId] ?? DEFAULT_ENABLED_MAP_TYPES[modeId] !== false
+)
+
 const getLegacyMapLineup = match => {
   const totalMaps = getSeriesMapTotal(match)
 
@@ -100,7 +110,7 @@ const getEventMapPool = settings => (
       const configuredPool = settings?.eventMapPool?.[modeId]
       const mapIds = Array.isArray(configuredPool) && configuredPool.length
         ? configuredPool
-        : maps.map(map => map.id)
+        : getDefaultMapPoolForMode(modeId)
 
       return [
         getLegacyMode(maps[0]),
@@ -121,7 +131,7 @@ const getEnabledMapTypes = settings => (
   Object.fromEntries(
     Object.entries(OW_MAPS_BY_MODE).map(([modeId, maps]) => [
       getLegacyMode(maps[0]),
-      settings?.enabledMapTypes?.[modeId] !== false
+      getMapTypeEnabled(settings, modeId)
     ])
   )
 )

@@ -1,8 +1,11 @@
 ﻿import { useState } from 'react'
 import {
+  DEFAULT_ENABLED_MAP_TYPES,
+  DEFAULT_EVENT_MAP_POOL,
   OW_GAME_MODE_OPTIONS,
   OW_MAP_BY_ID,
-  OW_MAPS_BY_MODE
+  OW_MAPS_BY_MODE,
+  createDefaultEnabledMapTypes
 } from '../../../data/overwatch'
 import { FT_OPTIONS } from '../../../match/defaultMatch'
 import styles from '../shared/SceneEditor.styles.js'
@@ -37,14 +40,25 @@ const recalculateScoreFromLineup = draft => {
   draft.currentMatch.score.teamB = lineup.filter(map => getWinnerSide(map) === 'B').length
 }
 
-const getDefaultMapPoolForMode = modeId => (OW_MAPS_BY_MODE[modeId] || []).map(map => map.id)
+const getDefaultMapPoolForMode = modeId => {
+  const eventPool = DEFAULT_EVENT_MAP_POOL[modeId]
+  if (Array.isArray(eventPool) && eventPool.length) return [...eventPool]
+  return (OW_MAPS_BY_MODE[modeId] || []).map(map => map.id)
+}
+
+const getMapTypeEnabled = (settings, modeId) => (
+  settings.enabledMapTypes?.[modeId] ?? DEFAULT_ENABLED_MAP_TYPES[modeId] !== false
+)
+
+const getSelectedMapPoolForMode = (settings, modeId) => {
+  const storedPool = settings.eventMapPool?.[modeId]
+  return Array.isArray(storedPool) && storedPool.length
+    ? storedPool
+    : getDefaultMapPoolForMode(modeId)
+}
 
 const getConfiguredMapsForMode = (settings, modeId) => {
-  const mapsForMode = OW_MAPS_BY_MODE[modeId] || []
-  const storedPool = settings.eventMapPool?.[modeId]
-  const mapIds = Array.isArray(storedPool) && storedPool.length
-    ? storedPool
-    : mapsForMode.map(map => map.id)
+  const mapIds = getSelectedMapPoolForMode(settings, modeId)
 
   return mapIds
     .map(mapId => OW_MAP_BY_ID[mapId])
@@ -77,15 +91,11 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
   const metaMode = settings.mapMetaDisplayMode || 'RESULT'
   const banDisplayMode = settings.mapBanDisplayMode || 'HIDE'
   const scoreReadout = `${project.currentMatch.score.teamA} : ${project.currentMatch.score.teamB}`
-  const enabledModeOptions = OW_GAME_MODE_OPTIONS.filter(mode => settings.enabledMapTypes?.[mode.value] !== false)
+  const enabledModeOptions = OW_GAME_MODE_OPTIONS.filter(mode => getMapTypeEnabled(settings, mode.value))
   const flowModeOptions = enabledModeOptions.length ? enabledModeOptions : OW_GAME_MODE_OPTIONS
   const poolModeSummaries = OW_GAME_MODE_OPTIONS.map(mode => {
-    const mapsForMode = OW_MAPS_BY_MODE[mode.value] || []
-    const storedPool = settings.eventMapPool?.[mode.value]
-    const selectedPool = Array.isArray(storedPool) && storedPool.length
-      ? storedPool
-      : mapsForMode.map(map => map.id)
-    const enabled = settings.enabledMapTypes?.[mode.value] !== false
+    const selectedPool = getSelectedMapPoolForMode(settings, mode.value)
+    const enabled = getMapTypeEnabled(settings, mode.value)
 
     return {
       enabled,
@@ -170,9 +180,7 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
       currentMapSettings.eventMapPool = Object.fromEntries(
         OW_GAME_MODE_OPTIONS.map(mode => [mode.value, getDefaultMapPoolForMode(mode.value)])
       )
-      currentMapSettings.enabledMapTypes = Object.fromEntries(
-        OW_GAME_MODE_OPTIONS.map(mode => [mode.value, true])
-      )
+      currentMapSettings.enabledMapTypes = createDefaultEnabledMapTypes()
     })
   }
 
@@ -327,11 +335,8 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
               <div className={styles.mapPoolModeGrid}>
                 {OW_GAME_MODE_OPTIONS.map(mode => {
                   const mapsForMode = OW_MAPS_BY_MODE[mode.value] || []
-                  const storedPool = settings.eventMapPool?.[mode.value]
-                  const selectedPool = Array.isArray(storedPool) && storedPool.length
-                    ? storedPool
-                    : mapsForMode.map(map => map.id)
-                  const enabled = settings.enabledMapTypes?.[mode.value] !== false
+                  const selectedPool = getSelectedMapPoolForMode(settings, mode.value)
+                  const enabled = getMapTypeEnabled(settings, mode.value)
                   const modeLabel = getModeLabel(mode, language)
 
                   return (

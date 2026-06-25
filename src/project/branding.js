@@ -1,6 +1,8 @@
-export const DEFAULT_EVENT_LOGO = '/OW.svg'
-export const DEFAULT_COMPETITION_NAME_ZH = 'OWBT'
-export const DEFAULT_COMPETITION_NAME_EN = 'OWBT'
+import { FRIES_CUP_CONFIG } from '../editions/friesCup/config'
+
+export const DEFAULT_EVENT_LOGO = FRIES_CUP_CONFIG.defaultLogo
+export const DEFAULT_COMPETITION_NAME_ZH = FRIES_CUP_CONFIG.brandName
+export const DEFAULT_COMPETITION_NAME_EN = FRIES_CUP_CONFIG.brandName
 
 const clean = value => String(value || '').trim()
 

@@ -1,3 +1,5 @@
+import { getFriesCupCopyOverrides } from '../editions/friesCup/copy'
+
 export const APP_COPY = {
   zh: {
     startupAria: 'OWBT 启动',
@@ -552,4 +554,10 @@ export const getAppLanguage = (project, overrideLanguage = '') => {
   return language === 'zh' ? 'zh' : 'en'
 }
 
-export const getAppCopy = (project, overrideLanguage = '') => APP_COPY[getAppLanguage(project, overrideLanguage)]
+export const getAppCopy = (project, overrideLanguage = '') => {
+  const language = getAppLanguage(project, overrideLanguage)
+  return {
+    ...APP_COPY[language],
+    ...getFriesCupCopyOverrides(language)
+  }
+}

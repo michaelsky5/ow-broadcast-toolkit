@@ -1,4 +1,5 @@
 import { OW_MAP_BY_ID } from '../../data/overwatch'
+import { FRIES_CUP_CONFIG } from '../../editions/friesCup/config'
 import { getBroadcastCompetitionName, getEventLogo } from '../../project/branding'
 import { getCurrentTeams } from '../../project/projectUtils'
 import styles from './PauseScene.module.css'
@@ -7,12 +8,12 @@ const clean = value => String(value || '').trim()
 
 const getTeamName = (team, fallback) => clean(team?.name) || fallback
 const getTeamShort = (team, fallback) => clean(team?.shortName) || fallback
-const getTeamLogo = team => clean(team?.logo) || '/OW.svg'
+const getTeamLogo = team => clean(team?.logo) || FRIES_CUP_CONFIG.defaultLogo
 
 const handleImageFallback = event => {
   if (event.currentTarget.dataset.fallbackApplied) return
   event.currentTarget.dataset.fallbackApplied = 'true'
-  event.currentTarget.src = '/OW.svg'
+  event.currentTarget.src = FRIES_CUP_CONFIG.defaultLogo
 }
 
 function TeamStrip({ team, side, score }) {
@@ -57,11 +58,11 @@ export default function PauseScene({ project }) {
       <header className={styles.topBar}>
         <div className={styles.brandBlock}>
           <div className={styles.eventLogo}>
-            <img src={eventLogo || '/OW.svg'} alt="" onError={handleImageFallback} />
+            <img src={eventLogo || FRIES_CUP_CONFIG.defaultLogo} alt="" onError={handleImageFallback} />
           </div>
           <div>
             <span>{eventName}</span>
-            <strong>OWBT LIVE CONTROL</strong>
+            <strong>{FRIES_CUP_CONFIG.brandName} LIVE CONTROL</strong>
           </div>
         </div>
 
