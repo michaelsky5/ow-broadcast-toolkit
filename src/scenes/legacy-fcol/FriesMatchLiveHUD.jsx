@@ -211,29 +211,34 @@ const getTeamMetaBadgeWidth = (mode, label) => {
   return '72px';
 };
 
-const getTeamMetaBadgeStyle = (isLeft, mode, label) => ({
-  width: getTeamMetaBadgeWidth(mode, label),
-  height: '45px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
-  boxSizing: 'border-box',
-  borderLeft: isLeft ? `1px solid ${COLORS.lineStrong}` : 'none',
-  borderRight: !isLeft ? `1px solid ${COLORS.lineStrong}` : 'none',
-  backgroundColor: 'rgba(42,42,42,0.96)',
-  color: COLORS.yellow,
-  padding: '0 6px',
-  overflow: 'hidden',
-  fontSize: '10px',
-  fontWeight: '900',
-  letterSpacing: '0.55px',
-  lineHeight: 1.12,
-  textAlign: 'center',
-  textOverflow: 'ellipsis',
-  textTransform: 'uppercase',
-  whiteSpace: 'nowrap'
-});
+const getTeamMetaBadgeStyle = (isLeft, mode, label) => {
+  const normalizedMode = String(mode || '').toUpperCase();
+  const isSeed = normalizedMode === 'SEED';
+
+  return {
+    width: getTeamMetaBadgeWidth(mode, label),
+    height: '45px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    boxSizing: 'border-box',
+    borderLeft: isLeft ? `1px solid ${COLORS.lineStrong}` : 'none',
+    borderRight: !isLeft ? `1px solid ${COLORS.lineStrong}` : 'none',
+    backgroundColor: 'rgba(42,42,42,0.96)',
+    color: COLORS.yellow,
+    padding: '0 6px',
+    overflow: 'hidden',
+    fontSize: isSeed ? '14px' : '10px',
+    fontWeight: '900',
+    letterSpacing: isSeed ? '0.3px' : '0.55px',
+    lineHeight: 1.12,
+    textAlign: 'center',
+    textOverflow: 'ellipsis',
+    textTransform: 'uppercase',
+    whiteSpace: 'nowrap'
+  };
+};
 
 const TeamMetaBadge = React.memo(({ label, mode, isLeft }) => {
   const text = String(label || '').trim();
