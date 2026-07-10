@@ -11,12 +11,20 @@
   display: grid;
   gap: 10px;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  container-type: inline-size;
 }
 
 .statsOutputModeBar {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   border: 1px solid rgba(255,255,255,0.09);
   background:
     repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
@@ -30,9 +38,13 @@
 
 .statsWorkbench {
   display: grid;
-  grid-template-columns: 300px minmax(620px, 1fr) 300px;
-  gap: 12px;
+  grid-template-columns: minmax(240px, 0.78fr) minmax(560px, 1.85fr) minmax(220px, 0.68fr);
+  gap: 10px;
   align-items: stretch;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .statsWorkbench .panel {
@@ -57,6 +69,44 @@
   align-content: start;
   gap: 12px;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@container (max-width: 1500px) {
+  .statsWorkbench {
+    grid-template-columns: minmax(220px, 0.72fr) minmax(480px, 1.78fr) minmax(200px, 0.62fr);
+    gap: 8px;
+  }
+
+  .statsWorkbench .panel {
+    padding: 10px;
+  }
+}
+
+@container (max-width: 1180px) {
+  .statsWorkbench {
+    grid-template-columns: minmax(190px, 0.64fr) minmax(360px, 1.68fr) minmax(176px, 0.58fr);
+    gap: 7px;
+  }
+
+  .statsWorkbench .panel {
+    padding: 9px;
+  }
+
+  .statsWorkbench input,
+  .statsWorkbench select,
+  .statsWorkbench button {
+    min-height: 36px;
+  }
+}
+
+@container (max-width: 760px) {
+  .statsWorkbench {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .statsWorkbench .statsImageDropzone {

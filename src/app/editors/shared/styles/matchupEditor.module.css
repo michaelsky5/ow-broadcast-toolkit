@@ -15,41 +15,491 @@
 
 .upNextTeamsPanel {
   min-width: 0;
+  overflow: hidden;
+  container: up-next-teams / inline-size;
+}
+
+.upNextControlPanel {
+  container: up-next-controls / inline-size;
+}
+
+.upNextControlGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.upNextControlGrid > .field {
+  margin-bottom: 0;
+}
+
+.upNextControlPanel .showFlowToggleStrip {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.09);
+}
+
+.upNextDisplaySwitch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  min-height: 42px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.11);
+  border-left: 2px solid rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.27);
+  color: var(--theme-text);
+  padding: 0 11px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.upNextDisplaySwitch:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.upNextDisplaySwitch span,
+.upNextDisplaySwitch strong {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upNextDisplaySwitch span {
+  font-size: 10px;
+}
+
+.upNextDisplaySwitch strong {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+}
+
+.upNextDisplaySwitchActive {
+  border-color: var(--theme-primary-border);
+  border-left-color: var(--theme-primary);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 82%),
+    rgba(0,0,0,0.27);
+}
+
+.upNextDisplaySwitchActive strong {
+  color: var(--theme-primary);
+}
+
+.matchDbPanel {
+  min-width: 0;
+}
+
+.matchDbToolbar {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 108px 74px;
+  gap: 8px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+
+.matchDbMetric,
+.matchDbSearch {
+  display: grid;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.26);
+}
+
+.matchDbMetric {
+  grid-template-columns: 54px minmax(0, 1fr);
+}
+
+.matchDbSearch {
+  grid-template-columns: 62px minmax(0, 1fr);
+}
+
+.matchDbMetric span,
+.matchDbSearch span,
+.matchDbFields label span {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted-text);
+  padding: 0 8px;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.matchDbMetric strong {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  color: var(--theme-primary);
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.matchDbSearch input {
+  min-width: 0;
+  border: 0;
+  background: rgba(0,0,0,0.12);
+}
+
+.matchDbToolbar button,
+.matchDbRow button {
+  min-width: 0;
+  min-height: 38px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 0 9px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.matchDbToolbar button:hover,
+.matchDbRow button:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+}
+
+.matchDbList {
+  display: grid;
+  gap: 8px;
+  max-height: clamp(280px, 42vh, 520px);
+  overflow-y: auto;
+}
+
+.matchDbRow {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-left: 2px solid rgba(255,255,255,0.18);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.22);
+  padding: 8px;
+}
+
+.matchDbRowActive {
+  border-left-color: var(--theme-primary);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 70%),
+    rgba(0,0,0,0.24);
+}
+
+.matchDbRowTop {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(70px, 0.32fr) minmax(70px, 0.32fr) 54px 58px;
+  gap: 5px;
+  min-width: 0;
+}
+
+.matchDbRowTop strong,
+.matchDbRowTop span,
+.matchDbEmpty span,
+.matchDbEmpty strong {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.18);
+  padding: 0 9px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.matchDbRowTop strong {
+  color: var(--theme-primary);
+  font-size: 11px;
+}
+
+.matchDbRowTop span {
+  color: var(--theme-text);
+}
+
+.matchDbFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 0;
+}
+
+.matchDbFields label {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.18);
+}
+
+.matchDbFields input,
+.matchDbFields select {
+  min-width: 0;
+  border: 0;
+  background: rgba(0,0,0,0.1);
+  padding: 0 8px;
+}
+
+.matchDbScoreInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  min-width: 0;
+}
+
+.matchDbScoreInputs input {
+  text-align: center;
+}
+
+.matchDbEmpty {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  min-height: 64px;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-left: 2px solid var(--theme-primary);
+  background: rgba(0,0,0,0.22);
+  padding: 8px;
+}
+
+.matchDbEmpty strong {
+  color: var(--theme-primary);
+}
+
+.upNextMatchupBar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px minmax(0, 1fr) 86px;
+  grid-template-areas: "team-a versus team-b swap";
+  gap: 6px;
+  align-items: stretch;
+  min-width: 0;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.24);
+  padding: 7px;
+}
+
+.upNextMatchupTeam {
+  grid-area: team-a;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+  border-left: 2px solid var(--theme-primary);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 76%),
+    rgba(255,255,255,0.025);
+  padding: 0 11px;
+}
+
+.upNextMatchupTeamRight {
+  grid-area: team-b;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  border-right: 2px solid var(--theme-primary);
+  border-left: 0;
+  background:
+    linear-gradient(270deg, var(--theme-primary-softer), transparent 76%),
+    rgba(255,255,255,0.025);
+  text-align: right;
+}
+
+.upNextMatchupTeamRight span {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.upNextMatchupTeamRight strong {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.upNextMatchupTeamRight em {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.upNextMatchupTeam span,
+.upNextMatchupTeam strong,
+.upNextMatchupTeam em {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.upNextMatchupTeam span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+}
+
+.upNextMatchupTeam strong {
+  color: var(--theme-primary);
+  font-size: 14px;
+}
+
+.upNextMatchupTeam em {
+  color: var(--theme-text);
+  font-size: 11px;
+  font-style: normal;
+}
+
+.upNextMatchupVersus {
+  grid-area: versus;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  min-width: 0;
+  border: 1px solid var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  text-align: center;
+}
+
+.upNextMatchupVersus span,
+.upNextMatchupVersus strong {
+  display: grid;
+  place-items: center;
+  font-weight: 950;
+}
+
+.upNextMatchupVersus span {
+  color: var(--theme-primary);
+  font-size: 16px;
+}
+
+.upNextMatchupVersus strong {
+  border-top: 1px solid var(--theme-primary-border);
+  color: var(--theme-text);
+  padding: 3px 0;
+  font-size: 9px;
+}
+
+.upNextSwapButton {
+  grid-area: swap;
+  display: grid;
+  gap: 2px;
+  place-content: center;
+  min-width: 0;
+  min-height: 52px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.055);
+  color: var(--theme-text);
+  padding: 6px;
+  cursor: pointer;
+}
+
+.upNextSwapButton:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.upNextSwapButton span,
+.upNextSwapButton strong {
+  overflow: hidden;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upNextSwapButton span {
+  color: var(--theme-primary);
+  font-size: 9px;
+}
+
+.upNextSwapButton strong {
+  font-size: 10px;
 }
 
 .upNextTeamGrid {
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) 112px minmax(260px, 1fr);
-  gap: 12px;
-  align-items: stretch;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(8px, 0.8vw, 12px);
+  align-items: start;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .upNextTeamCard {
   display: grid;
-  gap: 8px;
+  gap: clamp(6px, 0.6vw, 8px);
   min-width: 0;
   border: 1px solid rgba(255,255,255,0.08);
   background:
     repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
     rgba(0,0,0,0.22);
-  padding: 12px;
+  padding: clamp(9px, 0.8vw, 12px);
 }
 
 .upNextTeamCard .field {
   margin-bottom: 0;
 }
 
+.upNextTeamCard > .field {
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 0;
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.24);
+}
+
+.upNextTeamCard > .field > span {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.035);
+  padding: 0 9px;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.upNextTeamCard > .field > select {
+  min-width: 0;
+  border: 0;
+  background: rgba(0,0,0,0.12);
+  padding: 0 10px;
+}
+
 .upNextTeamTopbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 104px;
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) minmax(76px, 96px);
+  gap: clamp(6px, 0.6vw, 8px);
   align-items: stretch;
   min-width: 0;
 }
 
 .upNextTeamIdentity {
   display: grid;
-  grid-template-columns: 64px 72px minmax(0, 1fr);
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 9px;
   align-items: center;
   min-width: 0;
   min-height: 38px;
@@ -57,13 +507,14 @@
   background:
     linear-gradient(90deg, var(--theme-primary-softer), transparent 72%),
     rgba(255,255,255,0.035);
+  padding: 0 10px;
 }
 
 .upNextTeamIdentity span,
 .upNextTeamIdentity strong,
 .upNextTeamIdentity em {
   overflow: hidden;
-  padding: 0 10px;
+  padding: 0;
   font-weight: 950;
   text-overflow: ellipsis;
   text-transform: uppercase;
@@ -95,11 +546,14 @@
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.055);
   color: var(--theme-text);
-  padding: 0 10px;
-  font-size: 10px;
+  overflow: hidden;
+  padding: 0 8px;
+  font-size: 9px;
   font-weight: 950;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
   text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -112,17 +566,23 @@
 
 .upNextTeamSummaryGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .upNextTeamSummaryGrid div {
   display: grid;
-  gap: 5px;
+  gap: 4px;
   min-width: 0;
-  border: 1px solid rgba(255,255,255,0.08);
+  border-left: 1px solid rgba(255,255,255,0.08);
   background: rgba(0,0,0,0.24);
-  padding: 9px 10px;
+  padding: 7px 8px;
+}
+
+.upNextTeamSummaryGrid div:first-child {
+  border-left: 0;
 }
 
 .upNextTeamSummaryGrid span,
@@ -136,26 +596,25 @@
 
 .upNextTeamSummaryGrid span {
   color: var(--theme-muted-text);
-  font-size: 9px;
-  letter-spacing: 0.13em;
+  font-size: 8px;
+  letter-spacing: 0.08em;
 }
 
 .upNextTeamSummaryGrid strong {
   color: var(--theme-primary);
-  font-size: 12px;
-  letter-spacing: 0.05em;
+  font-size: 11px;
 }
 
 .upNextColorChip {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
 }
 
 .upNextColorChip::before {
   content: "";
-  width: 18px;
-  height: 10px;
+  width: 14px;
+  height: 9px;
   flex: 0 0 auto;
   border: 1px solid rgba(255,255,255,0.18);
   background: var(--team-color);
@@ -224,44 +683,56 @@
   font-weight: 950;
 }
 
-.upNextVsControl {
-  display: grid;
-  grid-template-rows: 1fr auto auto;
-  gap: 8px;
-  align-items: center;
-  justify-items: stretch;
-  min-width: 0;
+@container up-next-teams (max-width: 720px) {
+  .upNextMatchupBar {
+    grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+    grid-template-areas:
+      "team-a versus team-b"
+      "swap swap swap";
+  }
+
+  .upNextSwapButton {
+    grid-template-columns: auto auto;
+    gap: 8px;
+    min-height: 36px;
+  }
+
+  .upNextTeamGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.upNextVsControl span,
-.upNextVsControl strong {
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--theme-primary-border);
-  background: var(--theme-primary-soft);
-  color: var(--theme-primary);
-  font-weight: 950;
-  letter-spacing: 0.12em;
+@container up-next-teams (max-width: 480px) {
+  .upNextMatchupBar {
+    grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr);
+  }
+
+  .upNextMatchupTeam {
+    gap: 6px;
+    padding: 0 8px;
+  }
+
+  .upNextMatchupTeam em {
+    display: none;
+  }
+
+  .upNextTeamSummaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .upNextTeamSummaryGrid div:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .upNextTeamSummaryGrid div:nth-child(4) {
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
 }
 
-.upNextVsControl span {
-  min-height: 118px;
-  font-size: 28px;
-}
-
-.upNextVsControl strong {
-  min-height: 38px;
-  font-size: 12px;
-}
-
-.upNextVsControl button {
-  min-height: 40px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.055);
-  color: var(--theme-text);
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
+@container up-next-controls (max-width: 340px) {
+  .upNextControlGrid,
+  .upNextControlPanel .showFlowToggleStrip {
+    grid-template-columns: 1fr;
+  }
 }

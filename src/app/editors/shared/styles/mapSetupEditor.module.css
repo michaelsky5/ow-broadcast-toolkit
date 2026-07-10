@@ -1,6 +1,7 @@
 ﻿/* === Map setup editor === */
 
 .mapSetupDesk {
+  container-type: inline-size;
   display: grid;
   gap: 12px;
   min-width: 0;
@@ -25,6 +26,7 @@
 
 .mapSetupDesk button {
   overflow: hidden;
+  border-radius: 0;
   padding: 0 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -88,9 +90,12 @@
 
 .mapSetupWorkspace {
   display: grid;
-  grid-template-columns: clamp(300px, 21vw, 340px) minmax(0, 1fr);
+  grid-template-columns: clamp(280px, 20%, 320px) minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .mapSetupRail,
@@ -423,9 +428,84 @@
   font-size: 10px;
 }
 
+.mapDeskPanel {
+  min-width: 0;
+  margin-bottom: 10px;
+}
+
+.mapDeskSync {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.42fr);
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.mapDeskMatch {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 4px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-left: 2px solid var(--theme-primary);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 48%),
+    rgba(0,0,0,0.24);
+  padding: 10px;
+}
+
+.mapDeskMatch span,
+.mapDeskMatch strong,
+.mapDeskMatch em {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mapDeskMatch span,
+.mapDeskMatch em {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  font-style: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.mapDeskMatch strong {
+  color: var(--theme-text);
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.mapDeskActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.mapDeskActions button {
+  min-width: 0;
+  min-height: 48px;
+  font-size: 11px;
+}
+
+.mapDeskActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
 .mapFlowPanel {
   height: 100%;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  container-type: inline-size;
 }
 
 .mapFlowControls {
@@ -648,7 +728,7 @@
 
 .mapFlowHeader {
   display: grid;
-  grid-template-columns: 74px 96px minmax(170px, 1.6fr) minmax(104px, 0.82fr) minmax(104px, 0.82fr) 62px;
+  grid-template-columns: 64px minmax(88px, 0.8fr) minmax(0, 1.5fr) minmax(90px, 0.8fr) minmax(90px, 0.8fr) 56px;
   gap: 6px;
   margin-bottom: 8px;
   padding: 0 8px;
@@ -665,9 +745,17 @@
 .mapLineup {
   display: grid;
   gap: 7px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .mapRow {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
   border: 1px solid rgba(255,255,255,0.08);
   background:
     repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
@@ -684,9 +772,85 @@
 
 .mapMainRow {
   display: grid;
-  grid-template-columns: 74px 96px minmax(170px, 1.6fr) minmax(104px, 0.82fr) minmax(104px, 0.82fr) 62px;
+  grid-template-columns: 64px minmax(88px, 0.8fr) minmax(0, 1.5fr) minmax(90px, 0.8fr) minmax(90px, 0.8fr) 56px;
   gap: 6px;
   align-items: stretch;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.mapMainRow > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.mapMainRow select {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mapMainRow button {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@container (max-width: 920px) {
+  .mapSetupWorkspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mapSetupRail {
+    grid-template-rows: auto;
+  }
+}
+
+@container (max-width: 900px) {
+  .mapFlowHeader,
+  .mapMainRow {
+    grid-template-columns: 58px minmax(72px, 0.72fr) minmax(110px, 1.4fr) minmax(64px, 0.64fr) minmax(64px, 0.64fr) 58px;
+    gap: 5px;
+  }
+
+  .mapFlowHeader {
+    padding: 0 6px;
+  }
+
+  .mapRow {
+    padding: 7px;
+  }
+
+  .mapMainRow button {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+}
+
+@container (max-width: 680px) {
+  .mapFlowControls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mapFlowHeader {
+    display: none;
+  }
+
+  .mapMainRow {
+    grid-template-columns: 52px minmax(64px, 0.68fr) minmax(94px, 1.28fr) minmax(56px, 0.58fr) minmax(56px, 0.58fr) 52px;
+    gap: 4px;
+  }
+}
+
+@container (max-width: 460px) {
+  .mapMainRow {
+    grid-template-columns: 46px minmax(56px, 0.64fr) minmax(74px, 1.12fr) minmax(48px, 0.54fr) minmax(48px, 0.54fr) 44px;
+    gap: 3px;
+  }
+
+  .mapRow {
+    padding: 5px;
+  }
 }
 
 .mapBanPanel {
@@ -806,9 +970,69 @@
 }
 
 .mapIndexButton {
+  position: relative;
+  border-color: rgba(255,255,255,0.14) !important;
+  background: rgba(0,0,0,0.32) !important;
+  color: var(--theme-muted-text) !important;
+  box-shadow: inset 3px 0 0 rgba(255,255,255,0.2), inset 0 0 0 1px rgba(255,255,255,0.015);
+  padding-right: 6px !important;
+  padding-left: 8px !important;
+  font-size: 10px !important;
+  font-weight: 950;
+  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.mapIndexButton::after {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 4px;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  content: '';
+}
+
+.mapIndexButton:hover {
+  border-color: var(--theme-primary-border) !important;
+  background: var(--theme-primary-softer) !important;
+  color: var(--theme-primary) !important;
+  box-shadow: inset 3px 0 0 var(--theme-primary), inset 0 0 0 1px rgba(255,255,255,0.025);
+}
+
+.mapIndexButton:hover::after {
+  background: var(--theme-primary);
+}
+
+.mapIndexButton.mapIndexButtonActive {
   border-color: var(--theme-primary-border) !important;
   background: var(--theme-primary-soft) !important;
-  color: var(--theme-primary);
+  color: var(--theme-primary) !important;
+  box-shadow: inset 3px 0 0 var(--theme-primary), inset 0 0 0 1px rgba(255,255,255,0.035);
+}
+
+.mapIndexButton.mapIndexButtonActive::after {
+  background: var(--theme-primary);
+  box-shadow: 0 0 7px var(--theme-primary);
+}
+
+.mapBanButton {
+  border-color: rgba(255,255,255,0.14) !important;
+  background: rgba(0,0,0,0.34) !important;
+  color: var(--theme-muted-text) !important;
+  box-shadow: inset 3px 0 0 rgba(255,255,255,0.18);
+  padding-right: 5px !important;
+  padding-left: 7px !important;
+  font-size: 9px !important;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mapBanButton:hover {
+  border-color: var(--theme-primary-border) !important;
+  background: var(--theme-primary-softer) !important;
+  color: var(--theme-primary) !important;
+  box-shadow: inset 3px 0 0 var(--theme-primary);
 }
 
 .mapWinnerSelect {
@@ -818,10 +1042,18 @@
   font-weight: 950;
 }
 
-.mapBanFilled {
+.mapBanButton.mapBanFilled {
   border-color: rgba(255,77,77,0.36) !important;
   background: rgba(255,77,77,0.11) !important;
   color: #ff8585 !important;
+  box-shadow: inset 3px 0 0 #ff8585;
+}
+
+.mapBanButton.mapBanButtonActive {
+  border-color: var(--theme-primary-border) !important;
+  background: var(--theme-primary-soft) !important;
+  color: var(--theme-primary) !important;
+  box-shadow: inset 3px 0 0 var(--theme-primary);
 }
 
 .tickerGrid {

@@ -66,6 +66,12 @@
 
 .statsMetricsPanel {
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-x: clip;
+  container-type: inline-size;
 }
 
 .statsBoardHeader {
@@ -189,8 +195,12 @@
 .statsMetricHeader,
 .statsMetricRow {
   display: grid;
-  grid-template-columns: 56px 70px minmax(80px, 0.72fr) minmax(80px, 0.72fr) 76px 76px 78px;
+  grid-template-columns: 52px 66px minmax(0, 0.72fr) minmax(0, 0.72fr) minmax(0, 0.62fr) minmax(0, 0.62fr) 70px;
   gap: 6px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .statsMetricHeader {
@@ -209,6 +219,10 @@
 .statsMetricList {
   display: grid;
   gap: 7px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .statsMetricRow {
@@ -217,11 +231,14 @@
   background:
     repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
     rgba(0,0,0,0.22);
+  overflow: hidden;
   padding: 7px;
 }
 
 .statsMetricRow .field {
   margin: 0;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .statsMetricRow .field span {
@@ -230,6 +247,14 @@
 
 .statsMetricRow button {
   min-width: 0;
+  max-width: 100%;
+}
+
+.statsMetricHeader > *,
+.statsMetricRow > *,
+.statsMetricRow input {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .statsMetricName {
@@ -441,18 +466,28 @@
   display: grid;
   gap: 10px;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .teamDataOutputRosterGrid {
   display: grid;
   gap: 10px;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .teamDataOutputRoster {
   display: grid;
   gap: 7px;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
   border: 1px solid rgba(255,255,255,0.08);
   background:
     repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
@@ -493,10 +528,13 @@
 .teamDataOutputHeader,
 .teamDataOutputRow {
   display: grid;
-  grid-template-columns: 38px minmax(92px, 1.18fr) repeat(3, 46px) repeat(3, minmax(70px, 0.86fr));
+  grid-template-columns: 36px minmax(0, 1.18fr) repeat(3, 42px) repeat(3, minmax(0, 0.86fr));
   gap: 5px;
   align-items: stretch;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .teamDataOutputHeader {
@@ -522,12 +560,16 @@
   display: grid;
   gap: 5px;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .teamDataOutputRow {
   min-height: 34px;
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(0,0,0,0.24);
+  overflow: hidden;
   padding: 5px;
 }
 
@@ -618,4 +660,46 @@
 .teamDataRowPreview .teamDataRowActive span {
   border-color: var(--theme-primary-border);
   background: var(--theme-primary-softer);
+}
+
+@container (max-width: 760px) {
+  .statsToolbar {
+    grid-template-columns: 124px 124px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .statsMetricHeader,
+  .statsMetricRow {
+    grid-template-columns: 46px 58px minmax(0, 0.72fr) minmax(0, 0.72fr) minmax(0, 0.58fr) minmax(0, 0.58fr) 58px;
+    gap: 5px;
+  }
+
+  .statsMetricHeader {
+    padding: 0 6px;
+  }
+
+  .statsMetricRow {
+    padding: 6px;
+  }
+
+  .statsMetricName strong,
+  .statsMetricName span,
+  .statsMetricValueCell,
+  .statsMetricRateCell,
+  .statsStateCell {
+    padding-right: 5px;
+    padding-left: 5px;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+  }
+
+  .teamDataOutputHeader,
+  .teamDataOutputRow {
+    grid-template-columns: 32px minmax(0, 1.08fr) repeat(3, 34px) repeat(3, minmax(0, 0.72fr));
+    gap: 4px;
+  }
+
+  .teamDataOutputRow {
+    padding: 4px;
+  }
 }

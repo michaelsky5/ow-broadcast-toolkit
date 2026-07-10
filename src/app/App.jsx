@@ -248,6 +248,11 @@ const getSceneName = (scene, language) => getSceneDisplay(scene, language).name
 const getSceneMeta = (scene, language) => getSceneDisplay(scene, language).meta
 const getBundleLabel = (item, language) => getBundleDisplay(item, language).label
 const getBundleDescription = (item, language) => getBundleDisplay(item, language).description
+const getRailToggleLabel = (open, language) => (
+  language === 'zh'
+    ? (open ? '收起' : '展开')
+    : (open ? 'Collapse' : 'Expand')
+)
 
 const getModeLabel = (modes, modeId) => (
   modes?.find(mode => mode.id === modeId)?.label || ''
@@ -424,6 +429,17 @@ export default function App() {
   return showOverlay ? <OverlayPage /> : <ConsoleApp />
 }
 
+function RailPanel({ title, children }) {
+  return (
+    <section className={`${styles.panel} ${styles.railPanel}`}>
+      <div className={styles.railPanelTitle}>
+        <span>{title}</span>
+      </div>
+      <div className={styles.railPanelBody}>{children}</div>
+    </section>
+  )
+}
+
 function ConsoleApp() {
   const [project, setProject] = useState(() => loadStoredProject() || createDefaultProject())
   const [programProject, setProgramProject] = useState(() => loadStoredProgramProject() || project)
@@ -436,6 +452,7 @@ function ConsoleApp() {
   const [workspaceMode, setWorkspaceMode] = useState('production')
   const [sceneModeHints, setSceneModeHints] = useState({ 'live-hud': 'match', roster: 'roster' })
   const [consoleSettings, setConsoleSettings] = useState(loadConsoleSettings)
+  const [rightRailCollapsed, setRightRailCollapsed] = useState(false)
   const importInputRef = useRef(null)
   const projectRef = useRef(project)
   const programProjectRef = useRef(programProject)
@@ -445,6 +462,7 @@ function ConsoleApp() {
   const competitionName = getCompetitionName(project, language)
   const overlayUrl = getOverlayUrl(project)
   const statusOptions = getStatusOptions(copy)
+  const showRightRailControls = workspaceMode === 'production'
 
   const programScene = useMemo(() => {
     return getSceneById(programProject.scenes.activeSceneId)
@@ -965,6 +983,18 @@ function ConsoleApp() {
             <span>{copy.score}</span>
             <strong>{project.currentMatch.score.teamA} : {project.currentMatch.score.teamB}</strong>
           </div>
+          {showRightRailControls && (
+            <button
+              type="button"
+              className={`${styles.statBox} ${styles.statusRailToggle}`}
+              aria-controls="console-right-rail"
+              aria-expanded={!rightRailCollapsed}
+              onClick={() => setRightRailCollapsed(prev => !prev)}
+            >
+              <span>{language === 'zh' ? '控制栏' : 'Control Rail'}</span>
+              <strong>{getRailToggleLabel(!rightRailCollapsed, language)}</strong>
+            </button>
+          )}
         </section>
 
         {workspaceMode === 'toolbox' ? (
@@ -984,7 +1014,7 @@ function ConsoleApp() {
             onUpdate={updateConsoleSettings}
           />
         ) : (
-          <section className={styles.consoleBody}>
+          <section className={`${styles.consoleBody} ${rightRailCollapsed ? styles.consoleBodyRailCollapsed : ''}`}>
             <div className={styles.productionColumn}>
               <section className={styles.monitorGrid}>
                 <div className={styles.monitor}>
@@ -1030,46 +1060,45 @@ function ConsoleApp() {
               />
             </div>
 
-            <aside className={styles.rightRail}>
-              <section className={styles.panel}>
-                <div className={styles.panelTitle}>{copy.quickActions}</div>
-                <div className={styles.quickActionGrid}>
-                  <button onClick={swapMatchSides}>{copy.swapSides}</button>
-                  <button disabled={!undoStack.length} onClick={undoLastAction}>{copy.undoAction}</button>
-                  <button onClick={resetScore}>{copy.resetScore}</button>
-                </div>
-              </section>
+            {!rightRailCollapsed && (
+              <aside className={styles.rightRail} id="console-right-rail">
+                <RailPanel title={copy.quickActions}>
+                  <div className={styles.quickActionGrid}>
+                    <button onClick={swapMatchSides}>{copy.swapSides}</button>
+                    <button disabled={!undoStack.length} onClick={undoLastAction}>{copy.undoAction}</button>
+                    <button onClick={resetScore}>{copy.resetScore}</button>
+                  </div>
+                </RailPanel>
 
-              <section className={styles.panel}>
-                <div className={styles.panelTitle}>{copy.realTimeStatus}</div>
-                <div className={styles.infoGrid}>
-                  <span>{copy.program}</span>
-                  <strong>{getSceneName(programScene, language)}</strong>
-                  <span>{copy.preview}</span>
-                  <strong>{getSceneName(previewScene, language)}</strong>
-                  <span>{copy.status}</span>
-                  <strong>{statusOptions.find(option => option.value === project.currentMatch.status)?.label || project.currentMatch.status}</strong>
-                  <span>{copy.map}</span>
-                  <strong>{currentMapLabel}</strong>
-                  <span>{copy.score}</span>
-                  <strong>{project.currentMatch.score.teamA} : {project.currentMatch.score.teamB}</strong>
-                </div>
-              </section>
+                <RailPanel title={copy.realTimeStatus}>
+                  <div className={styles.infoGrid}>
+                    <span>{copy.program}</span>
+                    <strong>{getSceneName(programScene, language)}</strong>
+                    <span>{copy.preview}</span>
+                    <strong>{getSceneName(previewScene, language)}</strong>
+                    <span>{copy.status}</span>
+                    <strong>{statusOptions.find(option => option.value === project.currentMatch.status)?.label || project.currentMatch.status}</strong>
+                    <span>{copy.map}</span>
+                    <strong>{currentMapLabel}</strong>
+                    <span>{copy.score}</span>
+                    <strong>{project.currentMatch.score.teamA} : {project.currentMatch.score.teamB}</strong>
+                  </div>
+                </RailPanel>
 
-              <section className={styles.panel}>
-                <div className={styles.panelTitle}>{copy.operationLog}</div>
-                <div className={styles.logList}>
-                  {operationLog.length === 0 ? (
-                    <div className={styles.emptyLog}>{copy.noLog}</div>
-                  ) : operationLog.map(item => (
-                    <div className={styles.logItem} key={item.id}>
-                      <span>{item.time}</span>
-                      <strong>{item.message}</strong>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </aside>
+                <RailPanel title={copy.operationLog}>
+                  <div className={styles.logList}>
+                    {operationLog.length === 0 ? (
+                      <div className={styles.emptyLog}>{copy.noLog}</div>
+                    ) : operationLog.map(item => (
+                      <div className={styles.logItem} key={item.id}>
+                        <span>{item.time}</span>
+                        <strong>{item.message}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </RailPanel>
+              </aside>
+            )}
           </section>
         )}
       </main>

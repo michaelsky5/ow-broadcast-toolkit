@@ -683,7 +683,6 @@
   align-items: stretch;
 }
 
-.upNextDesk,
 .resultEditorDesk,
 .thanksEditorDesk {
   align-items: stretch;
@@ -693,13 +692,11 @@
   height: 100%;
 }
 
-.upNextDesk > .showFlowRail,
 .thanksEditorDesk > .showFlowRail {
   height: 100%;
 }
 
 .lineupEditorDesk > .showFlowRail > .panel,
-.upNextDesk > .showFlowRail > .panel,
 .thanksEditorDesk > .showFlowRail > .panel,
 .resultEditorDesk > .resultFlowPanel {
   box-sizing: border-box;

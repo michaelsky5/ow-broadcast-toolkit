@@ -6,14 +6,6 @@
   .twoPanelGrid,
   .panelGridWide,
   .showPackageModeBar,
-  .statsDesk,
-  .statsWorkbench,
-  .statsStoreTopGrid,
-  .statsStoreActionGrid,
-  .statsStoreSummary,
-  .statsMetricHeader,
-  .statsMetricRow,
-  .statsToolbar,
   .teamDataDesk,
   .teamDataWorkbench,
   .mvpWorkbench,
@@ -24,11 +16,8 @@
   .showFlowDesk,
   .showFlowLineupTeams,
   .upNextDesk,
-  .upNextTeamGrid,
   .liveMainGrid,
   .liveUtilityGrid,
-  .livePackageGrid,
-  .mapSetupWorkspace,
   .rosterWorkspace,
   .casterWorkspace,
   .casterPeopleGrid,
@@ -53,7 +42,6 @@
     grid-row: auto;
   }
 
-  .mapMainRow,
   .mapBanPanel,
   .mapBanToolbar,
   .mapBanTeams,
@@ -61,16 +49,9 @@
   .mapBanFields,
   .mediaSourceActions,
   .mediaToggleGrid,
-  .mapFlowHeader,
   .mapPoolModeGrid,
   .mapCurrentGrid,
-  .casterStatusStrip,
-  .casterLibraryHeader,
-  .casterRow,
   .thanksCreditSummary,
-  .rosterStatusStrip,
-  .rosterPlayerHeader,
-  .rosterPlayerRow,
   .teamDbGrid,
   .teamDbToolbar,
   .teamDbTeamFields,
@@ -110,6 +91,10 @@
   .teamDbList {
     grid-template-columns: 1fr;
   }
+
+  .rosterPlayerList {
+    min-width: 0;
+  }
 }
 
 @media (max-width: 760px) {
@@ -133,14 +118,8 @@
   .mapSetupStatusStrip,
   .mapPoolTopbar,
   .mapPoolActions,
-  .mapFlowHeader,
   .mapPoolModeGrid,
   .showPackageModeBar,
-  .statsDesk,
-  .statsWorkbench,
-  .statsMetricHeader,
-  .statsMetricRow,
-  .statsToolbar,
   .teamDataDesk,
   .teamDataWorkbench,
   .mvpWorkbench,
@@ -177,13 +156,7 @@
   .casterInterviewCompact,
   .casterStaffLockHeader,
   .casterStaffLockGrid,
-  .casterStatusStrip,
-  .casterLibraryHeader,
-  .casterRow,
   .thanksCreditSummary,
-  .rosterStatusStrip,
-  .rosterPlayerHeader,
-  .rosterPlayerRow,
   .teamDbGrid,
   .teamDbToolbar,
   .teamDbTeamFields,

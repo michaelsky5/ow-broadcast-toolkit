@@ -98,10 +98,10 @@ const getSeriesMapTotal = (ft, mapLineup) => {
 }
 
 const getMapEntryFromId = mapId => {
-  const map = OW_MAP_BY_ID[mapId] || OW_MAP_OPTIONS[0]
+  const map = mapId ? (OW_MAP_BY_ID[mapId] || OW_MAP_OPTIONS[0]) : null
   return {
     mapId: map?.id || '',
-    type: map?.mode || 'control',
+    type: map?.mode || '',
     name: map?.en || '',
     image: map?.image || '',
     picker: '',
@@ -115,14 +115,17 @@ const getMapEntryFromId = mapId => {
 }
 
 const getMapLineupEntry = (match, index) => {
-  const fallbackMap = index === Math.max(0, Number(match.currentMapIndex || 1) - 1)
-    ? getMapEntryFromId(match.currentMapId)
-    : getMapEntryFromId(OW_MAP_OPTIONS[index % OW_MAP_OPTIONS.length]?.id)
+  const storedEntry = match.mapLineup?.[index]
+  const fallbackMap = storedEntry
+    ? getMapEntryFromId('')
+    : index === Math.max(0, Number(match.currentMapIndex || 1) - 1) && match.currentMapId
+      ? getMapEntryFromId(match.currentMapId)
+      : getMapEntryFromId('')
 
   return {
     ...fallbackMap,
-    ...(match.mapLineup?.[index] || {}),
-    type: normalizeModeId(match.mapLineup?.[index]?.type || fallbackMap.type)
+    ...(storedEntry || {}),
+    type: storedEntry?.type ? normalizeModeId(storedEntry.type) : fallbackMap.type
   }
 }
 
@@ -131,7 +134,7 @@ const ensureMapLineup = draft => {
   const totalMaps = getSeriesMapTotal(draft.currentMatch.ft, draft.currentMatch.mapLineup)
 
   while (draft.currentMatch.mapLineup.length < totalMaps) {
-    draft.currentMatch.mapLineup.push(getMapEntryFromId(OW_MAP_OPTIONS[draft.currentMatch.mapLineup.length % OW_MAP_OPTIONS.length]?.id))
+    draft.currentMatch.mapLineup.push(getMapEntryFromId(''))
   }
 
   draft.currentMatch.mapLineup = draft.currentMatch.mapLineup.slice(0, totalMaps)
@@ -157,7 +160,7 @@ const setCurrentMapIndex = (draft, index) => {
 
   draft.currentMatch.currentMapIndex = nextIndex
   draft.currentMatch.currentRoundLabel = `MAP ${nextIndex}`
-  if (entry.mapId) draft.currentMatch.currentMapId = entry.mapId
+  draft.currentMatch.currentMapId = entry.mapId || ''
   draft.currentMatch.bansA = normalizeBanList(entry.bansA)
   draft.currentMatch.bansB = normalizeBanList(entry.bansB)
   draft.currentMatch.banOrderMode = entry.banOrderMode || 'A_FIRST'

@@ -2,7 +2,7 @@
 
 .teamDataDesk {
   display: grid;
-  grid-template-columns: clamp(300px, 24vw, 380px) minmax(0, 1fr);
+  grid-template-columns: clamp(320px, 21%, 360px) minmax(0, 1fr);
   gap: 12px;
   align-items: start;
 }
@@ -15,7 +15,7 @@
 
 .teamDataWorkbench {
   display: grid;
-  grid-template-columns: 300px 390px minmax(0, 1fr);
+  grid-template-columns: clamp(260px, 23%, 300px) clamp(320px, 30%, 390px) minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
 }

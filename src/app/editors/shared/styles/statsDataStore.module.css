@@ -4,12 +4,20 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .statsExportGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .statsStoreTopGrid {
@@ -17,6 +25,10 @@
   grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   align-items: end;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .statsStoreTopGrid .field {
@@ -44,6 +56,10 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .statsStoreActionGrid button {
@@ -68,6 +84,10 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 7px;
   margin-top: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .statsStoreSummary div {
@@ -86,6 +106,10 @@
 .statsSnapshotList {
   display: grid;
   gap: 7px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   max-height: 190px;
   overflow: hidden auto;
 }

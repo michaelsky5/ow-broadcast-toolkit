@@ -114,6 +114,7 @@
 .workspace {
   min-width: 0;
   min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: 16px;
 }
@@ -121,6 +122,7 @@
 .workspace::-webkit-scrollbar,
 .sidebar::-webkit-scrollbar,
 .sceneList::-webkit-scrollbar,
+.rightRail::-webkit-scrollbar,
 .logList::-webkit-scrollbar {
   width: 7px;
 }
@@ -128,6 +130,7 @@
 .workspace::-webkit-scrollbar-track,
 .sidebar::-webkit-scrollbar-track,
 .sceneList::-webkit-scrollbar-track,
+.rightRail::-webkit-scrollbar-track,
 .logList::-webkit-scrollbar-track {
   background: rgba(255,255,255,0.025);
 }
@@ -135,6 +138,7 @@
 .workspace::-webkit-scrollbar-thumb,
 .sidebar::-webkit-scrollbar-thumb,
 .sceneList::-webkit-scrollbar-thumb,
+.rightRail::-webkit-scrollbar-thumb,
 .logList::-webkit-scrollbar-thumb {
   background: rgba(255,255,255,0.16);
 }
@@ -142,6 +146,7 @@
 .workspace::-webkit-scrollbar-thumb:hover,
 .sidebar::-webkit-scrollbar-thumb:hover,
 .sceneList::-webkit-scrollbar-thumb:hover,
+.rightRail::-webkit-scrollbar-thumb:hover,
 .logList::-webkit-scrollbar-thumb:hover {
   background: var(--theme-primary-border);
 }
@@ -197,6 +202,47 @@
   padding: 12px 13px;
 }
 
+.statusRailToggle {
+  display: block;
+  position: relative;
+  border-color: var(--theme-primary-border);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 22px),
+    linear-gradient(135deg, var(--theme-primary-softer), rgba(255,255,255,0.035));
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.045),
+    0 0 0 1px rgba(255,216,74,0.08);
+  padding-right: 38px;
+  text-align: left;
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+  cursor: pointer;
+}
+
+.statusRailToggle::after {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid var(--theme-primary);
+  border-right: 2px solid var(--theme-primary);
+  content: '';
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.statusRailToggle:hover,
+.statusRailToggle:focus-visible {
+  border-color: var(--theme-primary-border);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.024) 0 1px, transparent 1px 22px),
+    linear-gradient(135deg, rgba(255,216,74,0.2), rgba(255,255,255,0.055));
+  box-shadow:
+    inset 0 0 0 1px rgba(255,216,74,0.14),
+    0 0 18px rgba(255,216,74,0.1);
+  outline: none;
+  transform: translateY(-1px);
+}
+
 .statBox span {
   display: block;
   color: var(--theme-muted-text);
@@ -219,11 +265,23 @@
   white-space: nowrap;
 }
 
+.statBox.statusRailToggle span {
+  color: var(--theme-primary);
+}
+
+.statBox.statusRailToggle strong {
+  color: var(--theme-text);
+}
+
 .consoleBody {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) clamp(240px, 16vw, 300px);
+  gap: 10px;
   align-items: start;
+}
+
+.consoleBodyRailCollapsed {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .productionColumn {
@@ -232,8 +290,14 @@
 
 .rightRail {
   display: grid;
-  gap: 14px;
+  position: sticky;
+  top: 0;
+  align-content: start;
+  gap: 10px;
+  max-height: calc(100vh - 32px);
   min-width: 0;
+  overflow-y: auto;
+  z-index: 5;
 }
 
 .actions {
@@ -310,6 +374,46 @@
   background: var(--theme-primary);
   box-shadow: 0 0 12px var(--theme-primary);
   content: '';
+}
+
+.railPanel {
+  padding: 0;
+}
+
+.railPanelTitle {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 10px;
+  color: var(--theme-text);
+}
+
+.railPanelTitle span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--theme-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.railPanelTitle span::before {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  background: var(--theme-primary);
+  box-shadow: 0 0 12px var(--theme-primary);
+  content: '';
+}
+
+.railPanelBody {
+  padding: 0 10px 10px;
 }
 
 .sceneList {
@@ -689,7 +793,7 @@
 
 .settingsStatusGrid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 9px;
 }
 
@@ -781,7 +885,7 @@
 
 .settingsControlGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 9px;
   margin-bottom: 14px;
 }
@@ -1148,13 +1252,24 @@
   .settingsGridPanel,
   .settingsControlGrid,
   .settingsDesktopGrid,
+  .assetHealthSummary,
   .settingsFieldRow,
   .twoColFields {
     grid-template-columns: 1fr;
   }
 
+  .rightRail {
+    grid-template-columns: 1fr;
+    max-height: none;
+    position: static;
+  }
+
   .hotkeyRow {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .assetHealthRow {
+    grid-template-columns: 1fr;
   }
 
   .hotkeyRow strong {

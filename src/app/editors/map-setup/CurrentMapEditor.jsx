@@ -7,7 +7,7 @@ import {
 import { FT_OPTIONS } from '../../../match/defaultMatch'
 import styles from '../shared/SceneEditor.styles.js'
 import { getMapEditorCopy } from '../shared/editorCopy'
-import { Field, Panel, SegmentedControl, Stepper, ToggleField } from '../shared/editorControls'
+import { EditorDialog, Field, Panel, SegmentedControl, Stepper, ToggleField } from '../shared/editorControls'
 import {
   BAN_ROLE_OPTIONS,
   DEFAULT_BAN_ENTRY,
@@ -53,7 +53,7 @@ const getConfiguredMapsForMode = (settings, modeId) => {
 
 const getMapEntryFromOption = map => ({
   mapId: map?.id || '',
-  type: map?.mode || 'control',
+  type: map?.mode || '',
   name: map?.en || '',
   image: map?.image || '',
   picker: '',
@@ -67,9 +67,11 @@ const getMapEntryFromOption = map => ({
 
 function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool', onUpdateProject }) {
   const [expandedBanIndex, setExpandedBanIndex] = useState(null)
+  const [mapPoolDialog, setMapPoolDialog] = useState(null)
   const editorTab = activeSection === 'pool' ? 'pool' : 'flow'
   const settings = getSceneSettings(project, 'current-map')
   const mapText = getMapEditorCopy(language)
+  const emptyLabel = language === 'en' ? 'Blank' : '留空'
   const totalMaps = getSeriesMapTotal(project.currentMatch.ft, project.currentMatch.mapLineup)
   const currentIndex = Math.max(1, Math.min(totalMaps, Number(project.currentMatch.currentMapIndex) || 1))
   const teamOptions = getTeamSideOptions(project, text)
@@ -105,7 +107,7 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
 
       if (index + 1 === Number(draft.currentMatch.currentMapIndex || 1)) {
         const nextEntry = getMapLineupEntry(draft.currentMatch, index)
-        if (nextEntry.mapId) draft.currentMatch.currentMapId = nextEntry.mapId
+        draft.currentMatch.currentMapId = nextEntry.mapId || ''
       }
 
       if (options.recalculateScore) recalculateScoreFromLineup(draft)
@@ -164,7 +166,7 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
     })
   }
 
-  const resetEventMapPool = () => {
+  const performResetEventMapPool = () => {
     onUpdateProject(draft => {
       const currentMapSettings = ensureSceneSettings(draft, 'current-map')
       currentMapSettings.eventMapPool = Object.fromEntries(
@@ -173,6 +175,20 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
       currentMapSettings.enabledMapTypes = Object.fromEntries(
         OW_GAME_MODE_OPTIONS.map(mode => [mode.value, true])
       )
+    })
+    setMapPoolDialog(null)
+  }
+
+  const resetEventMapPool = () => {
+    setMapPoolDialog({
+      title: mapText.resetPoolTitle,
+      kicker: mapText.mapPool,
+      message: mapText.resetPoolMessage,
+      tone: 'danger',
+      confirmLabel: mapText.resetPool,
+      cancelLabel: mapText.cancel,
+      onConfirm: performResetEventMapPool,
+      onCancel: () => setMapPoolDialog(null)
     })
   }
 
@@ -283,7 +299,7 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
                     ensureSceneSettings(draft, 'current-map').showOverviewCurrent = checked
                   })}
                 />
-                <button type="button" onClick={resetEventMapPool}>{mapText.resetPool}</button>
+                <button type="button" className={styles.dangerButton} onClick={resetEventMapPool}>{mapText.resetPool}</button>
               </div>
             )}
 
@@ -401,7 +417,8 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
           )}
 
           {editorTab === 'flow' && (
-            <Panel title={text.mapFlow} className={styles.mapFlowPanel}>
+            <>
+              <Panel title={text.mapFlow} className={styles.mapFlowPanel}>
               <div className={styles.mapFlowHeader}>
                 <span>{mapText.map}</span>
                 <span>{mapText.mode}</span>
@@ -414,8 +431,8 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
                 {Array.from({ length: totalMaps }).map((_, index) => {
                   const entry = getMapLineupEntry(project.currentMatch, index)
                   const selectedMap = OW_MAP_BY_ID[entry.mapId] || null
-                  const mapMode = entry.type || selectedMap?.mode || 'control'
-                  const mapsForMode = getConfiguredMapsForMode(settings, mapMode)
+                  const mapMode = entry.type || selectedMap?.mode || ''
+                  const mapsForMode = mapMode ? getConfiguredMapsForMode(settings, mapMode) : []
                   const selectedMapInPool = mapsForMode.some(map => map.id === selectedMap?.id)
                   const rowModeOptions = flowModeOptions.some(mode => mode.value === mapMode)
                     ? flowModeOptions
@@ -443,7 +460,11 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
                       <div className={styles.mapMainRow}>
                         <button
                           type="button"
-                          className={isCurrent ? styles.mapIndexButton : ''}
+                          className={[
+                            styles.mapIndexButton,
+                            isCurrent ? styles.mapIndexButtonActive : ''
+                          ].filter(Boolean).join(' ')}
+                          aria-current={isCurrent ? 'true' : undefined}
                           onClick={() => onUpdateProject(draft => setCurrentMapIndex(draft, index + 1))}
                         >
                           {isCurrent ? mapText.live : mapText.mapNumber(index + 1)}
@@ -453,10 +474,15 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
                           value={mapMode}
                           onChange={event => {
                             const nextMode = event.target.value
-                            const firstMap = getConfiguredMapsForMode(settings, nextMode)[0] || OW_MAPS_BY_MODE[nextMode]?.[0]
-                            updateMapEntry(index, getMapEntryFromOption(firstMap), { recalculateScore: true })
+                            updateMapEntry(index, {
+                              type: nextMode,
+                              mapId: '',
+                              name: '',
+                              image: ''
+                            })
                           }}
                         >
+                          <option value="">{emptyLabel}</option>
                           {rowModeOptions.map(mode => (
                             <option key={mode.value} value={mode.value}>{getModeLabel(mode, language)}</option>
                           ))}
@@ -464,13 +490,19 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
 
                         <select
                           value={selectedMapInPool ? selectedMap.id : ''}
-                          onChange={event => updateMapEntry(
-                            index,
-                            getMapEntryFromOption(OW_MAP_BY_ID[event.target.value]),
-                            { recalculateScore: true }
-                          )}
+                          onChange={event => {
+                            const nextMap = OW_MAP_BY_ID[event.target.value]
+                            updateMapEntry(
+                              index,
+                              nextMap
+                                ? getMapEntryFromOption(nextMap)
+                                : { mapId: '', name: '', image: '' },
+                              nextMap ? { recalculateScore: true } : undefined
+                            )
+                          }}
+                          disabled={!mapMode}
                         >
-                          {!selectedMapInPool && <option value="">{mapText.selectFromPool}</option>}
+                          <option value="">{emptyLabel}</option>
                           {mapsForMode.map(map => (
                             <option key={map.id} value={map.id}>{getMapLabel(map, language)}</option>
                           ))}
@@ -499,9 +531,11 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
                         <button
                           type="button"
                           className={[
-                            isBanExpanded ? styles.activeOutline : '',
+                            styles.mapBanButton,
+                            isBanExpanded ? styles.mapBanButtonActive : '',
                             rowBanCount ? styles.mapBanFilled : ''
                           ].filter(Boolean).join(' ')}
+                          aria-expanded={isBanExpanded}
                           onClick={() => setExpandedBanIndex(isBanExpanded ? null : index)}
                         >
                           {isBanExpanded ? mapText.close : rowBanCount ? `${rowBanCount} ${mapText.ban}` : mapText.ban}
@@ -568,10 +602,12 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
                 })}
               </div>
             </Panel>
+            </>
           )}
 
         </div>
       </div>
+      {mapPoolDialog && <EditorDialog {...mapPoolDialog} />}
     </div>
   )
 }

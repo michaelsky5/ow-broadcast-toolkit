@@ -1,6 +1,7 @@
 ﻿/* === Roster editor === */
 
 .rosterDesk {
+  container-type: inline-size;
   display: grid;
   gap: 12px;
   min-width: 0;
@@ -41,9 +42,12 @@
 
 .rosterWorkspace {
   display: grid;
-  grid-template-columns: clamp(300px, 24vw, 380px) minmax(0, 1fr);
+  grid-template-columns: clamp(340px, 21%, 360px) minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .rosterRail {
@@ -220,20 +224,32 @@
 .rosterPlayersPanel {
   height: 100%;
   min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-x: clip;
+  container-type: inline-size;
 }
 
 .rosterStatusStrip {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) repeat(5, minmax(72px, 0.42fr)) 108px 92px;
+  grid-template-columns: minmax(0, 1.2fr) repeat(5, minmax(0, 0.42fr)) 92px 82px;
   gap: 6px;
   align-items: stretch;
   margin-bottom: 12px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .rosterStatusStrip div {
   display: grid;
   grid-template-columns: minmax(56px, 1fr) auto;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   border: 1px solid rgba(255,255,255,0.09);
   background: rgba(0,0,0,0.26);
 }
@@ -334,9 +350,13 @@
 
 .rosterPlayerHeader {
   display: grid;
-  grid-template-columns: 64px minmax(76px, 0.64fr) minmax(134px, 1fr) 88px minmax(84px, 0.64fr) 64px minmax(148px, 1fr) 58px;
+  grid-template-columns: 58px minmax(0, 0.72fr) minmax(0, 1.08fr) minmax(0, 0.62fr) minmax(0, 0.76fr) 58px minmax(0, 0.9fr) 52px;
   gap: 6px;
   margin-bottom: 8px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 0 8px;
 }
 
@@ -353,28 +373,47 @@
 }
 
 .rosterPlayerHeaderNoBattleTag {
-  grid-template-columns: 64px minmax(112px, 1fr) 88px minmax(94px, 0.78fr) 64px minmax(154px, 1fr) 58px;
+  grid-template-columns: 58px minmax(0, 1fr) minmax(0, 0.64fr) minmax(0, 0.82fr) 58px minmax(0, 0.96fr) 52px;
 }
 
 .rosterPlayerList {
   display: grid;
   gap: 7px;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .rosterPlayerRow {
   display: grid;
-  grid-template-columns: 64px minmax(76px, 0.64fr) minmax(134px, 1fr) 88px minmax(84px, 0.64fr) 64px minmax(148px, 1fr) 58px;
+  grid-template-columns: 58px minmax(0, 0.72fr) minmax(0, 1.08fr) minmax(0, 0.62fr) minmax(0, 0.76fr) 58px minmax(0, 0.9fr) 52px;
   gap: 6px;
   align-items: stretch;
   border: 1px solid rgba(255,255,255,0.08);
   background:
     repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
     rgba(0,0,0,0.22);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
   padding: 8px;
 }
 
+.rosterStatusStrip > *,
+.rosterPlayerHeader > *,
+.rosterPlayerRow > *,
+.rosterPlayerRow .field,
+.rosterPlayerRow input,
+.rosterPlayerRow select,
+.rosterPlayerRow button {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .rosterPlayerRowNoBattleTag {
-  grid-template-columns: 64px minmax(112px, 1fr) 88px minmax(94px, 0.78fr) 64px minmax(154px, 1fr) 58px;
+  grid-template-columns: 58px minmax(0, 1fr) minmax(0, 0.64fr) minmax(0, 0.82fr) 58px minmax(0, 0.96fr) 52px;
 }
 
 .rosterPlayerInactive {
@@ -397,6 +436,8 @@
 .rosterXControlWithReset {
   display: grid;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   grid-template-columns: minmax(0, 1fr) 20px;
   border: 1px solid rgba(255,255,255,0.1);
   background: rgba(0,0,0,0.18);
@@ -451,6 +492,13 @@
   grid-template-columns: minmax(0, 1fr) 52px;
   gap: 4px;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.rosterImageControl input {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .rosterImageControl button {
@@ -508,6 +556,8 @@
   grid-template-columns: 1fr;
   gap: 4px;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .rosterRowActions button {
@@ -520,6 +570,90 @@
 .rosterRowActions button:disabled {
   cursor: not-allowed;
   opacity: 0.34;
+}
+
+@container (max-width: 1280px) {
+  .rosterStatusStrip {
+    grid-template-columns: minmax(0, 1.18fr) repeat(5, minmax(0, 0.36fr)) 82px 74px;
+    gap: 5px;
+  }
+
+  .rosterPlayerHeader,
+  .rosterPlayerRow {
+    grid-template-columns: 52px minmax(0, 0.68fr) minmax(0, 1.02fr) minmax(0, 0.58fr) minmax(0, 0.72fr) 52px minmax(0, 0.78fr) 48px;
+    gap: 5px;
+  }
+
+  .rosterPlayerHeaderNoBattleTag,
+  .rosterPlayerRowNoBattleTag {
+    grid-template-columns: 52px minmax(0, 1fr) minmax(0, 0.58fr) minmax(0, 0.76fr) 52px minmax(0, 0.82fr) 48px;
+  }
+
+  .rosterPlayerRow {
+    padding: 6px;
+  }
+
+  .rosterImageControl {
+    grid-template-columns: minmax(0, 1fr) 44px;
+  }
+
+  .rosterStatusStrip button,
+  .rosterImageControl button,
+  .rosterRowActions button {
+    padding: 0 3px;
+    font-size: 8px;
+  }
+}
+
+@container (max-width: 1080px) {
+  .rosterStatusStrip {
+    grid-template-columns: minmax(0, 1.12fr) repeat(5, minmax(0, 0.32fr)) 74px 66px;
+    gap: 4px;
+  }
+
+  .rosterPlayerHeader,
+  .rosterPlayerRow {
+    grid-template-columns: 48px minmax(0, 0.64fr) minmax(0, 0.94fr) minmax(0, 0.54fr) minmax(0, 0.64fr) 48px minmax(0, 0.62fr) 42px;
+    gap: 4px;
+  }
+
+  .rosterPlayerHeaderNoBattleTag,
+  .rosterPlayerRowNoBattleTag {
+    grid-template-columns: 48px minmax(0, 0.94fr) minmax(0, 0.54fr) minmax(0, 0.68fr) 48px minmax(0, 0.66fr) 42px;
+  }
+
+  .rosterPlayerHeader {
+    padding: 0 6px;
+  }
+
+  .rosterPlayerRow {
+    padding: 5px;
+  }
+
+  .rosterImageControl {
+    grid-template-columns: minmax(0, 1fr) 38px;
+    gap: 3px;
+  }
+
+  .rosterXControlWithReset {
+    grid-template-columns: minmax(0, 1fr) 18px;
+  }
+
+  .rosterImageControl button,
+  .rosterRowActions button {
+    padding: 0 2px;
+    font-size: 8px;
+  }
+}
+
+@container (max-width: 900px) {
+  .rosterWorkspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rosterRail {
+    grid-template-rows: auto;
+  }
 }
 
 .teamDbDesk {

@@ -3,8 +3,26 @@ import { useState } from 'react'
 import { FT_OPTIONS } from '../../../match/defaultMatch'
 import { DEFAULT_THEME } from '../../../theme/defaultTheme'
 import styles from '../shared/SceneEditor.styles.js'
-import { Field, Panel, ToggleField } from '../shared/editorControls'
+import { Field, Panel } from '../shared/editorControls'
 import { ensureSceneSettings, getMapLabel, getSceneSettings, getTeam } from '../shared/editorHelpers'
+
+function UpNextDisplaySwitch({ label, checked, language, onChange }) {
+  const stateLabel = language === 'zh'
+    ? (checked ? '\u5f00' : '\u5173')
+    : (checked ? 'ON' : 'OFF')
+
+  return (
+    <button
+      type="button"
+      className={`${styles.upNextDisplaySwitch} ${checked ? styles.upNextDisplaySwitchActive : ''}`}
+      aria-pressed={checked}
+      onClick={() => onChange(!checked)}
+    >
+      <span>{label}</span>
+      <strong>{stateLabel}</strong>
+    </button>
+  )
+}
 
 const normalizePlayerRole = role => {
   const value = String(role || '').trim().toLowerCase()
@@ -131,6 +149,8 @@ function MatchupTeamPanel({ side, title, project, copy, text, isExpanded, onTogg
 function MatchupEditor({ project, copy, text, language, statusOptions, onUpdateProject }) {
   const [expandedTeams, setExpandedTeams] = useState({ teamA: false, teamB: false })
   const settings = getSceneSettings(project, 'matchup')
+  const teamA = getTeam(project, 'teamA')
+  const teamB = getTeam(project, 'teamB')
 
   const updateSettings = patch => {
     onUpdateProject(draft => {
@@ -156,16 +176,16 @@ function MatchupEditor({ project, copy, text, language, statusOptions, onUpdateP
   return (
     <div className={`${styles.showFlowDesk} ${styles.upNextDesk}`}>
       <div className={styles.showFlowRail}>
-        <Panel title={text.upNextControl} className={styles.showFlowCompactPanel}>
-          <Field label={text.title}>
-            <input
-              value={settings.title || ''}
-              onChange={event => updateSettings({ title: event.target.value })}
-              placeholder="UP NEXT"
-            />
-          </Field>
+        <Panel title={text.upNextControl} className={`${styles.showFlowCompactPanel} ${styles.upNextControlPanel}`}>
+          <div className={styles.upNextControlGrid}>
+            <Field label={text.title} wide>
+              <input
+                value={settings.title || ''}
+                onChange={event => updateSettings({ title: event.target.value })}
+                placeholder="UP NEXT"
+              />
+            </Field>
 
-          <div className={styles.showFlowMetaGrid}>
             <Field label={copy.stage}>
               <input
                 value={project.currentMatch.stage}
@@ -183,9 +203,7 @@ function MatchupEditor({ project, copy, text, language, statusOptions, onUpdateP
                 })}
               />
             </Field>
-          </div>
 
-          <div className={styles.showFlowMetaGrid}>
             <Field label={copy.ft}>
               <select
                 value={project.currentMatch.ft}
@@ -211,40 +229,44 @@ function MatchupEditor({ project, copy, text, language, statusOptions, onUpdateP
                 ))}
               </select>
             </Field>
+
+            <Field label={copy.map} wide>
+              <select
+                value={project.currentMatch.currentMapId}
+                onChange={event => onUpdateProject(draft => {
+                  draft.currentMatch.currentMapId = event.target.value
+                })}
+              >
+                {OW_MAP_OPTIONS.map(map => (
+                  <option key={map.id} value={map.id}>{getMapLabel(map, language)}</option>
+                ))}
+              </select>
+            </Field>
           </div>
 
-          <Field label={copy.map}>
-            <select
-              value={project.currentMatch.currentMapId}
-              onChange={event => onUpdateProject(draft => {
-                draft.currentMatch.currentMapId = event.target.value
-              })}
-            >
-              {OW_MAP_OPTIONS.map(map => (
-                <option key={map.id} value={map.id}>{getMapLabel(map, language)}</option>
-              ))}
-            </select>
-          </Field>
-
           <div className={styles.showFlowToggleStrip}>
-            <ToggleField
+            <UpNextDisplaySwitch
               label={text.showStage}
               checked={settings.showStage !== false}
+              language={language}
               onChange={checked => updateSettings({ showStage: checked })}
             />
-            <ToggleField
+            <UpNextDisplaySwitch
               label={text.showFt}
               checked={settings.showFt !== false}
+              language={language}
               onChange={checked => updateSettings({ showFt: checked })}
             />
-            <ToggleField
+            <UpNextDisplaySwitch
               label={text.showMap}
               checked={settings.showMap !== false}
+              language={language}
               onChange={checked => updateSettings({ showMap: checked })}
             />
-            <ToggleField
+            <UpNextDisplaySwitch
               label={text.showSponsors}
               checked={settings.showSponsors !== false}
+              language={language}
               onChange={checked => updateSettings({ showSponsors: checked })}
             />
           </div>
@@ -252,6 +274,30 @@ function MatchupEditor({ project, copy, text, language, statusOptions, onUpdateP
       </div>
 
       <Panel title={text.teamMatchup} className={styles.upNextTeamsPanel}>
+        <div className={styles.upNextMatchupBar}>
+          <div className={styles.upNextMatchupTeam}>
+            <span>{copy.teamA}</span>
+            <strong>{teamA?.shortName || 'TBD'}</strong>
+            <em>{teamA?.name || text.empty}</em>
+          </div>
+
+          <div className={styles.upNextMatchupVersus}>
+            <span>VS</span>
+            <strong>FT{project.currentMatch.ft || 3}</strong>
+          </div>
+
+          <div className={`${styles.upNextMatchupTeam} ${styles.upNextMatchupTeamRight}`}>
+            <span>{copy.teamB}</span>
+            <strong>{teamB?.shortName || 'TBD'}</strong>
+            <em>{teamB?.name || text.empty}</em>
+          </div>
+
+          <button type="button" className={styles.upNextSwapButton} onClick={swapTeams}>
+            <span>A / B</span>
+            <strong>{text.swapTeams}</strong>
+          </button>
+        </div>
+
         <div className={styles.upNextTeamGrid}>
           <MatchupTeamPanel
             side="teamA"
@@ -263,12 +309,6 @@ function MatchupEditor({ project, copy, text, language, statusOptions, onUpdateP
             onToggleExpanded={() => toggleExpandedTeam('teamA')}
             onUpdateProject={onUpdateProject}
           />
-
-          <div className={styles.upNextVsControl}>
-            <span>VS</span>
-            <strong>FT{project.currentMatch.ft || 3}</strong>
-            <button type="button" onClick={swapTeams}>{text.swapTeams}</button>
-          </div>
 
           <MatchupTeamPanel
             side="teamB"
