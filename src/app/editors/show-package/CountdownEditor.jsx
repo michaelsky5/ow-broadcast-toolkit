@@ -386,7 +386,7 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
                 />
               )}
               <BreakSwitchButton
-                label={getShortDisplayLabel(countdownText.showSponsor)}
+                label={language === 'zh' ? '赞助商' : 'Sponsor'}
                 checked={settings.showSponsor === true}
                 onChange={checked => updateSetting({ showSponsor: checked })}
                 language={language}
