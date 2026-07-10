@@ -158,17 +158,6 @@ function MatchupEditor({ project, copy, text, language, statusOptions, onUpdateP
     })
   }
 
-  const swapTeams = () => {
-    onUpdateProject(draft => {
-      const nextTeamAId = draft.currentMatch.teamBId
-      const nextTeamBId = draft.currentMatch.teamAId
-      draft.currentMatch.teamAId = nextTeamAId
-      draft.currentMatch.teamBId = nextTeamBId
-      draft.currentMatch.startingFive.teamA = getTeamPlayers(draft, nextTeamAId)
-      draft.currentMatch.startingFive.teamB = getTeamPlayers(draft, nextTeamBId)
-    })
-  }
-
   const toggleExpandedTeam = side => {
     setExpandedTeams(previous => ({ ...previous, [side]: !previous[side] }))
   }
@@ -292,10 +281,6 @@ function MatchupEditor({ project, copy, text, language, statusOptions, onUpdateP
             <em>{teamB?.name || text.empty}</em>
           </div>
 
-          <button type="button" className={styles.upNextSwapButton} onClick={swapTeams}>
-            <span>A / B</span>
-            <strong>{text.swapTeams}</strong>
-          </button>
         </div>
 
         <div className={styles.upNextTeamGrid}>

@@ -48,17 +48,17 @@ const handleImageFallback = event => {
 
 const resolveWinner = (project, teamA, teamB) => {
   const match = project?.currentMatch || {}
-  const scoreA = Number(match.score?.teamA) || 0
-  const scoreB = Number(match.score?.teamB) || 0
-  if (scoreA > scoreB) return teamA
-  if (scoreB > scoreA) return teamB
-
   const explicitWinner = getTeamById(project, match.result?.winnerTeamId)
   if (explicitWinner) return explicitWinner
 
   const winnerSide = normalizeText(match.result?.winnerSide || match.winnerSide || match.winner)
   if (winnerSide === 'A') return teamA
   if (winnerSide === 'B') return teamB
+
+  const scoreA = Number(match.score?.teamA) || 0
+  const scoreB = Number(match.score?.teamB) || 0
+  if (scoreA > scoreB) return teamA
+  if (scoreB > scoreA) return teamB
 
   return null
 }

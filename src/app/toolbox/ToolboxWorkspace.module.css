@@ -2289,29 +2289,10 @@
 .matchupTeamSelectRow {
   display: grid;
   grid-column: 1 / -1;
-  grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--toolbox-space-xs);
   align-items: end;
   min-width: 0;
-}
-
-.matchupTeamSelectRow button {
-  height: var(--toolbox-control-height);
-  min-width: 0;
-  border: 1px solid rgba(255,255,255,0.11);
-  background: rgba(255,255,255,0.035);
-  color: var(--theme-muted-text);
-  cursor: pointer;
-  font-size: 10px;
-  font-weight: 950;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.matchupTeamSelectRow button:hover {
-  border-color: var(--theme-primary-border);
-  background: var(--theme-primary-softer);
-  color: var(--theme-primary);
 }
 
 .settingsToggle {

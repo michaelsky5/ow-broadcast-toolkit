@@ -490,12 +490,6 @@ function GraphicTeamSelector({ context, settings, teams = [], text, onUpdate }) 
   }))
   const teamAId = clean(settings.teamAId)
   const teamBId = clean(settings.teamBId)
-  const swapTeams = () => {
-    onUpdate({
-      teamAId: teamBId || clean(context.teamB?.id),
-      teamBId: teamAId || clean(context.teamA?.id)
-    })
-  }
 
   return (
     <div className={styles.matchupTeamSelectRow}>
@@ -507,7 +501,6 @@ function GraphicTeamSelector({ context, settings, teams = [], text, onUpdate }) 
         value={teamAId}
         onChange={value => onUpdate({ teamAId: value })}
       />
-      <button type="button" onClick={swapTeams}>{text.swapTeams}</button>
       <SettingsSelect
         disabled={!teamOptions.length}
         label={text.teamB}

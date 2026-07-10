@@ -102,32 +102,6 @@ const getMapBanSource = (map, matchData, side) => {
   return { entry: '', source: 'none' };
 };
 
-const boolish = value => {
-  if (value === true || value === 1) return true;
-  const s = String(value || '').trim().toLowerCase();
-  return s === 'true' || s === '1' || s === 'yes' || s === 'on';
-};
-
-const shouldSwapVisualTeams = (map, matchData) => {
-  const explicitSwap = [
-    map?.swapSides,
-    map?.isSwapSides,
-    map?.swapTeams,
-    map?.flipSides,
-    map?.reverseSides,
-    matchData?.swapSides,
-    matchData?.isSwapSides,
-    matchData?.swapTeams,
-    matchData?.flipSides,
-    matchData?.reverseSides
-  ].some(boolish);
-
-  if (explicitSwap) return true;
-
-  const attackSide = String(map?.attackSide || matchData?.attackSide || '').trim().toUpperCase();
-  return attackSide === 'B';
-};
-
 const getHeroAssetCandidates = (role, hero) => {
   const cleanRole = String(role || '').trim().toLowerCase();
   const cleanHero = String(hero || '').trim().toLowerCase();
@@ -302,9 +276,10 @@ const MapCard = React.memo(({
   const orderA = resolvedBanOrderMode === 'B_FIRST' ? '2ND' : '1ST';
   const orderB = resolvedBanOrderMode === 'B_FIRST' ? '1ST' : '2ND';
 
-  const swapped = shouldSwapVisualTeams(map, matchData);
-  const leftTeamKey = swapped ? 'B' : 'A';
-  const rightTeamKey = swapped ? 'A' : 'B';
+  // A/B slots have stable screen positions. Attack/defense only changes the
+  // status label and must never move a team or its bans to the other column.
+  const leftTeamKey = 'A';
+  const rightTeamKey = 'B';
 
   const leftBan = leftTeamKey === 'A' ? parsedBanA : parsedBanB;
   const rightBan = rightTeamKey === 'A' ? parsedBanA : parsedBanB;
