@@ -40,10 +40,46 @@ const clampNumber = (value, fallback, min, max) => {
   return Math.min(max, Math.max(min, number))
 }
 const cleanWholeNumber = value => String(value ?? '').replace(/\D+/g, '')
+const LIVE_TEAM_ROLE_ORDER = ['damage', 'damage', 'tank', 'support', 'support']
 const parseRecordValue = value => {
   const text = String(value || '').trim().replace(/\s+/g, '')
   const match = text.match(/^(\d+)W?[-/]*(\d+)L?$/i)
   return match ? { w: match[1], l: match[2] } : { w: '', l: '' }
+}
+const normalizeLiveRole = role => {
+  const value = String(role || '').trim().toLowerCase()
+  if (['damage', 'dps', 'attack'].includes(value)) return 'damage'
+  if (['tank', 'main tank', 'off tank'].includes(value)) return 'tank'
+  if (['support', 'sup', 'healer'].includes(value)) return 'support'
+  return value || 'damage'
+}
+const getDefaultStartingFive = (project, teamId) => {
+  const players = getTeamPlayers(project, teamId)
+  const usedIds = new Set()
+  const orderedPlayers = LIVE_TEAM_ROLE_ORDER
+    .map(role => {
+      const player = players.find(item => !usedIds.has(item.id) && normalizeLiveRole(item.role) === role)
+      if (player) usedIds.add(player.id)
+      return player
+    })
+    .filter(Boolean)
+
+  players.forEach(player => {
+    if (!usedIds.has(player.id)) {
+      orderedPlayers.push(player)
+      usedIds.add(player.id)
+    }
+  })
+
+  return orderedPlayers.slice(0, 5).map(player => player.id)
+}
+const getTeamSelectLabel = team => {
+  const shortName = String(team?.shortName || '').trim()
+  const name = String(team?.name || '').trim()
+  const fallback = String(team?.id || 'Team').trim()
+
+  if (shortName && name) return `${shortName} / ${name}`
+  return shortName || name || fallback
 }
 const getRecordParts = (hud, suffix) => {
   const win = cleanWholeNumber(hud?.[`teamRecord${suffix}W`])
@@ -87,7 +123,9 @@ function LiveTeamControlPanel({
 }) {
   const sideKey = side === 'B' ? 'teamB' : 'teamA'
   const team = getTeam(project, sideKey)
+  const currentTeamId = project.currentMatch?.[`${sideKey}Id`] || ''
   const players = getTeamPlayers(project, team?.id)
+  const teamOptions = project.teams || []
   const liveSlotPlayers = getStartingPlayers(project, sideKey)
   const banKey = side === 'B' ? 'bansB' : 'bansA'
   const banInfo = parseBanEntry(project.currentMatch?.[banKey]?.[0] || DEFAULT_BAN_ENTRY)
@@ -111,6 +149,21 @@ function LiveTeamControlPanel({
       const target = draft.teams.find(item => item.id === draft.currentMatch[`${sideKey}Id`])
       if (target) target[field] = value
     })
+  }
+
+  const selectMatchTeam = event => {
+    const nextTeamId = event.target.value
+    if (!nextTeamId || nextTeamId === currentTeamId) return
+
+    onUpdateLiveProject(draft => {
+      draft.currentMatch[`${sideKey}Id`] = nextTeamId
+      if (!draft.currentMatch.startingFive) draft.currentMatch.startingFive = { teamA: [], teamB: [] }
+      draft.currentMatch.startingFive[sideKey] = getDefaultStartingFive(draft, nextTeamId)
+      draft.currentMatch.hud = {
+        ...(draft.currentMatch.hud || {}),
+        [subIndexKey]: -1
+      }
+    }, { undoReason: `LOAD TEAM ${side}` })
   }
 
   const updateBan = patch => {
@@ -164,10 +217,24 @@ function LiveTeamControlPanel({
   return (
     <Panel title={liveText.teamControl(side)} className={styles.liveTeamPanel}>
       <div className={`${styles.liveTeamControlGrid} ${showSideControl ? '' : styles.noSideControl}`}>
-        <div className={styles.liveSideBadge}>
+        <label className={styles.liveSideBadge}>
           <span>{sideName}</span>
-          <strong>{teamShortName}</strong>
-        </div>
+          <select
+            aria-label={`${sideName} ${copy.teamPreset || 'Team'}`}
+            value={currentTeamId}
+            onChange={selectMatchTeam}
+          >
+            {!teamOptions.length && <option value="">{text.empty}</option>}
+            {currentTeamId && !teamOptions.some(option => option.id === currentTeamId) && (
+              <option value={currentTeamId}>{teamShortName}</option>
+            )}
+            {teamOptions.map(option => (
+              <option key={option.id} value={option.id}>
+                {getTeamSelectLabel(option)}
+              </option>
+            ))}
+          </select>
+        </label>
         <button type="button" onClick={() => onTriggerLineup(side, 'LIST')}>{liveText.lineup}</button>
         <button type="button" onClick={() => onTriggerLineup(side, 'CALLOUT')}>{liveText.callout}</button>
         {showSideControl && (
