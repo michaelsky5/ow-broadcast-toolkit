@@ -21,7 +21,7 @@ const getRoleLabel = role => {
 
 const getHeroImage = player => {
   const hero = OW_HERO_BY_ID[player?.primaryHeroes?.[0]]
-  return clean(player?.avatar) || clean(hero?.rosterIcon || hero?.icon) || '/OW.svg'
+  return clean(player?.avatar) || clean(player?.heroImage) || clean(hero?.rosterIcon || hero?.icon)
 }
 
 const getTeamForSide = (project, side) => {
@@ -48,10 +48,14 @@ const getRosterOutputPlayers = (project, team, side) => {
   ].slice(0, Math.min(targetCount, rosterPlayers.length))
 }
 
-const handleImageFallback = event => {
+const handleLogoFallback = event => {
   if (event.currentTarget.dataset.fallbackApplied) return
   event.currentTarget.dataset.fallbackApplied = 'true'
   event.currentTarget.src = '/OW.svg'
+}
+
+const handlePortraitFallback = event => {
+  event.currentTarget.hidden = true
 }
 
 export default function RosterScene({ project }) {
@@ -88,7 +92,7 @@ export default function RosterScene({ project }) {
 
       <section className={styles.hero}>
         <div className={styles.logoBox}>
-          <img src={teamLogo} alt="" onError={handleImageFallback} />
+          <img src={teamLogo} alt="" onError={handleLogoFallback} />
         </div>
         <div className={styles.heroCopy}>
           <p>{subtitle}</p>
@@ -120,6 +124,8 @@ export default function RosterScene({ project }) {
       <main className={styles.rosterGrid} style={{ '--player-count': Math.max(players.length, 5) }}>
         {players.length ? players.map((player, index) => {
           const battleTag = clean(player.battleTag)
+          const heroImage = getHeroImage(player)
+          const roleLabel = getRoleLabel(player.role)
 
           return (
             <article
@@ -128,11 +134,23 @@ export default function RosterScene({ project }) {
               style={{ '--card-index': index, '--portrait-x': `${getPortraitXPct(player)}%` }}
             >
               <div className={styles.cardNumber}>{String(index + 1).padStart(2, '0')}</div>
-              <div className={styles.portrait}>
-                <img src={getHeroImage(player)} alt="" />
+              <div className={`${styles.portrait} ${heroImage ? '' : styles.portraitEmpty}`}>
+                <div className={styles.portraitPlaceholder} aria-hidden="true">
+                  <img className={styles.portraitWatermark} src={teamLogo} alt="" onError={handleLogoFallback} />
+                  <strong>{roleLabel}</strong>
+                  <span>NO HERO DATA</span>
+                </div>
+                {heroImage && (
+                  <img
+                    className={styles.portraitImage}
+                    src={heroImage}
+                    alt=""
+                    onError={handlePortraitFallback}
+                  />
+                )}
               </div>
               <div className={styles.playerInfo}>
-                <span>{getRoleLabel(player.role)}</span>
+                <span>{roleLabel}</span>
                 <strong>{clean(player.name) || `PLAYER ${index + 1}`}</strong>
                 {battleTag && <em>{battleTag}</em>}
               </div>

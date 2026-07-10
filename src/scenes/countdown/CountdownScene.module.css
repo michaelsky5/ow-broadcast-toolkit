@@ -89,6 +89,89 @@
   font-size: 10px;
 }
 
+.topbarSponsorLockup {
+  position: absolute;
+  top: 58px;
+  right: 30px;
+  display: grid;
+  gap: 7px;
+  justify-items: end;
+  min-width: 0;
+  max-width: 680px;
+  text-align: right;
+}
+
+.topbarSponsorLockup > span {
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  opacity: 0.64;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.topbarSponsorBrands,
+.topbarSponsorBrandGroup,
+.topbarSponsorBrand {
+  display: flex;
+  align-items: center;
+}
+
+.topbarSponsorBrands {
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: flex-end;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.topbarSponsorBrandGroup {
+  flex: 0 0 auto;
+  gap: 16px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.topbarSponsorBrand {
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.topbarSponsorBrand img {
+  display: block;
+  width: auto;
+  max-width: 140px;
+  height: 40px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  opacity: 0.88;
+}
+
+.topbarSponsorBrand strong,
+.topbarSponsorBrands > strong {
+  min-width: 0;
+  color: var(--theme-text);
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  line-height: 1.05;
+  opacity: 0.78;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.topbarSponsorBrandGroup > i {
+  color: var(--theme-muted-text);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.46;
+}
+
 .standbyContent {
   position: absolute;
   inset: 44px 96px 72px;
@@ -160,8 +243,7 @@
 }
 
 .standbyRail,
-.standbyCopy,
-.sponsorPanelStandby {
+.standbyCopy {
   position: relative;
   z-index: 1;
 }
@@ -309,18 +391,29 @@
   min-width: 0;
 }
 
+.eventIdentityGroup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  margin-bottom: 42px;
+}
+
+.eventIdentityGroupCompact {
+  margin-bottom: 24px;
+}
+
 .eventMark {
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr);
   gap: 18px;
-  align-items: center;
-  margin-bottom: 50px;
+  align-items: start;
+  margin-bottom: 0;
 }
 
 .eventMarkCompact {
   grid-template-columns: 44px minmax(0, 1fr);
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .eventMarkNoLogo {
@@ -370,20 +463,40 @@
 }
 
 .eventMark h1 {
+  display: -webkit-box;
   margin: 0;
   overflow: hidden;
+  overflow-wrap: anywhere;
   color: var(--theme-text);
   font-size: 40px;
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 1.12;
+  line-height: 1.04;
   text-overflow: ellipsis;
   text-transform: uppercase;
-  white-space: nowrap;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.eventMark h1.eventNameMedium {
+  font-size: 36px;
+}
+
+.eventMark h1.eventNameLong {
+  font-size: 32px;
 }
 
 .eventMarkCompact h1 {
   font-size: 24px;
+}
+
+.eventMarkCompact h1.eventNameMedium {
+  font-size: 22px;
+}
+
+.eventMarkCompact h1.eventNameLong {
+  font-size: 19px;
 }
 
 .timerBlock {
@@ -1102,76 +1215,6 @@
 
 .scheduleListDense .scheduleMiniScore span {
   font-size: 10px;
-}
-
-.sponsorPanel {
-  display: grid;
-  grid-template-columns: 78px minmax(0, 1fr);
-  gap: 14px;
-  align-items: center;
-  box-sizing: border-box;
-  min-width: 0;
-  width: 100%;
-  max-width: 540px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background:
-    linear-gradient(90deg, var(--theme-primary-softer), transparent 62%),
-    rgba(0,0,0,0.28);
-  padding: 14px;
-}
-
-.sponsorPanelStandby {
-  grid-column: 2;
-  align-self: end;
-  max-width: 540px;
-}
-
-.sponsorLogo {
-  display: grid;
-  width: 78px;
-  height: 58px;
-  place-items: center;
-  border: 1px solid var(--theme-primary-border);
-  background: rgba(0,0,0,0.34);
-  padding: 8px;
-}
-
-.sponsorLogo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.sponsorPanel span,
-.sponsorPanel strong,
-.sponsorPanel em {
-  display: block;
-  overflow: hidden;
-  font-style: normal;
-  font-weight: 950;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.sponsorPanel span {
-  color: var(--theme-muted-text);
-  font-size: 9px;
-  letter-spacing: 0.16em;
-}
-
-.sponsorPanel strong {
-  margin-top: 5px;
-  color: var(--theme-primary);
-  font-size: 18px;
-  letter-spacing: 0.08em;
-}
-
-.sponsorPanel em {
-  margin-top: 5px;
-  color: var(--theme-muted-text);
-  font-size: 10px;
-  letter-spacing: 0.1em;
 }
 
 .footer {

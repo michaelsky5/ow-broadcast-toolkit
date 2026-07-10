@@ -40,7 +40,12 @@ const clampNumber = (value, fallback, min, max) => {
   return Math.min(max, Math.max(min, number))
 }
 const cleanWholeNumber = value => String(value ?? '').replace(/\D+/g, '')
-const LIVE_TEAM_ROLE_ORDER = ['damage', 'damage', 'tank', 'support', 'support']
+const LIVE_STARTING_ROLE_ORDER = ['damage', 'damage', 'tank', 'support', 'support']
+const LIVE_STARTING_ROLE_ORDINALS = {
+  damage: [1, 2],
+  tank: [1],
+  support: [1, 2]
+}
 const parseRecordValue = value => {
   const text = String(value || '').trim().replace(/\s+/g, '')
   const match = text.match(/^(\d+)W?[-/]*(\d+)L?$/i)
@@ -53,10 +58,21 @@ const normalizeLiveRole = role => {
   if (['support', 'sup', 'healer'].includes(value)) return 'support'
   return value || 'damage'
 }
+const getLiveSlotRoleMeta = (index, language) => {
+  const role = LIVE_STARTING_ROLE_ORDER[index] || 'damage'
+  const occurrence = LIVE_STARTING_ROLE_ORDER.slice(0, index + 1).filter(item => item === role).length
+  const needsOrdinal = (LIVE_STARTING_ROLE_ORDINALS[role] || []).length > 1
+  return {
+    role,
+    label: `${getPlayerRoleLabel({ role }, language)}${needsOrdinal ? ` ${occurrence}` : ''}`
+  }
+}
+const getLiveDualLineupLabel = language => (language === 'en' ? 'Both Lineups' : '双方首发')
+const getLiveLineupEntryLabel = language => (language === 'en' ? 'Team Lineup' : '本队首发')
 const getDefaultStartingFive = (project, teamId) => {
   const players = getTeamPlayers(project, teamId)
   const usedIds = new Set()
-  const orderedPlayers = LIVE_TEAM_ROLE_ORDER
+  const orderedPlayers = LIVE_STARTING_ROLE_ORDER
     .map(role => {
       const player = players.find(item => !usedIds.has(item.id) && normalizeLiveRole(item.role) === role)
       if (player) usedIds.add(player.id)
@@ -235,8 +251,6 @@ function LiveTeamControlPanel({
             ))}
           </select>
         </label>
-        <button type="button" onClick={() => onTriggerLineup(side, 'LIST')}>{liveText.lineup}</button>
-        <button type="button" onClick={() => onTriggerLineup(side, 'CALLOUT')}>{liveText.callout}</button>
         {showSideControl && (
           <button
             type="button"
@@ -296,15 +310,26 @@ function LiveTeamControlPanel({
       </div>
 
       <div className={styles.livePlayersPanel}>
-        <div className={styles.sectionTitle}>{liveText.currentPlayers}</div>
+        <div className={styles.livePlayersHeader}>
+          <div className={styles.sectionTitle}>{liveText.currentPlayers}</div>
+          <div className={styles.livePlayersHeaderActions}>
+            <button type="button" onClick={() => onTriggerLineup('', 'LIST')}>{getLiveDualLineupLabel(language)}</button>
+            <button type="button" onClick={() => onTriggerLineup(side, 'LIST')}>{getLiveLineupEntryLabel(language)}</button>
+            <button type="button" onClick={() => onTriggerLineup(side, 'CALLOUT')}>{liveText.callout}</button>
+          </div>
+        </div>
         <div className={styles.livePlayersGrid}>
           {Array.from({ length: 5 }).map((_, index) => {
             const selectedPlayerId = liveSlotPlayers[index]?.id || ''
             const isSubActive = safeActiveSubIndex === index
+            const slotMeta = getLiveSlotRoleMeta(index, language)
 
             return (
               <div className={styles.livePlayerSlot} key={`${side}-player-${index}`}>
-                <span>{liveText.playerSlot(index)}</span>
+                <span>
+                  <b>{slotMeta.label}</b>
+                  <em>{liveText.playerSlot(index)}</em>
+                </span>
                 <select
                   value={selectedPlayerId}
                   onChange={event => setPlayerSlot(index, event.target.value)}
@@ -347,6 +372,7 @@ function LiveHudPackagePanel({ project, hud, liveText, updateHud }) {
   const playerNameFontSize = clampNumber(hud.playerNameFontSize, DEFAULT_PLAYER_NAME_SIZE, 9, 16)
   const topEventLogoVisible = hud.topEventLogoVisible !== false
   const topMatchFormatVisible = hud.topMatchFormatVisible !== false
+  const topSponsorVisible = hud.topSponsorVisible === true
   const eventName = getBroadcastCompetitionName(project)
   const eventLogo = getEventLogo(project)
   const matchFormat = `FT${Number(project.currentMatch?.ft) || 3}`
@@ -514,6 +540,11 @@ function LiveHudPackagePanel({ project, hud, liveText, updateHud }) {
                   label={liveText.showFtLabel}
                   checked={topMatchFormatVisible}
                   onChange={checked => updateHud({ topMatchFormatVisible: checked })}
+                />
+                <ToggleField
+                  label={liveText.showSponsorLogo}
+                  checked={topSponsorVisible}
+                  onChange={checked => updateHud({ topSponsorVisible: checked })}
                 />
               </div>
             </div>
@@ -739,7 +770,7 @@ function LiveHudEditor({ project, copy, text, language, activeSection = 'match',
   }
 
   const triggerLineup = (side, mode = 'LIST') => {
-    const nextSide = side === 'B' ? 'B' : 'A'
+    const nextSide = side === 'A' || side === 'B' ? side : ''
     const nextMode = mode === 'CALLOUT' ? 'CALLOUT' : 'LIST'
 
     updateLiveProject(draft => {
@@ -747,7 +778,7 @@ function LiveHudEditor({ project, copy, text, language, activeSection = 'match',
       const previousSide = String(settings.startingLineupSide || '').toUpperCase()
       const previousMode = String(settings.startingLineupMode || '').toUpperCase()
       const previousIndex = Number(settings.startingLineupCalloutIndex)
-      const nextCalloutIndex = nextMode === 'CALLOUT'
+      const nextCalloutIndex = nextMode === 'CALLOUT' && nextSide
         ? (previousSide === nextSide && previousMode === 'CALLOUT' ? ((Number.isFinite(previousIndex) ? previousIndex : -1) + 1) % 5 : 0)
         : -1
 
@@ -756,7 +787,9 @@ function LiveHudEditor({ project, copy, text, language, activeSection = 'match',
       settings.startingLineupCalloutIndex = nextCalloutIndex
       settings.startingLineupTriggerAt = Date.now()
     })
-    onAutoTakeScene?.('starting-five')
+    onAutoTakeScene?.('starting-five', {
+      suppressSameSceneTransition: nextMode === 'CALLOUT'
+    })
   }
 
   const resetScoresAndMapResults = () => {

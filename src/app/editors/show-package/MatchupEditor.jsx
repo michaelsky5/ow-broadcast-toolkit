@@ -242,6 +242,11 @@ function MatchupEditor({ project, copy, text, language, statusOptions, onUpdateP
               checked={settings.showMap !== false}
               onChange={checked => updateSettings({ showMap: checked })}
             />
+            <ToggleField
+              label={text.showSponsors}
+              checked={settings.showSponsors !== false}
+              onChange={checked => updateSettings({ showSponsors: checked })}
+            />
           </div>
         </Panel>
       </div>

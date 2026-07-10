@@ -28,7 +28,8 @@ export const createDefaultSceneSettings = () => ({
     title: 'UP NEXT',
     showStage: true,
     showFt: true,
-    showMap: true
+    showMap: true,
+    showSponsors: true
   },
   'starting-five': {
     title: 'STARTING FIVE',
@@ -43,6 +44,7 @@ export const createDefaultSceneSettings = () => ({
     title: 'BROADCAST TALENT',
     subtitle: 'CASTER DESK',
     showEventLogo: true,
+    showSponsors: true,
     layoutMode: 'AUTO',
     showTitles: true,
     showSocial: true,
@@ -145,6 +147,7 @@ export const createDefaultSceneSettings = () => ({
   },
   countdown: {
     displayMode: 'standby',
+    eventNameLanguage: 'en',
     title: '',
     subtitle: 'OVERWATCH COMMUNITY TOURNAMENT',
     statusText: 'PLEASE STAND BY',

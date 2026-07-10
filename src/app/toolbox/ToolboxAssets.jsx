@@ -185,21 +185,12 @@ function SponsorAssetsTable({ sponsors, text, onUpdateSponsor, onRemoveSponsor }
                 placeholder={text.sponsorDefaultName(index)}
                 onChange={event => onUpdateSponsor(slot.id, index, { name: event.target.value })}
               />
-              <div className={styles.sponsorPathCell}>
-                <input
-                  aria-label={`${text.sponsorLogo} ${index + 1}`}
-                  value={slot.logo}
-                  placeholder="/sponsors/logo.png"
-                  onChange={event => onUpdateSponsor(slot.id, index, { logo: event.target.value })}
-                />
-                <button
-                  type="button"
-                  disabled={!slot.logo}
-                  onClick={() => onUpdateSponsor(slot.id, index, { logo: '' })}
-                >
-                  {text.clear}
-                </button>
-              </div>
+              <SponsorLogoPathCell
+                slot={slot}
+                index={index}
+                text={text}
+                onUpdateSponsor={onUpdateSponsor}
+              />
               <span className={hasLogo ? styles.sponsorStatusReady : styles.sponsorStatusEmpty}>
                 {hasLogo ? text.ready : text.empty}
               </span>
@@ -214,6 +205,47 @@ function SponsorAssetsTable({ sponsors, text, onUpdateSponsor, onRemoveSponsor }
           )
         })}
       </div>
+    </div>
+  )
+}
+
+function SponsorLogoPathCell({ slot, index, text, onUpdateSponsor }) {
+  const inputRef = useRef(null)
+
+  const loadLogo = async file => {
+    if (!file) return
+    const dataUrl = await fileToDataUrl(file)
+    onUpdateSponsor(slot.id, index, { logo: dataUrl })
+  }
+
+  return (
+    <div className={styles.sponsorPathCell}>
+      <input
+        aria-label={`${text.sponsorLogo} ${index + 1}`}
+        value={slot.logo}
+        placeholder="/sponsors/logo.png"
+        onChange={event => onUpdateSponsor(slot.id, index, { logo: event.target.value })}
+      />
+      <button type="button" onClick={() => inputRef.current?.click()}>
+        {text.loadFile}
+      </button>
+      <button
+        type="button"
+        disabled={!slot.logo}
+        onClick={() => onUpdateSponsor(slot.id, index, { logo: '' })}
+      >
+        {text.clear}
+      </button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={event => {
+          loadLogo(event.target.files?.[0])
+          event.target.value = ''
+        }}
+      />
     </div>
   )
 }

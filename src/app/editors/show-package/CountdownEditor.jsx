@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { getCurrentTeams } from '../../../project/projectUtils'
 import styles from '../shared/SceneEditor.styles.js'
 import { getCountdownEditorCopy } from '../shared/editorCopy'
-import { Field, Panel, SegmentedControl, ToggleField } from '../shared/editorControls'
+import { Field, Panel, SegmentedControl } from '../shared/editorControls'
 import { ensureSceneSettings, getSceneSettings } from '../shared/editorHelpers'
 
 const MAX_UPCOMING_MATCHES = 4
@@ -14,6 +14,28 @@ const getDisplayGroupLabel = language => (language === 'zh' ? '显示' : 'Show')
 const getShortDisplayLabel = label => clean(label)
   .replace(/^显示\s*/u, '')
   .replace(/^Show\s+/i, '')
+
+function BreakSwitchButton({ label, checked, onChange, language, compact = false }) {
+  const stateLabel = language === 'zh'
+    ? (checked ? '\u5f00' : '\u5173')
+    : (checked ? 'ON' : 'OFF')
+
+  return (
+    <button
+      type="button"
+      className={[
+        styles.breakSwitchButton,
+        checked ? styles.breakSwitchButtonActive : '',
+        compact ? styles.breakSwitchButtonCompact : ''
+      ].filter(Boolean).join(' ')}
+      aria-pressed={checked}
+      onClick={() => onChange(!checked)}
+    >
+      <span>{label}</span>
+      <strong>{stateLabel}</strong>
+    </button>
+  )
+}
 
 const SCHEDULE_MATCH_FIELDS = [
   'time',
@@ -71,7 +93,9 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
   const [localMinutes, setLocalMinutes] = useState(Math.floor(durationSeconds / 60))
   const [localSeconds, setLocalSeconds] = useState(durationSeconds % 60)
   const [expandedSlot, setExpandedSlot] = useState(0)
+  const [identityExpanded, setIdentityExpanded] = useState(false)
   const displayMode = getDisplayMode(settings.displayMode)
+  const eventNameLanguage = settings.eventNameLanguage === 'zh' ? 'zh' : 'en'
   const breakModeOptions = [
     { value: 'standby', label: countdownText.standbyMode },
     { value: 'full', label: countdownText.countdownMode },
@@ -89,6 +113,14 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
     ? countdownText.obsSource
     : countdownText.toolkitPlayback
   const displayGroupLabel = getDisplayGroupLabel(language)
+  const identitySectionLabel = language === 'zh' ? '\u8d5b\u4e8b\u4fe1\u606f' : 'Event Identity'
+  const identityActionLabel = language === 'zh'
+    ? (identityExpanded ? '\u6536\u8d77' : '\u5c55\u5f00')
+    : (identityExpanded ? 'Collapse' : 'Expand')
+  const identitySummary = [project.event?.nameEn, project.event?.nameZh, project.event?.subtitle]
+    .map(clean)
+    .filter(Boolean)
+    .join(' / ') || countdownText.unconfiguredSlot
 
   const createEmptyUpcomingMatch = (enabled = false) => ({
     enabled,
@@ -200,48 +232,78 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
     <div className={styles.breakEditorShell}>
       <div className={styles.breakEditorControlStack}>
         <Panel title={countdownText.breakSetup}>
-          <Field label={countdownText.breakMode}>
-            <SegmentedControl
-              value={displayMode}
-              options={breakModeOptions}
-              onChange={updateDisplayMode}
-            />
-          </Field>
+          <div className={styles.breakTopControlGrid}>
+            <Field label={countdownText.breakMode}>
+              <SegmentedControl
+                value={displayMode}
+                options={breakModeOptions}
+                onChange={updateDisplayMode}
+              />
+            </Field>
+            <Field label={countdownText.eventNameDisplay}>
+              <SegmentedControl
+                value={eventNameLanguage}
+                options={[
+                  { value: 'zh', label: countdownText.chineseName },
+                  { value: 'en', label: countdownText.englishName }
+                ]}
+                onChange={value => updateSetting({ eventNameLanguage: value })}
+              />
+            </Field>
+          </div>
 
-          <div className={styles.breakCopyGrid}>
-            <div className={styles.breakIdentityGrid}>
-              <Field label={text.eventNameEn}>
-                <input
-                  value={project.event?.nameEn || ''}
-                  onChange={event => updateEventName('nameEn')(event.target.value)}
-                  placeholder="OWBT"
-                />
-              </Field>
+          <div className={`${styles.breakCopyGrid} ${identityExpanded ? styles.breakCopyGridExpanded : ''}`}>
+            <div className={styles.breakIdentitySection}>
+              <button
+                type="button"
+                className={styles.breakIdentityDisclosure}
+                aria-expanded={identityExpanded}
+                title={identitySummary}
+                onClick={() => setIdentityExpanded(value => !value)}
+              >
+                <span>{identitySectionLabel}</span>
+                <strong>{identitySummary}</strong>
+                <em>{identityActionLabel}</em>
+              </button>
 
-              <Field label={text.eventNameZh}>
+              {identityExpanded && (
+                <div className={styles.breakIdentityFields}>
+                  <Field label={text.eventNameEn}>
+                    <input
+                      value={project.event?.nameEn || ''}
+                      onChange={event => updateEventName('nameEn')(event.target.value)}
+                      placeholder="OWBT"
+                    />
+                  </Field>
+
+                  <Field label={text.eventNameZh}>
+                    <input
+                      value={project.event?.nameZh || ''}
+                      onChange={event => updateEventName('nameZh')(event.target.value)}
+                      placeholder="OWBT"
+                    />
+                  </Field>
+
+                  <Field label={text.eventSubtitle}>
+                    <input
+                      value={project.event?.subtitle || ''}
+                      onChange={event => updateEventFullName(event.target.value)}
+                      placeholder="OVERWATCH COMMUNITY TOURNAMENT"
+                    />
+                  </Field>
+                </div>
+              )}
+            </div>
+
+            <div className={styles.breakStatusField}>
+              <Field label={countdownText.statusText}>
                 <input
-                  value={project.event?.nameZh || ''}
-                  onChange={event => updateEventName('nameZh')(event.target.value)}
-                  placeholder="OWBT"
+                  value={settings.statusText || ''}
+                  onChange={event => updateSetting({ statusText: event.target.value })}
+                  placeholder="PLEASE STAND BY"
                 />
               </Field>
             </div>
-
-            <Field label={text.eventSubtitle}>
-              <input
-                value={project.event?.subtitle || ''}
-                onChange={event => updateEventFullName(event.target.value)}
-                placeholder="OVERWATCH COMMUNITY TOURNAMENT"
-              />
-            </Field>
-
-            <Field label={countdownText.statusText}>
-              <input
-                value={settings.statusText || ''}
-                onChange={event => updateSetting({ statusText: event.target.value })}
-                placeholder="PLEASE STAND BY"
-              />
-            </Field>
           </div>
 
           {!isStandbyMode && (
@@ -296,28 +358,40 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
 
           <div className={`${styles.breakFeatureStrip} ${isStandbyMode ? styles.breakFeatureStripStandby : ''}`}>
             <span className={styles.breakFeatureLabel}>{displayGroupLabel}</span>
-            <ToggleField
-              label={getShortDisplayLabel(countdownText.showLogo)}
-              checked={settings.showEventLogo !== false}
-              onChange={checked => updateSetting({ showEventLogo: checked })}
-            />
-            <ToggleField
-              label={getShortDisplayLabel(countdownText.showEvent)}
-              checked={settings.showEventName !== false}
-              onChange={checked => updateSetting({ showEventName: checked })}
-            />
-            <ToggleField
-              label={getShortDisplayLabel(countdownText.showStatus)}
-              checked={settings.showStatus !== false}
-              onChange={checked => updateSetting({ showStatus: checked })}
-            />
-            {!isStandbyMode && (
-              <ToggleField
-                label={getShortDisplayLabel(countdownText.showSchedule)}
-                checked={settings.showSchedule !== false}
-                onChange={checked => updateSetting({ showSchedule: checked })}
+            <div className={styles.breakFeatureOptions}>
+              <BreakSwitchButton
+                label={getShortDisplayLabel(countdownText.showLogo)}
+                checked={settings.showEventLogo !== false}
+                onChange={checked => updateSetting({ showEventLogo: checked })}
+                language={language}
               />
-            )}
+              <BreakSwitchButton
+                label={getShortDisplayLabel(countdownText.showEvent)}
+                checked={settings.showEventName !== false}
+                onChange={checked => updateSetting({ showEventName: checked })}
+                language={language}
+              />
+              <BreakSwitchButton
+                label={getShortDisplayLabel(countdownText.showStatus)}
+                checked={settings.showStatus !== false}
+                onChange={checked => updateSetting({ showStatus: checked })}
+                language={language}
+              />
+              {!isStandbyMode && (
+                <BreakSwitchButton
+                  label={getShortDisplayLabel(countdownText.showSchedule)}
+                  checked={settings.showSchedule !== false}
+                  onChange={checked => updateSetting({ showSchedule: checked })}
+                  language={language}
+                />
+              )}
+              <BreakSwitchButton
+                label={getShortDisplayLabel(countdownText.showSponsor)}
+                checked={settings.showSponsor === true}
+                onChange={checked => updateSetting({ showSponsor: checked })}
+                language={language}
+              />
+            </div>
           </div>
 
           {displayMode === 'video' && (
@@ -368,10 +442,12 @@ function CountdownEditor({ project, text, language, onUpdateProject }) {
                   </button>
 
                   <div className={styles.breakScheduleVisibility}>
-                    <ToggleField
-                      label={visible ? text.show : text.hide}
+                    <BreakSwitchButton
+                      label={displayGroupLabel}
                       checked={visible}
                       onChange={checked => updateUpcomingMatch(index, { enabled: checked })}
+                      language={language}
+                      compact
                     />
                   </div>
                 </header>

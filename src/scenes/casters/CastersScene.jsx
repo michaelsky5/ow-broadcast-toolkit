@@ -87,6 +87,14 @@ const getTeamShort = (team, fallback) => clean(team?.shortName) || clean(team?.n
 
 const getTeamLogo = team => clean(team?.logo) || '/OW.svg'
 
+const getSponsorSlots = project => (
+  Array.isArray(project?.assets?.sponsors?.logos)
+    ? project.assets.sponsors.logos
+      .filter(slot => slot?.enabled !== false && (clean(slot?.logo) || clean(slot?.name)))
+      .slice(0, 4)
+    : []
+)
+
 const getPrimaryHeroLabel = player => {
   const heroId = Array.isArray(player?.primaryHeroes) ? player.primaryHeroes[0] : player?.primaryHero
   const hero = OW_HERO_BY_ID[heroId]
@@ -151,6 +159,8 @@ export default function CastersScene({ project }) {
   const match = project?.currentMatch || {}
   const eventName = getBroadcastCompetitionName(project)
   const eventLogo = getEventLogo(project)
+  const sponsorSlots = getSponsorSlots(project)
+  const sponsorText = clean(project?.assets?.sponsors?.tickerText)
   const { teamA, teamB } = getCurrentTeams(project)
   const packageMode = settings.packageMode === 'STAFF' ? 'STAFF' : 'CASTERS'
   const casters = getActivePeople(project, settings, packageMode)
@@ -222,6 +232,25 @@ export default function CastersScene({ project }) {
           <span>{subtitle}</span>
         </div>
       </section>
+
+      {settings.showSponsors !== false && sponsorSlots.length > 0 && (
+        <aside className={styles.sponsorRail} aria-label="Event sponsors">
+          <div className={styles.sponsorHeading}>
+            <span>Supported By</span>
+            {sponsorText && <strong>{sponsorText}</strong>}
+          </div>
+          <div className={styles.sponsorLogos}>
+            {sponsorSlots.map((sponsor, index) => (
+              <div className={styles.sponsorSlot} key={sponsor.id || `${sponsor.name}-${index}`}>
+                {clean(sponsor.logo) && (
+                  <img src={sponsor.logo} alt={clean(sponsor.name) || `Sponsor ${index + 1}`} />
+                )}
+                <strong>{clean(sponsor.name) || `Sponsor ${index + 1}`}</strong>
+              </div>
+            ))}
+          </div>
+        </aside>
+      )}
 
       {showDeskNote && (
         <aside className={styles.deskNoteBox}>

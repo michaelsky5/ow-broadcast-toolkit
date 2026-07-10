@@ -810,8 +810,11 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
   const topEventTitle = String(matchData.topEventTitle || matchData.info || '').trim();
   const topEventLogo = matchData.topEventLogo || matchData.stingerLogo || '/OW.svg';
   const topMatchFormatLabel = String(matchData.topMatchFormatLabel || matchData.matchFormat || 'TOURNAMENT').trim();
+  const topSponsorLogo = String(matchData.topSponsorLogo || '').trim();
+  const topSponsorName = String(matchData.topSponsorName || 'Sponsor').trim();
   const showTopEventLogo = matchData.showTopEventLogo !== false;
   const showTopMatchFormat = matchData.showTopMatchFormat !== false;
+  const showTopSponsor = matchData.showTopSponsor === true && Boolean(topSponsorLogo);
 
   const showSideStatus = needsAttackDefense(currentMapModeKey);
   const attackSide = currentMapData?.attackSide || '';
@@ -864,7 +867,65 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
               height: '32px'
             }}
           >
-            {/* 1. 左侧：赛事 Logo 块 */}
+            {/* 1. 冠名赞助商：透明底 Logo + PRESENTS，与赛事信息明确分组 */}
+            {showTopSponsor && (
+            <div
+              style={{
+                height: '32px',
+                backgroundColor: COLORS.mainDark,
+                display: 'flex',
+                alignItems: 'center',
+                borderTop: `1px solid ${COLORS.lineStrong}`,
+                borderRight: '1px solid rgba(255,255,255,0.26)',
+                borderBottom: `1px solid ${COLORS.lineStrong}`,
+                flexShrink: 0,
+                overflow: 'hidden'
+              }}
+              title={`${topSponsorName} presents`}
+            >
+              <div
+                style={{
+                  minWidth: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxSizing: 'border-box',
+                  padding: 0
+                }}
+              >
+                <img
+                  src={topSponsorLogo}
+                  alt={topSponsorName}
+                  style={{
+                    width: 'auto',
+                    maxWidth: '72px',
+                    height: '90%',
+                    objectFit: 'contain',
+                    display: 'block'
+                  }}
+                  onError={event => {
+                    event.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+              <span
+                style={{
+                  padding: '0 10px 0 4px',
+                  color: COLORS.gray,
+                  fontSize: '8px',
+                  fontWeight: '900',
+                  lineHeight: 1,
+                  letterSpacing: '1.1px',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                PRESENTS
+              </span>
+            </div>
+            )}
+
+            {/* 2. 赛事 Logo 块 */}
             {showTopEventLogo && (
             <div
               style={{
@@ -888,7 +949,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
             </div>
             )}
 
-            {/* 2. 中间：赛事信息块 */}
+            {/* 3. 赛事信息块 */}
             <div
               style={{
                 backgroundColor: COLORS.mainDark,
@@ -915,7 +976,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
               </span>
             </div>
 
-            {/* 3. 右侧：赛制标签块 */}
+            {/* 4. 赛制标签块 */}
             {showTopMatchFormat && (
             <div
               style={{

@@ -46,6 +46,14 @@ const getPlayerImage = player =>
     player?.photo
   );
 
+const getPlayerBattleTag = player =>
+  safeText(
+    player?.battleTag ||
+    player?.battletag ||
+    player?.battle_tag ||
+    player?.editionData?.friesCup?.battletag
+  );
+
 const findRosterPlayer = (rosterPool, name) => {
   const target = norm(name);
   if (!target) return null;
@@ -53,7 +61,7 @@ const findRosterPlayer = (rosterPool, name) => {
   return (rosterPool || []).find(p => {
     const candidates = [
       p?.nickname,
-      p?.battleTag,
+      getPlayerBattleTag(p),
       p?.name,
       p?.id,
       p?.playerName
@@ -79,7 +87,7 @@ const getActiveLineup = (matchData, side) => {
     return found
       ? {
           nickname: safeText(found.nickname || found.playerName || found.name || name),
-          battleTag: safeText(found.battleTag),
+          battleTag: getPlayerBattleTag(found),
           role: normalizeRole(found.role),
           heroImage: getPlayerImage(found),
           heroScale: Number(found.heroScale) || Number(found.imageScale) || 1.0,
@@ -117,11 +125,29 @@ const displaySecondaryName = p => {
   return sub && sub !== main ? sub : '';
 };
 
-const PlayerCard = ({ player, index, entrance = false, large = false }) => {
+const getCenterTeamNameSize = name => {
+  const length = Array.from(safeText(name)).length;
+  if (length >= 13) return '34px';
+  if (length >= 10) return '37px';
+  if (length >= 8) return '40px';
+  return '44px';
+};
+
+const PlayerCard = ({ player, index, entrance = false, large = false, compact = false }) => {
   const isEmpty = !player;
   const role = isEmpty ? 'TBD' : normalizeRole(player.role);
   const cardDelay = `${260 + index * 170}ms`;
   const calloutDelay = `${1050 + index * 620}ms`;
+  const isCompact = compact && !large;
+  const secondaryName = displaySecondaryName(player);
+  const showSecondaryName = !isEmpty && !!secondaryName;
+  const framePadding = large ? '16px' : isCompact ? '10px' : '12px';
+  const portraitInset = large ? '14px' : '10px';
+  const portraitBottom = large ? '136px' : isCompact ? '104px' : '110px';
+  const namePadding = large ? '18px 18px 20px' : isCompact ? '10px 13px 12px' : '14px 14px 15px';
+  const nameSize = large ? '27px' : isCompact ? '21px' : '20px';
+  const metaSize = large ? '13px' : isCompact ? '9px' : '11px';
+  const roleBadgeSize = large ? '12px' : isCompact ? '10px' : '11px';
 
   return (
     <div
@@ -147,9 +173,9 @@ const PlayerCard = ({ player, index, entrance = false, large = false }) => {
       <div style={{ position: 'absolute', top: large ? '14px' : '10px', left: large ? '14px' : '10px', width: large ? '18px' : '14px', height: large ? '18px' : '14px', borderTop: `2px solid ${isEmpty ? COLORS.faintWhite : COLORS.yellow}`, borderLeft: `2px solid ${isEmpty ? COLORS.faintWhite : COLORS.yellow}`, zIndex: 8 }} />
       <div style={{ position: 'absolute', top: large ? '14px' : '10px', right: large ? '14px' : '10px', fontSize: large ? '12px' : '10px', fontWeight: '900', letterSpacing: '1.5px', color: 'rgba(255,255,255,0.18)', textTransform: 'uppercase', zIndex: 8 }}>{String(index + 1).padStart(2, '0')}</div>
 
-      <div style={{ position: 'relative', flex: 1, minHeight: 0, padding: large ? '16px' : '12px', display: 'flex', flexDirection: 'column', zIndex: 2 }}>
+      <div style={{ position: 'relative', flex: 1, minHeight: 0, padding: framePadding, display: 'flex', flexDirection: 'column', zIndex: 2 }}>
         <div style={{ position: 'relative', flex: 1, minHeight: 0, background: COLORS.black, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: large ? '14px' : '10px', left: large ? '14px' : '10px', right: large ? '14px' : '10px', bottom: large ? '136px' : '110px', background: 'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.008) 100%)', border: '1px solid rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: portraitInset, left: portraitInset, right: portraitInset, bottom: portraitBottom, background: 'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.008) 100%)', border: '1px solid rgba(255,255,255,0.06)', overflow: 'hidden' }}>
             {!isEmpty && player.heroImage && (
               <img
                 src={player.heroImage}
@@ -167,24 +193,24 @@ const PlayerCard = ({ player, index, entrance = false, large = false }) => {
               />
             )}
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 14%, rgba(42,42,42,0.16) 62%, rgba(42,42,42,0.82) 100%)' }} />
-            <div style={{ position: 'absolute', left: '12px', bottom: '12px', padding: '5px 8px', border: '1px solid var(--theme-primary-border)', background: 'rgba(21,21,21,0.62)', color: COLORS.yellow, fontSize: large ? '11px' : '9px', fontWeight: '900', letterSpacing: '1.8px' }}>
+            <div style={{ position: 'absolute', left: '12px', bottom: '12px', padding: isCompact ? '4px 7px' : '5px 8px', border: '1px solid var(--theme-primary-border)', background: 'rgba(21,21,21,0.62)', color: COLORS.yellow, fontSize: large ? '11px' : isCompact ? '8px' : '9px', fontWeight: '900', letterSpacing: '1.8px' }}>
               {getRoleMark(role)} ROLE_LOCKED
             </div>
           </div>
 
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
             <div style={{ height: '3px', background: isEmpty ? COLORS.faintWhite : `linear-gradient(90deg, ${COLORS.white} 0 10%, ${COLORS.yellow} 10% 100%)` }} />
-            <div style={{ position: 'relative', padding: large ? '18px 18px 20px' : '14px 14px 15px', background: 'linear-gradient(180deg, rgba(42,42,42,0.18) 0%, rgba(42,42,42,0.94) 100%)', borderTop: `1px solid ${COLORS.line}` }}>
-              <div className={entrance ? 'lineup-name-callout' : ''} style={{ fontSize: large ? '27px' : '20px', fontWeight: '900', color: isEmpty ? COLORS.faintWhite : COLORS.white, lineHeight: 1.12, textTransform: 'uppercase', letterSpacing: '0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ position: 'relative', padding: namePadding, background: 'linear-gradient(180deg, rgba(42,42,42,0.18) 0%, rgba(42,42,42,0.94) 100%)', borderTop: `1px solid ${COLORS.line}` }}>
+              <div className={entrance ? 'lineup-name-callout' : ''} style={{ fontSize: nameSize, fontWeight: '900', color: isEmpty ? COLORS.faintWhite : COLORS.white, lineHeight: 1.08, textTransform: 'uppercase', letterSpacing: '0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {displayPrimaryName(player)}
               </div>
-              {!isEmpty && !!displaySecondaryName(player) && (
-                <div style={{ marginTop: '6px', fontSize: large ? '13px' : '11px', fontWeight: '900', color: COLORS.faintWhite, letterSpacing: '1.1px', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {displaySecondaryName(player)}
+              {showSecondaryName && (
+                <div style={{ marginTop: isCompact ? '4px' : '6px', fontSize: metaSize, fontWeight: '900', color: COLORS.faintWhite, letterSpacing: isCompact ? '0.8px' : '1.1px', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {secondaryName}
                 </div>
               )}
-              <div style={{ marginTop: large ? '13px' : '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ padding: large ? '8px 13px' : '7px 11px', background: isEmpty ? 'transparent' : COLORS.yellow, border: isEmpty ? `1px solid ${COLORS.line}` : 'none', color: isEmpty ? COLORS.faintWhite : COLORS.black, fontSize: large ? '12px' : '11px', fontWeight: '900', letterSpacing: '2px', textTransform: 'uppercase' }}>
+              <div style={{ marginTop: large ? '13px' : isCompact ? (showSecondaryName ? '7px' : '8px') : '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ padding: large ? '8px 13px' : isCompact ? '6px 10px' : '7px 11px', background: isEmpty ? 'transparent' : COLORS.yellow, border: isEmpty ? `1px solid ${COLORS.line}` : 'none', color: isEmpty ? COLORS.faintWhite : COLORS.black, fontSize: roleBadgeSize, fontWeight: '900', letterSpacing: '2px', textTransform: 'uppercase' }}>
                   {isEmpty ? 'TBD' : role}
                 </div>
                 <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.10)' }} />
@@ -197,31 +223,97 @@ const PlayerCard = ({ player, index, entrance = false, large = false }) => {
   );
 };
 
-const MiniTeamSection = ({ data, align }) => {
+const TeamLineupBand = ({ data, align, rowIndex = 0 }) => {
   const isLeft = align === 'left';
+  const bandDelay = `${80 + rowIndex * 140}ms`;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', padding: '0 40px', marginBottom: '30px', flexDirection: isLeft ? 'row' : 'row-reverse' }}>
-        <div style={{ width: '90px', height: '90px', background: 'rgba(255,255,255,0.02)', border: UI.outerFrame, boxShadow: `${UI.panelShadow}, ${UI.insetLine}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-          <div style={{ position: 'absolute', top: '8px', [isLeft ? 'left' : 'right']: '8px', width: '12px', height: '12px', borderTop: `2px solid ${COLORS.yellow}`, [isLeft ? 'borderLeft' : 'borderRight']: `2px solid ${COLORS.yellow}` }} />
-          <img src={data.teamLogo} alt={data.teamName} onError={e => { e.currentTarget.src = '/OW.svg'; }} style={{ width: '70%', height: '70%', objectFit: 'contain' }} />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: isLeft ? 'flex-start' : 'flex-end', minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isLeft ? 'row' : 'row-reverse', minWidth: 0 }}>
-            <div style={{ width: '24px', height: '24px', backgroundColor: COLORS.yellow, boxShadow: '0 0 16px var(--theme-primary-soft)', flex: '0 0 auto' }} />
-            <span style={{ fontSize: '42px', fontWeight: '900', color: COLORS.white, letterSpacing: '4px', lineHeight: 1.12, textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '620px' }}>{data.teamName}</span>
-          </div>
-          <div style={{ width: '400px', height: '4px', background: `linear-gradient(${isLeft ? '90deg' : '270deg'}, ${COLORS.yellow} 0%, var(--theme-primary-soft) 100%)`, marginTop: '8px' }} />
-        </div>
-      </div>
+    <section
+      className="lineup-dual-band"
+      style={{
+        '--band-delay': bandDelay,
+        position: 'relative',
+        minHeight: 0,
+        overflow: 'hidden',
+        border: UI.outerFrame,
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.038), rgba(255,255,255,0.012))',
+        boxShadow: `${UI.panelShadow}, ${UI.insetLine}`,
+        padding: '16px 24px',
+        display: 'grid'
+      }}
+    >
+      <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(${isLeft ? '90deg' : '270deg'}, var(--theme-primary-softer), transparent 42%)`, opacity: 0.88, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: `linear-gradient(${isLeft ? '90deg' : '270deg'}, ${COLORS.yellow}, var(--theme-primary-soft), transparent)` }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px', background: `linear-gradient(${isLeft ? '90deg' : '270deg'}, rgba(255,255,255,0.16), rgba(255,255,255,0.04), transparent)` }} />
 
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px', padding: '0 40px' }}>
-        {data.players.map((p, idx) => <PlayerCard key={idx} player={p} index={idx} />)}
+      <div style={{ position: 'relative', zIndex: 2, minHeight: 0, display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: '18px' }}>
+        {data.players.map((p, idx) => <PlayerCard key={`${data.side}-${idx}-${displayPrimaryName(p)}`} player={p} index={idx} compact />)}
+      </div>
+    </section>
+  );
+};
+
+const CenterTeamLockup = ({ data, align }) => {
+  const isLeft = align === 'left';
+  const readyCount = data.players.filter(Boolean).length;
+  const teamNameSize = getCenterTeamNameSize(data.teamName);
+  const logo = (
+    <div className="lineup-logo-lock" style={{ width: '58px', height: '58px', background: 'rgba(255,255,255,0.02)', border: UI.outerFrame, boxShadow: `${UI.panelShadow}, ${UI.insetLine}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', flex: '0 0 auto' }}>
+      <div style={{ position: 'absolute', top: '6px', [isLeft ? 'right' : 'left']: '6px', width: '11px', height: '11px', borderTop: `2px solid ${COLORS.yellow}`, [isLeft ? 'borderRight' : 'borderLeft']: `2px solid ${COLORS.yellow}` }} />
+      <img src={data.teamLogo} alt={data.teamName} onError={e => { e.currentTarget.src = '/OW.svg'; }} style={{ width: '72%', height: '72%', objectFit: 'contain' }} />
+    </div>
+  );
+  const text = (
+    <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: isLeft ? 'flex-end' : 'flex-start', textAlign: isLeft ? 'right' : 'left' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexDirection: isLeft ? 'row' : 'row-reverse', maxWidth: '100%' }}>
+        <div style={{ width: '14px', height: '14px', backgroundColor: COLORS.yellow, boxShadow: '0 0 14px var(--theme-primary-soft)', flex: '0 0 auto' }} />
+        <strong style={{ display: 'block', minWidth: 0, maxWidth: '100%', fontSize: teamNameSize, fontWeight: '900', color: COLORS.white, letterSpacing: '0px', lineHeight: 1, textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.teamName}</strong>
+      </div>
+      <div className="lineup-title-line" style={{ marginTop: '7px', width: 'min(340px, 100%)', height: '3px', background: `linear-gradient(${isLeft ? '270deg' : '90deg'}, ${COLORS.yellow} 0%, var(--theme-primary-soft) 100%)` }} />
+      <div style={{ marginTop: '7px', display: 'flex', alignItems: 'center', gap: '10px', flexDirection: isLeft ? 'row' : 'row-reverse', fontSize: '11px', fontWeight: '900', letterSpacing: '0px', textTransform: 'uppercase' }}>
+        <span style={{ color: COLORS.faintWhite }}>TEAM {data.side} // STARTING FIVE</span>
+        <span style={{ color: COLORS.yellow }}>{readyCount}/5 READY</span>
       </div>
     </div>
   );
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: isLeft ? 'flex-end' : 'flex-start', gap: '14px', minWidth: 0 }}>
+      {isLeft ? text : logo}
+      {isLeft ? logo : text}
+    </div>
+  );
 };
+
+const DualLineupPreview = ({ teamA, teamB, totalReadyCount }) => (
+  <div style={{ position: 'absolute', inset: '108px 64px 98px', display: 'grid', gridTemplateRows: 'minmax(0,1fr) 86px minmax(0,1fr)', gap: '12px', zIndex: 10 }}>
+    <TeamLineupBand data={teamA} align="left" rowIndex={0} />
+
+    <div
+      className="lineup-dual-vs"
+      style={{
+        position: 'relative',
+        minHeight: 0,
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0,1fr) 112px minmax(0,1fr)',
+        alignItems: 'center',
+        gap: '18px',
+        '--vs-delay': '260ms'
+      }}
+    >
+      <CenterTeamLockup data={teamA} align="left" />
+      <div style={{ position: 'relative', height: '70px', background: COLORS.black, border: `2px solid ${COLORS.yellow}`, boxShadow: UI.primaryGlow, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div className="lineup-boot-sweep" />
+        <span style={{ color: COLORS.faintWhite, fontSize: '9px', fontWeight: '900', letterSpacing: '0px', textTransform: 'uppercase', lineHeight: 1 }}>DUAL LINEUP</span>
+        <strong style={{ marginTop: '2px', fontSize: '30px', fontWeight: '900', color: COLORS.yellow, letterSpacing: '0px', fontStyle: 'italic', lineHeight: 1 }}>VS</strong>
+        <span style={{ marginTop: '2px', color: COLORS.faintWhite, fontSize: '9px', fontWeight: '900', letterSpacing: '0px', textTransform: 'uppercase', lineHeight: 1 }}>{totalReadyCount} READY</span>
+      </div>
+      <CenterTeamLockup data={teamB} align="right" />
+    </div>
+
+    <TeamLineupBand data={teamB} align="right" rowIndex={1} />
+  </div>
+);
 
 const BootLine = ({ activeSide, activeTeam }) => (
   <div style={{ position: 'absolute', top: '58px', left: '72px', right: '72px', height: '32px', zIndex: 18, overflow: 'hidden', borderTop: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
@@ -449,6 +541,16 @@ export default function StartingLineupScene({ matchData = {} }) {
           100% { transform: scaleX(1); transform-origin: left center; opacity: 1; }
         }
 
+        @keyframes lineupDualBandIn {
+          0% { opacity: 0; transform: translateY(24px); filter: blur(6px); }
+          100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        @keyframes lineupDualVsIn {
+          0% { opacity: 0; transform: scaleX(0.92); filter: blur(5px); }
+          100% { opacity: 1; transform: scaleX(1); filter: blur(0); }
+        }
+
         @keyframes calloutSpotlightIn {
           0% { opacity: 0; transform: translateY(42px) scale(0.96) rotateX(8deg); filter: blur(8px); }
           72% { opacity: 1; transform: translateY(-5px) scale(1.006) rotateX(0deg); filter: blur(0); }
@@ -486,6 +588,8 @@ export default function StartingLineupScene({ matchData = {} }) {
         .lineup-boot-sweep { position: absolute; top: 0; bottom: 0; left: -30%; width: 46%; background: linear-gradient(90deg, transparent, var(--theme-primary-soft), rgba(255,255,255,0.18), transparent); animation: lineupBootSweep 1100ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .lineup-logo-lock { animation: lineupLogoLock 2200ms ease-in-out infinite; }
         .lineup-title-line { animation: lineupTitleLine 760ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .lineup-dual-band { opacity: 0; animation: lineupDualBandIn 640ms cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: var(--band-delay); }
+        .lineup-dual-vs { opacity: 0; animation: lineupDualVsIn 520ms cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: var(--vs-delay); transform-origin: center center; }
         .callout-spotlight { opacity: 0; transform-style: preserve-3d; animation: calloutSpotlightIn 720ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .callout-sweep { position: absolute; top: 0; bottom: 0; left: -34%; width: 48%; background: linear-gradient(90deg, transparent, var(--theme-primary-soft), rgba(255,255,255,0.18), transparent); z-index: 9; pointer-events: none; animation: calloutSweep 880ms cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: 130ms; }
         .callout-name { animation: calloutNamePulse 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-delay: 120ms; }
@@ -539,23 +643,12 @@ export default function StartingLineupScene({ matchData = {} }) {
       ) : activeSide ? (
         <EntranceTeamSection data={activeTeam} triggerKey={triggerKey} />
       ) : (
-        <>
-          <div style={{ position: 'absolute', top: '120px', left: 0, right: 0, bottom: '120px', display: 'grid', gridTemplateColumns: '1fr 1fr', zIndex: 10 }}>
-            <MiniTeamSection data={teamA} align="left" />
-            <MiniTeamSection data={teamB} align="right" />
-          </div>
-
-          <div style={{ position: 'absolute', top: '120px', bottom: '120px', left: '50%', transform: 'translateX(-50%)', width: '2px', background: 'rgba(255,255,255,0.06)', zIndex: 5 }}>
-            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '70px', height: '70px', background: COLORS.black, border: `2px solid ${COLORS.yellow}`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: UI.primaryGlow }}>
-              <span style={{ fontSize: '24px', fontWeight: '900', color: COLORS.yellow, letterSpacing: '2px', fontStyle: 'italic' }}>VS</span>
-            </div>
-          </div>
-        </>
+        <DualLineupPreview teamA={teamA} teamB={teamB} totalReadyCount={totalReadyCount} />
       )}
 
-      <div style={{ position: 'absolute', bottom: '60px', left: '40px', right: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '2px solid rgba(255,255,255,0.08)', paddingTop: '20px', color: 'rgba(255,255,255,0.26)', fontSize: '11px', fontWeight: '900', letterSpacing: '1.8px', textTransform: 'uppercase', zIndex: 20 }}>
+      <div style={{ position: 'absolute', bottom: '48px', left: '40px', right: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.075)', paddingTop: '16px', color: 'rgba(255,255,255,0.22)', fontSize: '10px', fontWeight: '900', letterSpacing: '1.8px', textTransform: 'uppercase', zIndex: 20 }}>
         <span>{isCalloutMode ? `SYS // TEAM_${activeSide}_PLAYER_${String(calloutIndex + 1).padStart(2, '0')}_CALLED` : activeSide ? `SYS // TEAM_${activeSide}_FINAL_ROSTER_LOCKED` : 'SYS // LIVE_ROSTER_CONFIRMED'}</span>
-        <span style={{ color: COLORS.yellow, opacity: 0.92 }}>{isCalloutMode ? `${Math.min(5, calloutIndex + 1)}/5 PLAYERS CALLED // MANUAL CALLOUT` : activeSide ? `${activeReadyCount} PLAYERS READY // STARTING FIVE` : `${totalReadyCount} PLAYERS READY`}</span>
+        <span style={{ color: COLORS.yellow, opacity: 0.82 }}>{isCalloutMode ? `${Math.min(5, calloutIndex + 1)}/5 PLAYERS CALLED // MANUAL CALLOUT` : activeSide ? `${activeReadyCount} PLAYERS READY // STARTING FIVE` : `${totalReadyCount} PLAYERS READY`}</span>
       </div>
     </div>
   );

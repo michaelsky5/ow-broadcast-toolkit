@@ -75,6 +75,7 @@ export const createDefaultMatch = () => ({
     topEventTitle: '',
     topMatchFormatVisible: true,
     topMatchFormatLabel: '',
+    topSponsorVisible: false,
     eventLogoBg: '#2A2A2A',
     teamLogoBgA: '#2A2A2A',
     teamLogoBgB: '#2A2A2A',

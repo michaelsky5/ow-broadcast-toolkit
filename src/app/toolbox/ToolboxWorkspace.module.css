@@ -3051,7 +3051,7 @@
 
 .sponsorPathCell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 56px;
+  grid-template-columns: minmax(0, 1fr) 56px 56px;
   gap: var(--toolbox-space-xs);
   min-width: 0;
 }
@@ -3911,6 +3911,10 @@
   }
 
   .assetInputRow {
+    grid-template-columns: 1fr;
+  }
+
+  .sponsorPathCell {
     grid-template-columns: 1fr;
   }
 }

@@ -3,6 +3,16 @@ import { getCurrentTeams } from '../../project/projectUtils'
 import { getBroadcastCompetitionName } from '../../project/branding'
 import styles from './MatchupScene.module.css'
 
+const clean = value => String(value || '').trim()
+
+const getSponsorSlots = project => (
+  Array.isArray(project?.assets?.sponsors?.logos)
+    ? project.assets.sponsors.logos
+      .filter(slot => slot?.enabled !== false && (clean(slot?.logo) || clean(slot?.name)))
+      .slice(0, 4)
+    : []
+)
+
 const COPY = {
   zh: {
     ready: 'UP NEXT',
@@ -94,6 +104,7 @@ export default function MatchupScene({ project }) {
   const copy = COPY[lang]
   const map = OW_MAP_BY_ID[match.currentMapId]
   const competitionName = getBroadcastCompetitionName(project)
+  const sponsorSlots = getSponsorSlots(project)
 
   const title = settings.title || 'UP NEXT'
   const shouldShowMap = settings.showMap !== false
@@ -126,6 +137,20 @@ export default function MatchupScene({ project }) {
         <div>SHOW FLOW // MATCH READY</div>
         <div>{copy.ready}</div>
       </header>
+
+      {settings.showSponsors !== false && sponsorSlots.length > 0 && (
+        <aside className={styles.sponsorRail} aria-label="Event sponsors">
+          <span className={styles.sponsorLabel}>Supported By</span>
+          {sponsorSlots.map((sponsor, index) => (
+            <div className={styles.sponsorSlot} key={sponsor.id || `${sponsor.name}-${index}`}>
+              {clean(sponsor.logo) && (
+                <img src={sponsor.logo} alt={clean(sponsor.name) || `Sponsor ${index + 1}`} />
+              )}
+              <strong>{clean(sponsor.name) || `Sponsor ${index + 1}`}</strong>
+            </div>
+          ))}
+        </aside>
+      )}
 
       <main className={styles.main}>
         <div className={styles.titleBlock}>

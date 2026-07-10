@@ -496,6 +496,12 @@ function CastersEditor({ project, text, language, activeSection = 'casters', onU
                 copy={casterText}
               />
               <ToggleButton
+                label={casterText.sponsors}
+                active={settings.showSponsors !== false}
+                onClick={checked => updateCasterSettings({ showSponsors: checked })}
+                copy={casterText}
+              />
+              <ToggleButton
                 label={casterText.portraits}
                 active={settings.showPortraits !== false}
                 onClick={checked => updateCasterSettings({ showPortraits: checked })}
@@ -587,7 +593,7 @@ function CastersEditor({ project, text, language, activeSection = 'casters', onU
                         onChange={event => updatePersonSlot(index, { social: event.target.value, description: event.target.value })}
                       />
                     </Field>
-                    <div className={styles.casterAvatarControl}>
+                    <div className={`${styles.casterAvatarControl} ${styles.casterAvatarPickerControl}`}>
                       <div className={styles.casterThumb}>
                         {person.avatar ? <img src={person.avatar} alt="" /> : <span>{person.name?.[0] || personCopy.slotPrefix}</span>}
                       </div>

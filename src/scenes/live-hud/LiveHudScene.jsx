@@ -164,6 +164,10 @@ const buildLegacyMatchData = project => {
   const eventName = getBroadcastCompetitionName(project)
   const eventLogo = getEventLogo(project)
   const matchFormat = `FT${Number(match.ft) || 3}`
+  const sponsor = Array.isArray(project?.assets?.sponsors?.logos)
+    ? project.assets.sponsors.logos.find(slot => slot?.enabled !== false && clean(slot?.logo))
+    : null
+  const sponsorLogo = clean(sponsor?.logo)
 
   return {
     uiMode,
@@ -175,6 +179,9 @@ const buildLegacyMatchData = project => {
     topMatchFormatLabel: clean(hud.topMatchFormatLabel) || matchFormat,
     showTopEventLogo: hud.topEventLogoVisible !== false,
     showTopMatchFormat: hud.topMatchFormatVisible !== false,
+    topSponsorLogo: sponsorLogo,
+    topSponsorName: clean(sponsor?.name),
+    showTopSponsor: hud.topSponsorVisible === true && Boolean(sponsorLogo),
     totalMaps: getSeriesMapTotal(match),
     pointsToWin: Number(match.ft) || 3,
     hudMarginTop: Number.isFinite(hudMarginTop) ? hudMarginTop : (uiMode === 'TOURNAMENT' ? 56 : 0),

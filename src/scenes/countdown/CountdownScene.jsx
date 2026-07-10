@@ -236,25 +236,48 @@ function ScheduleBoard({ matches, compact = false, dense = false, featured = fal
   )
 }
 
-function SponsorPanel({ settings, standby = false }) {
-  const sponsorName = clean(settings.sponsorName)
-  const sponsorLogo = clean(settings.sponsorLogo)
-  const sponsorText = clean(settings.sponsorText)
-  const hasSponsor = Boolean(settings.showSponsor && (sponsorName || sponsorLogo || sponsorText))
+const getSponsorContent = (project, settings) => {
+  const sponsorSlots = Array.isArray(project?.assets?.sponsors?.logos)
+    ? project.assets.sponsors.logos
+    : []
+  const assetSponsors = sponsorSlots
+    .filter(slot => slot?.enabled !== false && (clean(slot?.logo) || clean(slot?.name)))
+    .map((slot, index) => ({
+      id: clean(slot?.id) || `sponsor-${index + 1}`,
+      name: clean(slot?.name),
+      logo: clean(slot?.logo)
+    }))
+  const legacyName = clean(settings.sponsorName)
+  const legacyLogo = clean(settings.sponsorLogo)
+  const sponsors = assetSponsors.length
+    ? assetSponsors
+    : (legacyName || legacyLogo ? [{ id: 'countdown-sponsor', name: legacyName, logo: legacyLogo }] : [])
+  const text = clean(settings.sponsorText) || clean(project?.assets?.sponsors?.tickerText)
 
-  if (!hasSponsor) return null
+  return {
+    visible: settings.showSponsor === true && Boolean(sponsors.length || text),
+    sponsors,
+    text
+  }
+}
+
+function TopbarSponsorLockup({ sponsor }) {
+  if (!sponsor?.visible) return null
 
   return (
-    <aside className={`${styles.sponsorPanel} ${standby ? styles.sponsorPanelStandby : ''}`}>
-      {sponsorLogo && (
-        <div className={styles.sponsorLogo}>
-          <img src={sponsorLogo} alt="" onError={handleImageFallback} />
-        </div>
-      )}
-      <div>
-        <span>Supported By</span>
-        <strong>{sponsorName || 'Sponsor'}</strong>
-        {sponsorText && <em>{sponsorText}</em>}
+    <aside className={styles.topbarSponsorLockup} title={sponsor.text || sponsor.sponsors?.map(item => item.name).filter(Boolean).join(' × ')}>
+      <span>Presented By</span>
+      <div className={styles.topbarSponsorBrands}>
+        {sponsor.sponsors?.map((item, index) => (
+          <div className={styles.topbarSponsorBrandGroup} key={item.id}>
+            <div className={styles.topbarSponsorBrand}>
+              {item.logo && <img src={item.logo} alt={item.name} onError={handleImageFallback} />}
+              {item.name && <strong>{item.name}</strong>}
+            </div>
+            {index < sponsor.sponsors.length - 1 && <i aria-hidden="true">×</i>}
+          </div>
+        ))}
+        {!sponsor.sponsors?.length && sponsor.text && <strong>{sponsor.text}</strong>}
       </div>
     </aside>
   )
@@ -288,17 +311,27 @@ function VideoFrame({ cleanVideo }) {
 function EventMark({ eventLogo, eventName, subtitle, settings, compact = false }) {
   const showLogo = settings.showEventLogo !== false
   const showEventName = settings.showEventName !== false
+  const eventNameVisualLength = Array.from(clean(eventName)).reduce((length, character) => (
+    length + ((character.codePointAt(0) ?? 0) > 0xff ? 2 : 1)
+  ), 0)
+  const eventNameSizeClass = eventNameVisualLength > 30
+    ? styles.eventNameLong
+    : eventNameVisualLength > 20
+      ? styles.eventNameMedium
+      : ''
 
   return (
-    <div className={`${styles.eventMark} ${compact ? styles.eventMarkCompact : ''} ${showLogo ? '' : styles.eventMarkNoLogo}`}>
-      {showLogo && (
-        <div className={styles.eventLogoBox}>
-          <img src={eventLogo || '/OW.svg'} alt="" onError={handleImageFallback} />
+    <div className={`${styles.eventIdentityGroup} ${compact ? styles.eventIdentityGroupCompact : ''}`}>
+      <div className={`${styles.eventMark} ${compact ? styles.eventMarkCompact : ''} ${showLogo ? '' : styles.eventMarkNoLogo}`}>
+        {showLogo && (
+          <div className={styles.eventLogoBox}>
+            <img src={eventLogo || '/OW.svg'} alt="" onError={handleImageFallback} />
+          </div>
+        )}
+        <div>
+          <p>{subtitle}</p>
+          {showEventName && <h1 className={eventNameSizeClass} title={eventName}>{eventName}</h1>}
         </div>
-      )}
-      <div>
-        <p>{subtitle}</p>
-        {showEventName && <h1>{eventName}</h1>}
       </div>
     </div>
   )
@@ -359,7 +392,6 @@ function StandbyPanel({ eventLogo, eventName, title, subtitle, status, settings 
           {showEventName && <em>{eventName}</em>}
         </div>
 
-        <SponsorPanel settings={settings} standby />
       </section>
     </main>
   )
@@ -369,7 +401,10 @@ export default function CountdownScene({ project }) {
   const settings = project?.scenes?.settings?.countdown ?? EMPTY_COUNTDOWN_SETTINGS
   const [now, setNow] = useState(() => Date.now())
   const { teamA, teamB } = getCurrentTeams(project)
-  const eventName = getBroadcastCompetitionName(project)
+  const fallbackEventName = getBroadcastCompetitionName(project)
+  const eventName = settings.eventNameLanguage === 'zh'
+    ? clean(project?.event?.nameZh) || fallbackEventName
+    : clean(project?.event?.nameEn) || fallbackEventName
   const eventLogo = getEventLogo(project)
   const displayMode = normalizeMode(settings.displayMode)
   const isStandbyMode = displayMode === 'standby'
@@ -390,6 +425,7 @@ export default function CountdownScene({ project }) {
   const scheduleMatches = getScheduleMatches(settings, project, teamA, teamB)
   const denseSchedule = scheduleMatches.length >= 4
   const cleanVideo = useMemo(() => getCleanVideoSource(project), [project])
+  const sponsor = getSponsorContent(project, settings)
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -410,7 +446,9 @@ export default function CountdownScene({ project }) {
           <span />
           <strong>{modeLabel}</strong>
         </div>
-        <em>{settings.showEventName !== false ? eventName : modeLabel}</em>
+        {sponsor.visible
+          ? <TopbarSponsorLockup sponsor={sponsor} />
+          : <em>{settings.showEventName !== false ? eventName : modeLabel}</em>}
       </header>
 
       {isStandbyMode ? (
@@ -440,7 +478,6 @@ export default function CountdownScene({ project }) {
                 featured={scheduleMatches.length === 1}
               />
             )}
-            <SponsorPanel settings={settings} />
           </aside>
         </main>
       ) : (
@@ -453,7 +490,6 @@ export default function CountdownScene({ project }) {
           {showSchedule && (
             <aside className={styles.fullScheduleColumn}>
               <ScheduleBoard matches={scheduleMatches} />
-              <SponsorPanel settings={settings} />
             </aside>
           )}
         </main>

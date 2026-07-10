@@ -587,14 +587,21 @@ function ConsoleApp() {
     setSceneModeHints(prev => ({ ...prev, [sceneId]: modeId }))
   }
 
-  const autoTakeProgramScene = scene => {
-    setProgramProject(prev => markTakeTransition({
-      ...prev,
-      scenes: {
-        ...prev.scenes,
-        activeSceneId: scene.id
+  const autoTakeProgramScene = (scene, options = {}) => {
+    setProgramProject(prev => {
+      const nextProject = {
+        ...prev,
+        scenes: {
+          ...prev.scenes,
+          activeSceneId: scene.id
+        }
       }
-    }))
+
+      const isSameProgramScene = prev.scenes?.activeSceneId === scene.id
+      return options.suppressSameSceneTransition && isSameProgramScene
+        ? nextProject
+        : markTakeTransition(nextProject)
+    })
     setPreviewSceneId('live-hud')
     pushLog(copy.logAutoTake(getSceneName(scene, language)))
   }
@@ -1015,7 +1022,7 @@ function ConsoleApp() {
                 statusOptions={statusOptions}
                 onUpdateProject={updateProject}
                 onSelectScene={sceneId => selectPreviewScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene)}
-                onAutoTakeScene={sceneId => autoTakeProgramScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene)}
+                onAutoTakeScene={(sceneId, options) => autoTakeProgramScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene, options)}
                 onTakeToProgram={takePreviewToProgram}
                 sceneModeHints={sceneModeHints}
                 onSceneModeHintChange={updateSceneModeHint}
