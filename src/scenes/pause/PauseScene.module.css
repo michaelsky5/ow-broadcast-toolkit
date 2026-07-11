@@ -314,3 +314,9 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
+
+.sponsorLockup {
+  position: absolute;
+  right: 70px;
+  bottom: 27px;
+}

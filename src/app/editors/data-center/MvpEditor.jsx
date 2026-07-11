@@ -8,7 +8,7 @@ import {
   resolveStatsData
 } from '../../../project/statsModel'
 import styles from '../shared/SceneEditor.styles.js'
-import { Field, Panel, SegmentedControl } from '../shared/editorControls'
+import { Field, Panel, SegmentedControl, ToggleField } from '../shared/editorControls'
 import { getPageEditorCopy } from '../shared/editorCopy'
 import { getHeroLabel, getPlayerRoleLabel } from '../shared/editorHelpers'
 import { formatDurationMinutes } from './statsCaptureUtils'
@@ -171,6 +171,12 @@ function MvpEditor({ project, language = 'en', onUpdateProject }) {
                 onChange={event => updateMvpSettings({ note: event.target.value })}
               />
             </Field>
+
+            <ToggleField
+              label={language === 'zh' ? '显示赞助商' : 'Show Sponsors'}
+              checked={settings.showSponsors !== false}
+              onChange={checked => updateMvpSettings({ showSponsors: checked })}
+            />
           </div>
         </details>
 

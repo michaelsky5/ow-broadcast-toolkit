@@ -301,7 +301,7 @@
     rgba(0,0,0,0.24) !important;
 }
 
-.mapControlSection > button {
+.mapControlSection > button:not([aria-pressed]) {
   min-width: 0;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.055);
@@ -313,7 +313,7 @@
   cursor: pointer;
 }
 
-.mapControlSection > button:hover {
+.mapControlSection > button:not([aria-pressed]):hover {
   border-color: var(--theme-primary-border);
   background: var(--theme-primary-soft);
 }
@@ -614,7 +614,7 @@
 
 .mapPoolModeHeader {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 70px auto;
+  grid-template-columns: minmax(0, 1fr) 70px;
   align-items: center;
   gap: 8px;
   min-width: 0;
@@ -622,7 +622,7 @@
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.mapPoolModeHeader strong,
+.mapPoolModeHeader > strong,
 .mapPoolModeHeader > span {
   overflow: hidden;
   color: var(--theme-text);
@@ -641,26 +641,9 @@
   text-align: center;
 }
 
-.mapPoolModeHeader label {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 28px;
-  border: 1px solid rgba(255,255,255,0.09);
-  background: rgba(0,0,0,0.28);
-  color: var(--theme-primary);
-  padding: 0 8px;
-  font-size: 10px;
-  font-weight: 950;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.mapPoolModeHeader input {
-  width: 15px;
-  height: 15px;
-  min-height: 15px;
-  accent-color: var(--theme-primary);
+.mapPoolModeToggle {
+  min-height: 32px;
+  margin-top: 0;
 }
 
 .mapPoolSlots {
@@ -728,7 +711,7 @@
 
 .mapFlowHeader {
   display: grid;
-  grid-template-columns: 64px minmax(88px, 0.8fr) minmax(0, 1.5fr) minmax(90px, 0.8fr) minmax(90px, 0.8fr) 56px;
+  grid-template-columns: 64px minmax(130px, 0.85fr) minmax(180px, 1.15fr) minmax(150px, 1fr) minmax(150px, 1fr) 64px;
   gap: 6px;
   margin-bottom: 8px;
   padding: 0 8px;
@@ -772,7 +755,7 @@
 
 .mapMainRow {
   display: grid;
-  grid-template-columns: 64px minmax(88px, 0.8fr) minmax(0, 1.5fr) minmax(90px, 0.8fr) minmax(90px, 0.8fr) 56px;
+  grid-template-columns: 64px minmax(130px, 0.85fr) minmax(180px, 1.15fr) minmax(150px, 1fr) minmax(150px, 1fr) 64px;
   gap: 6px;
   align-items: stretch;
   min-width: 0;
@@ -809,7 +792,7 @@
 @container (max-width: 900px) {
   .mapFlowHeader,
   .mapMainRow {
-    grid-template-columns: 58px minmax(72px, 0.72fr) minmax(110px, 1.4fr) minmax(64px, 0.64fr) minmax(64px, 0.64fr) 58px;
+    grid-template-columns: 58px minmax(82px, 0.72fr) minmax(110px, 1.05fr) minmax(88px, 0.85fr) minmax(88px, 0.85fr) 58px;
     gap: 5px;
   }
 
@@ -837,14 +820,14 @@
   }
 
   .mapMainRow {
-    grid-template-columns: 52px minmax(64px, 0.68fr) minmax(94px, 1.28fr) minmax(56px, 0.58fr) minmax(56px, 0.58fr) 52px;
+    grid-template-columns: 52px minmax(68px, 0.65fr) minmax(90px, 1fr) minmax(68px, 0.78fr) minmax(68px, 0.78fr) 52px;
     gap: 4px;
   }
 }
 
 @container (max-width: 460px) {
   .mapMainRow {
-    grid-template-columns: 46px minmax(56px, 0.64fr) minmax(74px, 1.12fr) minmax(48px, 0.54fr) minmax(48px, 0.54fr) 44px;
+    grid-template-columns: 46px minmax(56px, 0.6fr) minmax(72px, 0.9fr) minmax(54px, 0.7fr) minmax(54px, 0.7fr) 44px;
     gap: 3px;
   }
 
@@ -881,7 +864,7 @@
 
 .mapBanTeamCard {
   display: grid;
-  grid-template-columns: 104px minmax(0, 1fr);
+  grid-template-rows: 42px minmax(0, 1fr);
   gap: 8px;
   min-width: 0;
   border: 1px solid rgba(255,77,77,0.16);
@@ -891,7 +874,7 @@
 
 .mapBanTeamHeader {
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
   border: 1px solid rgba(255,77,77,0.18);
   background: rgba(255,77,77,0.07);
@@ -920,13 +903,31 @@
 .mapBanTeamHeader strong {
   justify-content: flex-end;
   color: var(--theme-primary);
+  padding-left: 14px;
 }
 
 .mapBanFields {
   display: grid;
-  grid-template-columns: minmax(96px, 0.82fr) minmax(140px, 1.18fr);
+  grid-template-columns: minmax(110px, 0.72fr) minmax(160px, 1.28fr);
   gap: 8px;
   min-width: 0;
+}
+
+@container (max-width: 940px) {
+  .mapBanToolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mapBanTeams {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container (max-width: 560px) {
+  .mapBanToolbar,
+  .mapBanFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .mapBanPanel button,

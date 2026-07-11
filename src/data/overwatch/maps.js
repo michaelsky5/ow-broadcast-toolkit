@@ -71,3 +71,21 @@ export const OW_MAPS_BY_MODE = OW_MAP_OPTIONS.reduce((acc, map) => {
   acc[map.mode].push(map)
   return acc
 }, {})
+
+export const OW_DEFAULT_EVENT_MAP_POOL_COUNTS = {
+  control: 3,
+  escort: 3,
+  hybrid: 3,
+  push: 2,
+  flashpoint: 2,
+  clash: 2
+}
+
+export const OW_DEFAULT_EVENT_MAP_POOL = Object.fromEntries(
+  Object.entries(OW_MAPS_BY_MODE).map(([modeId, maps]) => [
+    modeId,
+    maps
+      .slice(0, OW_DEFAULT_EVENT_MAP_POOL_COUNTS[modeId] || 2)
+      .map(map => map.id)
+  ])
+)

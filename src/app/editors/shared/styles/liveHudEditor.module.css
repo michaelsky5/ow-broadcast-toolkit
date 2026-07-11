@@ -173,7 +173,7 @@
 
 .liveTeamControlGrid button,
 .liveLineupActions button,
-.liveTickerGrid button {
+.liveTickerControlGrid button {
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.055);
   color: var(--theme-text);
@@ -185,7 +185,7 @@
 
 .liveTeamControlGrid button:hover,
 .liveLineupActions button:hover,
-.liveTickerGrid button:hover {
+.liveTickerControlGrid button:hover {
   border-color: var(--theme-primary-border);
   background: var(--theme-primary-soft);
 }
@@ -280,7 +280,8 @@
 
 .liveTeamMetaRow .field,
 .liveTeamInfoRow .field,
-.liveTickerGrid .field {
+.liveTickerControlGrid .field,
+.liveTickerSettingsGrid .field {
   margin-bottom: 0;
 }
 
@@ -639,19 +640,43 @@
   gap: 6px;
 }
 
-.liveTickerGrid {
+.liveTickerControlGrid {
   display: grid;
-  grid-template-columns: 138px 74px minmax(0, 1fr);
-  gap: 8px;
-  align-items: end;
+  grid-template-columns: minmax(300px, 1fr) 154px minmax(220px, auto);
+  gap: 10px;
+  align-items: stretch;
 }
 
-.liveTickerGrid .segmented {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
+.liveTickerTextField {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
 }
 
-.liveTickerGrid input {
+.liveTickerTextField > span {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.035);
+  color: var(--theme-muted);
+  padding: 0 11px;
+  font-size: 10px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.liveTickerTextField input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.liveTickerControlGrid input,
+.liveTickerSettingsGrid input {
   min-width: 0;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(0,0,0,0.35);
@@ -660,17 +685,133 @@
   outline: none;
 }
 
+.liveTickerRuntime {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left: 2px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.28);
+  padding: 8px 10px;
+}
+
+.liveTickerRuntime em {
+  color: var(--theme-muted);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.liveTickerRuntime em {
+  border-left: 1px solid rgba(255,255,255,0.12);
+  padding-left: 9px;
+  white-space: nowrap;
+}
+
+.liveTickerRuntime strong {
+  color: var(--theme-text);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.liveTickerRuntimeActive {
+  border-color: var(--theme-primary-border);
+  border-left-color: var(--theme-primary);
+  background: var(--theme-primary-soft);
+}
+
+.liveTickerRuntimeActive em,
+.liveTickerRuntimeActive strong {
+  color: var(--theme-primary);
+}
+
+.liveTickerNumberInput {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.35);
+}
+
+.liveTickerNumberInput input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.liveTickerNumberInput span {
+  padding: 0 10px 0 4px;
+  color: var(--theme-muted);
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.liveTickerActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(72px, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.liveTickerActionsThree {
+  grid-template-columns: repeat(3, minmax(72px, 1fr));
+}
+
+.liveTickerActions button {
+  min-height: 38px;
+}
+
 .livePackageGrid {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
   gap: 12px;
-  align-items: start;
+  align-items: stretch;
   min-width: 0;
 }
 
 .livePackagePanel {
-  height: auto;
+  height: 100%;
   min-width: 0;
+}
+
+.liveTickerSettingsPanel {
+  grid-column: 1 / -1;
+  height: auto;
+}
+
+.liveTickerSettingsGrid {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.72fr) minmax(300px, 1.18fr) minmax(220px, 1fr);
+  gap: 12px;
+  align-items: end;
+  min-width: 0;
+}
+
+.liveTickerSettingsMode,
+.liveTickerSettingsTiming {
+  min-width: 0;
+}
+
+.liveTickerSettingsTiming {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(90px, 1fr));
+  gap: 8px;
+}
+
+.liveTickerSettingsSummary {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  border-left: 2px solid var(--theme-primary);
+  background: rgba(255,255,255,0.025);
+  color: var(--theme-muted);
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 .livePackageGrid > .livePackagePanel:first-child {
@@ -678,7 +819,7 @@
 }
 
 .liveStatusPanel {
-  align-self: start;
+  align-self: stretch;
 }
 
 .livePackageStack {
@@ -731,9 +872,82 @@
 
 .livePackageSection {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   border-top: 1px solid rgba(255,255,255,0.08);
-  padding-top: 10px;
+  padding-top: 11px;
+}
+
+.livePackageSection:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.livePackageSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.livePackageSectionHeader span,
+.livePackageSectionHeader em {
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.livePackageSectionHeader span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--theme-primary);
+}
+
+.livePackageSectionHeader span::before {
+  width: 5px;
+  height: 5px;
+  background: var(--theme-primary);
+  content: '';
+}
+
+.livePackageSectionHeader em {
+  color: rgba(255,255,255,0.22);
+  font-style: normal;
+}
+
+.livePackageSectionToggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.livePackageSectionToggle > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.livePackageSectionToggle strong {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.livePackageSectionToggle:hover span,
+.livePackageSectionToggle[aria-expanded="true"] span,
+.livePackageSectionToggle[aria-expanded="true"] strong {
+  color: var(--theme-primary);
+}
+
+.livePackageSectionBody {
+  display: grid;
+  gap: 10px;
 }
 
 .livePackageRecordGrid {
@@ -851,6 +1065,235 @@
   min-width: 124px;
 }
 
+.liveSponsorSpotlightSection {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(205px, 0.72fr) minmax(270px, 1.12fr) minmax(240px, 0.88fr) minmax(190px, 0.68fr);
+  grid-template-areas: "identity controls timing footer";
+  gap: 8px 12px;
+  align-items: stretch;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-top: 2px solid var(--theme-primary-border);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.24);
+  padding: 12px;
+}
+
+.liveSponsorSpotlightHeader,
+.liveSponsorSpotlightFooter,
+.liveSponsorSpotlightControls,
+.liveSponsorSpotlightTiming,
+.liveSponsorSpotlightBrand {
+  display: grid;
+  align-items: center;
+  min-width: 0;
+}
+
+.liveSponsorSpotlightIdentity {
+  grid-area: identity;
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  min-width: 0;
+}
+
+.liveSponsorSpotlightHeader {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-self: center;
+}
+
+.liveSponsorSpotlightHeader span,
+.liveSponsorSpotlightHeader strong,
+.liveSponsorSpotlightMode > span,
+.liveSponsorSpotlightBrand span,
+.liveSponsorSpotlightBrand strong,
+.liveSponsorSpotlightBrand em {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.liveSponsorSpotlightHeader span {
+  color: var(--theme-primary);
+  font-size: 11px;
+}
+
+.liveSponsorSpotlightHeader strong {
+  border: 1px solid var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-primary);
+  font-size: 10px;
+  padding: 5px 8px;
+}
+
+.liveSponsorSpotlightControls {
+  grid-area: controls;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  align-content: center;
+  border-left: 1px solid rgba(255,255,255,0.08);
+  padding-left: 12px;
+}
+
+.liveSponsorSpotlightMode {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.liveSponsorSpotlightMode > span,
+.liveSponsorSpotlightBrand span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+}
+
+.liveSponsorSpotlightMode .segmented {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.liveSponsorSpotlightMode .segmented button {
+  min-height: 34px;
+  padding-inline: 5px;
+}
+
+.liveSponsorSpotlightTiming {
+  grid-area: timing;
+  grid-template-columns: repeat(2, minmax(108px, max-content));
+  gap: 8px;
+  align-content: center;
+  align-items: center;
+  border-left: 1px solid rgba(255,255,255,0.08);
+  padding-left: 12px;
+}
+
+.liveSponsorSpotlightTiming .field {
+  display: grid;
+  grid-template-columns: auto 64px;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+}
+
+.liveSponsorSpotlightTiming .field > span {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.liveSponsorSpotlightTiming .field > input {
+  width: 64px;
+  min-width: 64px;
+  padding-inline: 9px;
+}
+
+.liveSponsorSpotlightProgressToggle {
+  min-height: 36px;
+  margin: 0;
+}
+
+.liveSponsorSpotlightNote {
+  grid-column: 1 / -1;
+  min-height: 32px;
+  margin: 0;
+  border-left: 2px solid var(--theme-primary-border);
+  background: rgba(255,255,255,0.025);
+  color: var(--theme-muted-text);
+  padding: 7px 9px;
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.liveSponsorSpotlightBrand {
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 8px;
+}
+
+.liveSponsorSpotlightLogo {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.38);
+}
+
+.liveSponsorSpotlightLogo img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.liveSponsorSpotlightLogo span {
+  color: rgba(255,255,255,0.3);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.liveSponsorSpotlightBrand > div:nth-child(2) {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.liveSponsorSpotlightBrand strong {
+  color: var(--theme-text);
+  font-size: 12px;
+}
+
+.liveSponsorSpotlightBrand em {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-style: normal;
+}
+
+.liveSponsorSpotlightFooter {
+  grid-area: footer;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-content: center;
+  border-left: 1px solid rgba(255,255,255,0.08);
+  padding-left: 12px;
+}
+
+.liveSponsorSpotlightFooter button {
+  min-height: 38px;
+  border: 1px solid var(--theme-primary-border);
+  background: var(--theme-primary-soft);
+  color: var(--theme-text);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  cursor: pointer;
+}
+
+.liveSponsorSpotlightFooter button:hover:not(:disabled) {
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.liveSponsorSpotlightFooter button:disabled {
+  border-color: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.025);
+  color: rgba(255,255,255,0.28);
+  cursor: not-allowed;
+}
+
 .livePackagePanel .segmented {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px;
@@ -868,6 +1311,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.liveTickerSettingsPanel .liveTickerSettingsMode .field:first-child .segmented {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .liveStatusPanel .livePackageRecordGrid,
 .liveStatusPanel .livePackagePairGrid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -876,6 +1323,58 @@
 @container live-desk (max-width: 940px) {
   .livePackageGrid {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container live-desk (max-width: 800px) {
+  .liveTickerSettingsGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container live-desk (max-width: 700px) {
+  .liveTickerControlGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container live-desk (max-width: 900px) {
+  .liveSponsorSpotlightSection {
+    grid-template-columns: minmax(210px, 0.82fr) minmax(0, 1.5fr);
+    grid-template-areas:
+      "identity controls"
+      "identity timing"
+      "footer footer";
+  }
+
+  .liveSponsorSpotlightFooter {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-left: 0;
+    padding-top: 10px;
+    padding-left: 0;
+  }
+}
+
+@container live-desk (max-width: 700px) {
+  .liveSponsorSpotlightSection {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "identity"
+      "controls"
+      "timing"
+      "footer";
+  }
+
+  .liveSponsorSpotlightControls,
+  .liveSponsorSpotlightTiming {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .liveSponsorSpotlightControls {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 10px;
   }
 }
 
@@ -895,6 +1394,12 @@
     height: auto;
     min-height: 40px;
     padding-block: 8px;
+  }
+
+  .liveSponsorSpotlightControls,
+  .liveSponsorSpotlightTiming,
+  .liveSponsorSpotlightFooter {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

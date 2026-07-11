@@ -308,3 +308,9 @@
 .footer strong {
   text-align: right;
 }
+
+.sponsorLockup {
+  position: absolute;
+  top: 70px;
+  right: 72px;
+}

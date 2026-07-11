@@ -88,10 +88,6 @@
     margin-left: auto;
   }
 
-  .teamDbList {
-    grid-template-columns: 1fr;
-  }
-
   .rosterPlayerList {
     min-width: 0;
   }
@@ -110,7 +106,9 @@
   .liveTeamInfoRow,
   .liveBanPanel,
   .liveLineupGrid,
-  .liveTickerGrid,
+  .liveTickerControlGrid,
+  .liveTickerSettingsGrid,
+  .liveTickerSettingsTiming,
   .livePackagePairGrid,
   .livePackageRecordGrid,
   .livePackageNote,
@@ -173,6 +171,10 @@
     grid-template-columns: 1fr;
   }
 
+  .liveTickerActions {
+    grid-template-columns: 1fr;
+  }
+
   .casterInterviewModeControl,
   .casterInterviewTeamControl,
   .casterInterviewCompact > .field,
@@ -189,15 +191,17 @@
   }
 
   .teamDbListRow {
-    grid-template-columns: 32px 64px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "index short name"
-      "index short status"
-      "roster roles staff"
-      "actions actions actions";
+      "identity"
+      "meta"
+      "actions";
   }
 
   .teamDbListActions {
-    grid-template-columns: minmax(0, 1fr) repeat(3, 42px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, 28px);
+    justify-self: stretch;
+    width: 100%;
   }
 }

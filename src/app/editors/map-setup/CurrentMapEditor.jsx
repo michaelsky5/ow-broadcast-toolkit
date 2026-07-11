@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react'
 import {
+  OW_DEFAULT_EVENT_MAP_POOL,
   OW_GAME_MODE_OPTIONS,
   OW_MAP_BY_ID,
   OW_MAPS_BY_MODE
@@ -16,7 +17,6 @@ import {
   ensureSceneSettings,
   getHeroLabel,
   getHeroOptionsByRole,
-  getMapLabel,
   getMapLineupEntry,
   getModeLabel,
   getPlayerRoleLabel,
@@ -31,20 +31,23 @@ import {
 
 const getWinnerSide = map => String(map?.winnerSide || map?.winner || '').trim().toUpperCase()
 
+const getMapNameLabel = (map, language) => (
+  language === 'en' ? map.en : map.zh
+)
+
 const recalculateScoreFromLineup = draft => {
   const lineup = ensureMapLineup(draft)
   draft.currentMatch.score.teamA = lineup.filter(map => getWinnerSide(map) === 'A').length
   draft.currentMatch.score.teamB = lineup.filter(map => getWinnerSide(map) === 'B').length
 }
 
-const getDefaultMapPoolForMode = modeId => (OW_MAPS_BY_MODE[modeId] || []).map(map => map.id)
+const getDefaultMapPoolForMode = modeId => [...(OW_DEFAULT_EVENT_MAP_POOL[modeId] || [])]
 
 const getConfiguredMapsForMode = (settings, modeId) => {
-  const mapsForMode = OW_MAPS_BY_MODE[modeId] || []
   const storedPool = settings.eventMapPool?.[modeId]
   const mapIds = Array.isArray(storedPool) && storedPool.length
     ? storedPool
-    : mapsForMode.map(map => map.id)
+    : getDefaultMapPoolForMode(modeId)
 
   return mapIds
     .map(mapId => OW_MAP_BY_ID[mapId])
@@ -82,11 +85,10 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
   const enabledModeOptions = OW_GAME_MODE_OPTIONS.filter(mode => settings.enabledMapTypes?.[mode.value] !== false)
   const flowModeOptions = enabledModeOptions.length ? enabledModeOptions : OW_GAME_MODE_OPTIONS
   const poolModeSummaries = OW_GAME_MODE_OPTIONS.map(mode => {
-    const mapsForMode = OW_MAPS_BY_MODE[mode.value] || []
     const storedPool = settings.eventMapPool?.[mode.value]
     const selectedPool = Array.isArray(storedPool) && storedPool.length
       ? storedPool
-      : mapsForMode.map(map => map.id)
+      : getDefaultMapPoolForMode(mode.value)
     const enabled = settings.enabledMapTypes?.[mode.value] !== false
 
     return {
@@ -346,7 +348,7 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
                   const storedPool = settings.eventMapPool?.[mode.value]
                   const selectedPool = Array.isArray(storedPool) && storedPool.length
                     ? storedPool
-                    : mapsForMode.map(map => map.id)
+                    : getDefaultMapPoolForMode(mode.value)
                   const enabled = settings.enabledMapTypes?.[mode.value] !== false
                   const modeLabel = getModeLabel(mode, language)
 
@@ -359,16 +361,14 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
                       key={mode.value}
                     >
                       <div className={styles.mapPoolModeHeader}>
-                        <strong>{modeLabel}</strong>
+                        <ToggleField
+                          className={styles.mapPoolModeToggle}
+                          label={modeLabel}
+                          language={language}
+                          checked={enabled}
+                          onChange={checked => toggleMapPoolMode(mode.value, checked)}
+                        />
                         <span>{mapText.mapCount(selectedPool.length)}</span>
-                        <label>
-                          <span>{enabled ? mapText.on : mapText.off}</span>
-                          <input
-                            type="checkbox"
-                            checked={enabled}
-                            onChange={event => toggleMapPoolMode(mode.value, event.target.checked)}
-                          />
-                        </label>
                       </div>
 
                       <div className={styles.mapPoolSlots}>
@@ -384,7 +384,7 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
                               }}
                             >
                               {mapsForMode.map(map => (
-                                <option key={map.id} value={map.id}>{getMapLabel(map, language)}</option>
+                                <option key={map.id} value={map.id}>{getMapNameLabel(map, language)}</option>
                               ))}
                             </select>
                             <button
@@ -504,7 +504,7 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
                         >
                           <option value="">{emptyLabel}</option>
                           {mapsForMode.map(map => (
-                            <option key={map.id} value={map.id}>{getMapLabel(map, language)}</option>
+                            <option key={map.id} value={map.id}>{getMapNameLabel(map, language)}</option>
                           ))}
                         </select>
 

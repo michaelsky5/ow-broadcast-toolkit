@@ -9,12 +9,28 @@ function Field({ label, children, wide = false }) {
   )
 }
 
-function ToggleField({ label, checked, onChange }) {
+function ToggleField({ label, checked, onChange, language, className = '' }) {
+  const isChinese = language
+    ? language === 'zh'
+    : /[\u3400-\u9fff]/u.test(String(label || ''))
+  const stateLabel = isChinese
+    ? (checked ? '\u5f00' : '\u5173')
+    : (checked ? 'ON' : 'OFF')
+
   return (
-    <label className={styles.toggleField}>
-      <input type="checkbox" checked={checked} onChange={event => onChange(event.target.checked)} />
+    <button
+      type="button"
+      className={[
+        styles.stateToggle,
+        checked ? styles.stateToggleActive : '',
+        className
+      ].filter(Boolean).join(' ')}
+      aria-pressed={checked}
+      onClick={() => onChange(!checked)}
+    >
       <span>{label}</span>
-    </label>
+      <strong>{stateLabel}</strong>
+    </button>
   )
 }
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps, no-unused-vars */
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { needsAttackDefense } from '../../data/overwatch';
 import BeginInfoOverlay from './BeginInfoOverlay';
 import BanPhaseScene from './BanPhaseScene';
@@ -533,6 +533,11 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
 
   const [tickerKey, setTickerKey] = useState(0);
   const [localShowTicker, setLocalShowTicker] = useState(matchData.showTicker);
+  const [sponsorSpotlightPhase, setSponsorSpotlightPhase] = useState('hidden');
+  const [sponsorSpotlightContentPhase, setSponsorSpotlightContentPhase] = useState('enter');
+  const [sponsorSpotlightIndex, setSponsorSpotlightIndex] = useState(Math.max(0, Number(matchData.sponsorSpotlightIndex) || 0));
+  const [sponsorSpotlightRunKey, setSponsorSpotlightRunKey] = useState(0);
+  const [sponsorSpotlightProgressDelayMs, setSponsorSpotlightProgressDelayMs] = useState(0);
   const [banPhaseTrigger, setBanPhaseTrigger] = useState(0);
   const [showKeyPlayer, setShowKeyPlayer] = useState(false);
   const [keyPlayerPhase, setKeyPlayerPhase] = useState('hidden');
@@ -543,6 +548,148 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
   const keyPlayerEnterTimerRef = useRef(null);
   const keyPlayerArmedRef = useRef(false);
   const lastConsumedKeyTriggerRef = useRef(0);
+  const sponsorSpotlightIndexRef = useRef(Math.max(0, Number(matchData.sponsorSpotlightIndex) || 0));
+  const sponsorSpotlightDisplayedIndexRef = useRef(Math.max(0, Number(matchData.sponsorSpotlightIndex) || 0));
+  const sponsorSpotlightPhaseRef = useRef('hidden');
+  const sponsorSpotlightVisibleUntilRef = useRef(0);
+  const sponsorSpotlightEnterTimerRef = useRef(null);
+  const sponsorSpotlightHideTimerRef = useRef(null);
+  const sponsorSpotlightExitTimerRef = useRef(null);
+  const sponsorSpotlightContentSwapTimerRef = useRef(null);
+  const sponsorSpotlightContentEnterTimerRef = useRef(null);
+  const sponsorSpotlightAutoStartRef = useRef(null);
+  const sponsorSpotlightAutoIntervalRef = useRef(null);
+  const restartSponsorSpotlightAutoRotationRef = useRef(null);
+  const sponsorSpotlightPersistentTimerRef = useRef(null);
+  const restartSponsorSpotlightPersistentRotationRef = useRef(null);
+  const lastSponsorSpotlightTriggerRef = useRef(matchData.sponsorSpotlightTriggerAt || 0);
+  const tickerScheduleStartRef = useRef(null);
+  const tickerScheduleIntervalRef = useRef(null);
+  const restartTickerScheduleRef = useRef(null);
+  const lastTickerTriggerRef = useRef(matchData.tickerTriggerAt || 0);
+  const lastTickerStopRef = useRef(matchData.tickerStopAt || 0);
+
+  const sponsorSpotlightSource = JSON.stringify(matchData.sponsorSpotlights || []);
+  const sponsorSpotlights = useMemo(() => (
+    Array.isArray(matchData.sponsorSpotlights)
+      ? matchData.sponsorSpotlights.filter(item => item && (item.logo || item.name))
+      : []
+  ), [sponsorSpotlightSource]);
+  const sponsorSpotlightMode = ['AUTO', 'PERSISTENT', 'MANUAL'].includes(String(matchData.sponsorSpotlightMode || '').toUpperCase())
+    ? String(matchData.sponsorSpotlightMode).toUpperCase()
+    : 'OFF';
+  const sponsorSpotlightDurationMs = Math.max(4, Math.min(20, Number(matchData.sponsorSpotlightDurationSeconds) || 8)) * 1000;
+  const sponsorSpotlightIntervalMs = Math.max(15, Math.min(180, Number(matchData.sponsorSpotlightIntervalSeconds) || 45)) * 1000;
+  const sponsorSpotlightProgressVisible = matchData.sponsorSpotlightProgressVisible !== false;
+  const tickerMode = ['ONCE', 'SCHEDULED', 'INFINITE'].includes(String(matchData.tickerMode || '').toUpperCase())
+    ? String(matchData.tickerMode).toUpperCase()
+    : 'ONCE';
+  const tickerDurationSeconds = Math.max(12, Math.min(60, Number(matchData.tickerDurationSeconds) || 25));
+  const tickerIntervalSeconds = Math.max(
+    tickerDurationSeconds + 5,
+    Math.max(30, Math.min(600, Number(matchData.tickerIntervalSeconds) || 90))
+  );
+  const tickerInitialDelaySeconds = Math.max(0, Math.min(120, Number(matchData.tickerInitialDelaySeconds) || 0));
+
+  const playTickerOnce = useCallback(() => {
+    setLocalShowTicker(true);
+    setTickerKey(key => key + 1);
+  }, []);
+
+  const clearTickerSchedule = useCallback(() => {
+    if (tickerScheduleStartRef.current) {
+      clearTimeout(tickerScheduleStartRef.current);
+      tickerScheduleStartRef.current = null;
+    }
+    if (tickerScheduleIntervalRef.current) {
+      clearTimeout(tickerScheduleIntervalRef.current);
+      tickerScheduleIntervalRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    sponsorSpotlightPhaseRef.current = sponsorSpotlightPhase;
+  }, [sponsorSpotlightPhase]);
+
+  const clearSponsorVisualTimers = useCallback(() => {
+    [
+      sponsorSpotlightEnterTimerRef,
+      sponsorSpotlightHideTimerRef,
+      sponsorSpotlightExitTimerRef,
+      sponsorSpotlightContentSwapTimerRef,
+      sponsorSpotlightContentEnterTimerRef
+    ].forEach(ref => {
+      if (ref.current) {
+        clearTimeout(ref.current);
+        ref.current = null;
+      }
+    });
+  }, []);
+
+  const clearSponsorAutoTimers = useCallback(() => {
+    if (sponsorSpotlightAutoStartRef.current) {
+      clearTimeout(sponsorSpotlightAutoStartRef.current);
+      sponsorSpotlightAutoStartRef.current = null;
+    }
+    if (sponsorSpotlightAutoIntervalRef.current) {
+      clearTimeout(sponsorSpotlightAutoIntervalRef.current);
+      sponsorSpotlightAutoIntervalRef.current = null;
+    }
+  }, []);
+
+  const showSponsorSpotlight = useCallback((requestedIndex, advance = false, persistent = false) => {
+    if (!sponsorSpotlights.length) return;
+
+    clearSponsorVisualTimers();
+    const baseIndex = Number.isFinite(Number(requestedIndex))
+      ? Number(requestedIndex)
+      : sponsorSpotlightIndexRef.current;
+    const nextIndex = ((baseIndex + (advance ? 1 : 0)) % sponsorSpotlights.length + sponsorSpotlights.length) % sponsorSpotlights.length;
+    const shellVisible = sponsorSpotlightPhaseRef.current === 'enter';
+    const contentChanged = nextIndex !== sponsorSpotlightDisplayedIndexRef.current;
+    const revealDelayMs = shellVisible && contentChanged ? 194 : (!shellVisible ? 34 : 0);
+
+    sponsorSpotlightIndexRef.current = nextIndex;
+    sponsorSpotlightVisibleUntilRef.current = Date.now() + revealDelayMs + sponsorSpotlightDurationMs;
+    setSponsorSpotlightProgressDelayMs(shellVisible && contentChanged ? revealDelayMs : 0);
+    setSponsorSpotlightRunKey(key => key + 1);
+    if (shellVisible && contentChanged) {
+      setSponsorSpotlightContentPhase('exit');
+      sponsorSpotlightContentSwapTimerRef.current = setTimeout(() => {
+        sponsorSpotlightDisplayedIndexRef.current = nextIndex;
+        setSponsorSpotlightIndex(nextIndex);
+        setSponsorSpotlightContentPhase('pre-enter');
+        sponsorSpotlightContentEnterTimerRef.current = setTimeout(() => {
+          setSponsorSpotlightContentPhase('enter');
+          sponsorSpotlightContentEnterTimerRef.current = null;
+        }, 34);
+        sponsorSpotlightContentSwapTimerRef.current = null;
+      }, 160);
+    } else {
+      sponsorSpotlightDisplayedIndexRef.current = nextIndex;
+      setSponsorSpotlightIndex(nextIndex);
+      setSponsorSpotlightContentPhase('enter');
+    }
+
+    if (!shellVisible) {
+      setSponsorSpotlightPhase('pre-enter');
+      sponsorSpotlightEnterTimerRef.current = setTimeout(() => {
+        setSponsorSpotlightPhase('enter');
+        sponsorSpotlightEnterTimerRef.current = null;
+      }, 34);
+    }
+
+    if (!persistent) {
+      sponsorSpotlightHideTimerRef.current = setTimeout(() => {
+        setSponsorSpotlightPhase('exit');
+        sponsorSpotlightExitTimerRef.current = setTimeout(() => {
+          setSponsorSpotlightPhase('hidden');
+          sponsorSpotlightExitTimerRef.current = null;
+        }, 440);
+        sponsorSpotlightHideTimerRef.current = null;
+      }, sponsorSpotlightDurationMs + revealDelayMs);
+    }
+  }, [clearSponsorVisualTimers, sponsorSpotlightDurationMs, sponsorSpotlights]);
 
   const clearKeyPlayerTimers = () => {
     [keyPlayerTimerRef, keyPlayerExitTimerRef, keyPlayerEnterTimerRef].forEach(ref => {
@@ -554,9 +701,189 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
   };
 
   useEffect(() => {
-    setLocalShowTicker(matchData.showTicker);
-    if (matchData.showTicker) setTickerKey(k => k + 1);
-  }, [matchData.showTicker]);
+    clearTickerSchedule();
+
+    if (!isActive) {
+      setLocalShowTicker(false);
+      return clearTickerSchedule;
+    }
+
+    if (tickerMode === 'INFINITE') {
+      setLocalShowTicker(Boolean(matchData.showTicker));
+      if (matchData.showTicker) setTickerKey(key => key + 1);
+      return clearTickerSchedule;
+    }
+
+    if (tickerMode === 'SCHEDULED' && matchData.showTicker) {
+      setLocalShowTicker(false);
+
+      const runScheduledTicker = () => {
+        playTickerOnce();
+        tickerScheduleIntervalRef.current = setTimeout(runScheduledTicker, tickerIntervalSeconds * 1000);
+      };
+      const restartScheduleAfterCurrentRun = () => {
+        clearTickerSchedule();
+        tickerScheduleIntervalRef.current = setTimeout(runScheduledTicker, tickerIntervalSeconds * 1000);
+      };
+
+      restartTickerScheduleRef.current = restartScheduleAfterCurrentRun;
+      tickerScheduleStartRef.current = setTimeout(() => {
+        tickerScheduleStartRef.current = null;
+        runScheduledTicker();
+      }, tickerInitialDelaySeconds * 1000);
+      return () => {
+        restartTickerScheduleRef.current = null;
+        clearTickerSchedule();
+      };
+    }
+
+    if (tickerMode === 'ONCE' && matchData.showTicker) {
+      playTickerOnce();
+      return clearTickerSchedule;
+    }
+
+    setLocalShowTicker(false);
+    return clearTickerSchedule;
+  }, [
+    clearTickerSchedule,
+    isActive,
+    matchData.showTicker,
+    playTickerOnce,
+    tickerInitialDelaySeconds,
+    tickerIntervalSeconds,
+    tickerMode
+  ]);
+
+  useEffect(() => {
+    const nextTrigger = matchData.tickerTriggerAt || 0;
+    if (!isActive || !nextTrigger || nextTrigger === lastTickerTriggerRef.current) return;
+
+    lastTickerTriggerRef.current = nextTrigger;
+    playTickerOnce();
+    if (tickerMode === 'SCHEDULED' && matchData.showTicker) {
+      restartTickerScheduleRef.current?.();
+    }
+  }, [isActive, matchData.showTicker, matchData.tickerTriggerAt, playTickerOnce, tickerMode]);
+
+  useEffect(() => {
+    const nextStop = matchData.tickerStopAt || 0;
+    if (!nextStop || nextStop === lastTickerStopRef.current) return;
+
+    lastTickerStopRef.current = nextStop;
+    setLocalShowTicker(false);
+  }, [matchData.tickerStopAt]);
+
+  useEffect(() => {
+    clearSponsorAutoTimers();
+
+    if (!isActive || sponsorSpotlightMode !== 'AUTO' || !sponsorSpotlights.length) return undefined;
+
+    function scheduleNextAutoSponsor() {
+      if (sponsorSpotlightAutoIntervalRef.current) {
+        clearTimeout(sponsorSpotlightAutoIntervalRef.current);
+      }
+      const nextAutoAt = sponsorSpotlightVisibleUntilRef.current + sponsorSpotlightIntervalMs;
+      const delay = Math.max(0, nextAutoAt - Date.now());
+      sponsorSpotlightAutoIntervalRef.current = setTimeout(() => {
+        const remaining = sponsorSpotlightVisibleUntilRef.current + sponsorSpotlightIntervalMs - Date.now();
+        if (remaining > 16) {
+          scheduleNextAutoSponsor();
+          return;
+        }
+        showSponsorSpotlight(sponsorSpotlightIndexRef.current, true);
+        scheduleNextAutoSponsor();
+      }, delay);
+    }
+
+    restartSponsorSpotlightAutoRotationRef.current = () => {
+      clearSponsorAutoTimers();
+      scheduleNextAutoSponsor();
+    };
+
+    sponsorSpotlightAutoStartRef.current = setTimeout(() => {
+      showSponsorSpotlight(sponsorSpotlightIndexRef.current, false);
+      scheduleNextAutoSponsor();
+      sponsorSpotlightAutoStartRef.current = null;
+    }, 15000);
+
+    return () => {
+      restartSponsorSpotlightAutoRotationRef.current = null;
+      clearSponsorAutoTimers();
+    };
+  }, [clearSponsorAutoTimers, isActive, showSponsorSpotlight, sponsorSpotlightDurationMs, sponsorSpotlightIntervalMs, sponsorSpotlightMode, sponsorSpotlights.length]);
+
+  useEffect(() => {
+    if (!isActive || sponsorSpotlightMode !== 'PERSISTENT' || !sponsorSpotlights.length) return undefined;
+
+    function schedulePersistentRotation() {
+      if (sponsorSpotlightPersistentTimerRef.current) {
+        clearTimeout(sponsorSpotlightPersistentTimerRef.current);
+      }
+
+      if (sponsorSpotlights.length < 2) {
+        sponsorSpotlightPersistentTimerRef.current = null;
+        return;
+      }
+
+      const delay = Math.max(0, sponsorSpotlightVisibleUntilRef.current - Date.now());
+      sponsorSpotlightPersistentTimerRef.current = setTimeout(() => {
+        const remaining = sponsorSpotlightVisibleUntilRef.current - Date.now();
+        if (remaining > 16) {
+          schedulePersistentRotation();
+          return;
+        }
+        showSponsorSpotlight(sponsorSpotlightIndexRef.current, true, true);
+        schedulePersistentRotation();
+      }, delay);
+    }
+
+    const requestedIndex = Math.max(0, Number(matchData.sponsorSpotlightIndex) || 0);
+    sponsorSpotlightIndexRef.current = requestedIndex;
+    showSponsorSpotlight(requestedIndex, false, true);
+    restartSponsorSpotlightPersistentRotationRef.current = schedulePersistentRotation;
+    schedulePersistentRotation();
+
+    return () => {
+      restartSponsorSpotlightPersistentRotationRef.current = null;
+      if (sponsorSpotlightPersistentTimerRef.current) {
+        clearTimeout(sponsorSpotlightPersistentTimerRef.current);
+        sponsorSpotlightPersistentTimerRef.current = null;
+      }
+      clearSponsorVisualTimers();
+      setSponsorSpotlightPhase('hidden');
+    };
+  }, [clearSponsorVisualTimers, isActive, showSponsorSpotlight, sponsorSpotlightDurationMs, sponsorSpotlightMode, sponsorSpotlights.length]);
+
+  useEffect(() => {
+    const nextTrigger = matchData.sponsorSpotlightTriggerAt || 0;
+    if (!isActive || !nextTrigger || nextTrigger === lastSponsorSpotlightTriggerRef.current) return;
+
+    lastSponsorSpotlightTriggerRef.current = nextTrigger;
+    const requestedIndex = Math.max(0, Number(matchData.sponsorSpotlightIndex) || 0);
+    sponsorSpotlightIndexRef.current = requestedIndex;
+    showSponsorSpotlight(requestedIndex, false, sponsorSpotlightMode === 'PERSISTENT');
+    if (sponsorSpotlightMode === 'AUTO') {
+      restartSponsorSpotlightAutoRotationRef.current?.();
+    }
+    if (sponsorSpotlightMode === 'PERSISTENT') {
+      restartSponsorSpotlightPersistentRotationRef.current?.();
+    }
+  }, [isActive, matchData.sponsorSpotlightIndex, matchData.sponsorSpotlightTriggerAt, showSponsorSpotlight, sponsorSpotlightDurationMs, sponsorSpotlightMode]);
+
+  useEffect(() => {
+    if (sponsorSpotlightMode !== 'OFF' && sponsorSpotlights.length) return;
+    clearSponsorVisualTimers();
+    sponsorSpotlightVisibleUntilRef.current = 0;
+    setSponsorSpotlightPhase('hidden');
+  }, [clearSponsorVisualTimers, sponsorSpotlightMode, sponsorSpotlights.length]);
+
+  useEffect(() => {
+    if (isActive) return;
+    clearSponsorVisualTimers();
+    sponsorSpotlightVisibleUntilRef.current = 0;
+    setSponsorSpotlightPhase('hidden');
+    setSponsorSpotlightContentPhase('enter');
+  }, [clearSponsorVisualTimers, isActive]);
 
   useEffect(() => {
     const next = matchData.heroBanTriggerAt || 0;
@@ -614,6 +941,11 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
   }, [isActive, matchData.keyPlayerTriggerAt, matchData.keyPlayerSide, matchData.keyPlayerName, matchData.rosterPlayersA, matchData.rosterPlayersB]);
 
   useEffect(() => clearKeyPlayerTimers, []);
+  useEffect(() => () => {
+    clearSponsorVisualTimers();
+    clearSponsorAutoTimers();
+    clearTickerSchedule();
+  }, [clearSponsorAutoTimers, clearSponsorVisualTimers, clearTickerSchedule]);
 
   const { safeLogoA, safeLogoB } = useMemo(() => ({
     safeLogoA: getValidLogo(matchData.logoA),
@@ -815,6 +1147,14 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
   const showTopEventLogo = matchData.showTopEventLogo !== false;
   const showTopMatchFormat = matchData.showTopMatchFormat !== false;
   const showTopSponsor = matchData.showTopSponsor === true && Boolean(topSponsorLogo);
+  const activeSponsorSpotlight = sponsorSpotlights[sponsorSpotlightIndex % Math.max(1, sponsorSpotlights.length)] || null;
+  const sponsorSpotlightHasTimedProgress = sponsorSpotlightProgressVisible && (
+    sponsorSpotlightMode === 'AUTO'
+      || sponsorSpotlightMode === 'MANUAL'
+      || (sponsorSpotlightMode === 'PERSISTENT' && sponsorSpotlights.length > 1)
+  );
+  const sponsorSpotlightHasStaticProgress = !sponsorSpotlightProgressVisible
+    || (sponsorSpotlightMode === 'PERSISTENT' && sponsorSpotlights.length < 2);
 
   const showSideStatus = needsAttackDefense(currentMapModeKey);
   const attackSide = currentMapData?.attackSide || '';
@@ -823,7 +1163,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
   const rightSideTag = showSideStatus && attackSide ? (attackSide === 'B' ? 'ATK' : 'DEF') : '';
 
   const handleTickerEnd = () => {
-    if (matchData.tickerMode === 'ONCE') {
+    if (tickerMode !== 'INFINITE') {
       setTimeout(() => { setLocalShowTicker(false); }, 0);
     }
   };
@@ -835,6 +1175,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
         @keyframes hudSlideInLeft { 0% { opacity: 0; transform: translateX(-40px); } 100% { opacity: 1; transform: translateX(0); } }
         @keyframes hudSlideInRight { 0% { opacity: 0; transform: translateX(40px); } 100% { opacity: 1; transform: translateX(0); } }
         @keyframes tickerScroll { 0% { transform: translateX(1920px); } 100% { transform: translateX(-100%); } }
+        @keyframes sponsorSpotlightProgress { 0% { transform: scaleX(1); } 100% { transform: scaleX(0); } }
       `}</style>
 
       {renderState === 'INTRO' && (
@@ -848,6 +1189,121 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
       {renderState === 'HUD' && !matchData.showBanPhase && (
         <>
           <KeyPlayerCard show={showKeyPlayer} phase={keyPlayerPhase} data={keyPlayerData} matchData={matchData} />
+
+          {activeSponsorSpotlight && sponsorSpotlightPhase !== 'hidden' && (
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                bottom: localShowTicker ? '38px' : '12px',
+                width: '500px',
+                maxWidth: 'calc(100% - 80px)',
+                height: '52px',
+                display: 'grid',
+                gridTemplateColumns: '112px minmax(0, 1fr)',
+                alignItems: 'stretch',
+                borderTop: sponsorSpotlightHasStaticProgress
+                  ? `2px solid ${COLORS.yellow}`
+                  : '1px solid rgba(255,255,255,0.18)',
+                borderRight: `4px solid ${COLORS.yellow}`,
+                background: 'linear-gradient(90deg, rgba(28,28,28,0.96), rgba(18,18,18,0.94))',
+                boxShadow: '0 10px 24px rgba(0,0,0,0.30), inset 0 0 0 1px rgba(255,255,255,0.06)',
+                opacity: sponsorSpotlightPhase === 'enter' ? 1 : 0,
+                transform: sponsorSpotlightPhase === 'enter'
+                  ? 'translate(-50%, 0)'
+                  : 'translate(-50%, calc(100% + 12px))',
+                transition: 'bottom 440ms cubic-bezier(0.16, 1, 0.3, 1), transform 440ms cubic-bezier(0.16, 1, 0.3, 1), opacity 320ms ease',
+                overflow: 'hidden',
+                pointerEvents: 'none',
+                zIndex: 210,
+                willChange: 'transform, opacity'
+              }}
+            >
+              {sponsorSpotlightHasTimedProgress && sponsorSpotlightPhase === 'enter' && (
+                <div
+                  key={`${sponsorSpotlightRunKey}-${sponsorSpotlightPhase}`}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '2px',
+                    background: COLORS.yellow,
+                    transformOrigin: 'left center',
+                    transform: 'scaleX(1)',
+                    animation: `sponsorSpotlightProgress ${sponsorSpotlightDurationMs}ms linear ${sponsorSpotlightProgressDelayMs}ms forwards`,
+                    pointerEvents: 'none',
+                    zIndex: 2
+                  }}
+                />
+              )}
+              <div
+                style={{
+                  display: 'grid',
+                  placeItems: 'center start',
+                  borderRight: '1px solid rgba(255,255,255,0.10)',
+                  padding: '0 14px',
+                  color: 'rgba(255,255,255,0.52)',
+                  fontSize: '9px',
+                  fontWeight: 900,
+                  letterSpacing: '1.45px',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                Supported By
+              </div>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '58px minmax(0, 1fr)',
+                  alignItems: 'center',
+                  minWidth: 0,
+                  opacity: sponsorSpotlightContentPhase === 'enter' ? 1 : 0,
+                  transform: sponsorSpotlightContentPhase === 'exit' ? 'translateY(-3px)' : (sponsorSpotlightContentPhase === 'pre-enter' ? 'translateY(3px)' : 'translateY(0)'),
+                  transition: 'opacity 160ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1)',
+                  willChange: 'opacity, transform'
+                }}
+              >
+                <div
+                  style={{
+                    alignSelf: 'stretch',
+                    display: 'grid',
+                    placeItems: 'center',
+                    borderRight: '1px solid rgba(255,255,255,0.10)'
+                  }}
+                >
+                  {activeSponsorSpotlight.logo && (
+                    <img
+                      src={activeSponsorSpotlight.logo}
+                      alt=""
+                      onError={event => { event.currentTarget.style.display = 'none'; }}
+                      style={{ width: '38px', height: '38px', objectFit: 'contain', filter: 'drop-shadow(0 3px 8px rgba(0,0,0,0.30))' }}
+                    />
+                  )}
+                </div>
+                <strong
+                  style={{
+                    minWidth: 0,
+                    gridColumn: 2,
+                    overflow: 'hidden',
+                    padding: '0 16px',
+                    color: COLORS.white,
+                    fontSize: '20px',
+                    fontWeight: 900,
+                    letterSpacing: '1.1px',
+                    lineHeight: 1.12,
+                    textOverflow: 'ellipsis',
+                    textAlign: 'center',
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {activeSponsorSpotlight.name || 'Sponsor'}
+                </strong>
+              </div>
+            </div>
+          )}
 
           {/* 🌟 中央赛事胶囊组件：悬浮并与两侧 SubBar 严格顶部对齐 🌟 */}
           <div
@@ -867,65 +1323,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
               height: '32px'
             }}
           >
-            {/* 1. 冠名赞助商：透明底 Logo + PRESENTS，与赛事信息明确分组 */}
-            {showTopSponsor && (
-            <div
-              style={{
-                height: '32px',
-                backgroundColor: COLORS.mainDark,
-                display: 'flex',
-                alignItems: 'center',
-                borderTop: `1px solid ${COLORS.lineStrong}`,
-                borderRight: '1px solid rgba(255,255,255,0.26)',
-                borderBottom: `1px solid ${COLORS.lineStrong}`,
-                flexShrink: 0,
-                overflow: 'hidden'
-              }}
-              title={`${topSponsorName} presents`}
-            >
-              <div
-                style={{
-                  minWidth: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxSizing: 'border-box',
-                  padding: 0
-                }}
-              >
-                <img
-                  src={topSponsorLogo}
-                  alt={topSponsorName}
-                  style={{
-                    width: 'auto',
-                    maxWidth: '72px',
-                    height: '90%',
-                    objectFit: 'contain',
-                    display: 'block'
-                  }}
-                  onError={event => {
-                    event.currentTarget.style.display = 'none';
-                  }}
-                />
-              </div>
-              <span
-                style={{
-                  padding: '0 10px 0 4px',
-                  color: COLORS.gray,
-                  fontSize: '8px',
-                  fontWeight: '900',
-                  lineHeight: 1,
-                  letterSpacing: '1.1px',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                PRESENTS
-              </span>
-            </div>
-            )}
-
-            {/* 2. 赛事 Logo 块 */}
+            {/* 1. 赛事 Logo 块 */}
             {showTopEventLogo && (
             <div
               style={{
@@ -949,14 +1347,15 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
             </div>
             )}
 
-            {/* 3. 赛事信息块 */}
+            {/* 2. 赛事信息块 */}
             <div
               style={{
                 backgroundColor: COLORS.mainDark,
                 color: COLORS.white,
-                padding: '0 20px',
-                minWidth: '92px',
-                maxWidth: '360px',
+                padding: '0 16px',
+                minWidth: '96px',
+                maxWidth: '480px',
+                flex: '0 1 auto',
                 fontSize: '14px',
                 fontWeight: '900',
                 letterSpacing: '2.2px',
@@ -967,7 +1366,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                 borderTop: `1px solid ${COLORS.lineStrong}`,
                 borderBottom: `1px solid ${COLORS.lineStrong}`,
                 borderLeft: `1px solid ${COLORS.lineStrong}`,
-                borderRight: showTopMatchFormat ? 'none' : `1px solid ${COLORS.lineStrong}`
+                borderRight: showTopMatchFormat || showTopSponsor ? 'none' : `1px solid ${COLORS.lineStrong}`
               }}
               title={topEventTitle}
             >
@@ -976,7 +1375,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
               </span>
             </div>
 
-            {/* 4. 赛制标签块 */}
+            {/* 3. 赛制标签块 */}
             {showTopMatchFormat && (
             <div
               style={{
@@ -996,6 +1395,52 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
               }}
             >
               {topMatchFormatLabel || 'LIVE'}
+            </div>
+            )}
+
+            {/* 4. 主赞助商：置于赛制右侧，以终端署名方式呈现 */}
+            {showTopSponsor && (
+            <div
+              style={{
+                height: '32px',
+                backgroundColor: COLORS.mainDark,
+                display: 'flex',
+                alignItems: 'center',
+                borderTop: `1px solid ${COLORS.lineStrong}`,
+                borderRight: `1px solid ${COLORS.lineStrong}`,
+                borderBottom: `1px solid ${COLORS.lineStrong}`,
+                borderLeft: '1px solid rgba(255,255,255,0.34)',
+                flexShrink: 0,
+                overflow: 'hidden'
+              }}
+              title={topSponsorName}
+            >
+              <div
+                style={{
+                  minWidth: '36px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxSizing: 'border-box',
+                  padding: 0
+                }}
+              >
+                <img
+                  src={topSponsorLogo}
+                  alt={topSponsorName}
+                  style={{
+                    width: 'auto',
+                    maxWidth: '72px',
+                    height: '90%',
+                    objectFit: 'contain',
+                    display: 'block'
+                  }}
+                  onError={event => {
+                    event.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
             </div>
             )}
           </div>
@@ -1198,7 +1643,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                 fontSize: '16px',
                 fontWeight: '900',
                 letterSpacing: '1.8px',
-                animation: `tickerScroll 25s linear ${matchData.tickerMode === 'ONCE' ? '1 forwards' : 'infinite'}`,
+                animation: `tickerScroll ${tickerDurationSeconds}s linear ${tickerMode === 'INFINITE' ? 'infinite' : '1 forwards'}`,
                 textTransform: 'uppercase',
                 willChange: 'transform',
                 backfaceVisibility: 'hidden'

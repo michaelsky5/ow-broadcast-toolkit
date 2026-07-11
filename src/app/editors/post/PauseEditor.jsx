@@ -39,6 +39,11 @@ function PauseEditor({ project, copy, text, language, statusOptions, onUpdatePro
           checked={settings.showMatchFrame !== false}
           onChange={checked => updatePauseSettings({ showMatchFrame: checked })}
         />
+        <ToggleField
+          label={language === 'zh' ? '显示赞助商' : 'Show Sponsors'}
+          checked={settings.showSponsors !== false}
+          onChange={checked => updatePauseSettings({ showSponsors: checked })}
+        />
       </Panel>
 
       <Panel title={postText.pauseContext}>

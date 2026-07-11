@@ -164,9 +164,12 @@ const buildLegacyMatchData = project => {
   const eventName = getBroadcastCompetitionName(project)
   const eventLogo = getEventLogo(project)
   const matchFormat = `FT${Number(match.ft) || 3}`
-  const sponsor = Array.isArray(project?.assets?.sponsors?.logos)
-    ? project.assets.sponsors.logos.find(slot => slot?.enabled !== false && clean(slot?.logo))
-    : null
+  const sponsorSlots = Array.isArray(project?.assets?.sponsors?.logos)
+    ? project.assets.sponsors.logos.filter(slot => (
+      slot?.enabled !== false && (clean(slot?.logo) || clean(slot?.name))
+    ))
+    : []
+  const sponsor = sponsorSlots.find(slot => clean(slot?.logo)) || sponsorSlots[0] || null
   const sponsorLogo = clean(sponsor?.logo)
 
   return {
@@ -182,6 +185,19 @@ const buildLegacyMatchData = project => {
     topSponsorLogo: sponsorLogo,
     topSponsorName: clean(sponsor?.name),
     showTopSponsor: hud.topSponsorVisible === true && Boolean(sponsorLogo),
+    sponsorSpotlights: sponsorSlots.map((slot, index) => ({
+      id: clean(slot?.id) || `sponsor-${index + 1}`,
+      name: clean(slot?.name) || `Sponsor ${index + 1}`,
+      logo: clean(slot?.logo)
+    })),
+    sponsorSpotlightMode: ['AUTO', 'PERSISTENT', 'MANUAL'].includes(String(hud.sponsorSpotlightMode || '').toUpperCase())
+      ? String(hud.sponsorSpotlightMode).toUpperCase()
+      : 'OFF',
+    sponsorSpotlightDurationSeconds: getHudNumber(hud.sponsorSpotlightDurationSeconds, 8, 4, 20),
+    sponsorSpotlightIntervalSeconds: getHudNumber(hud.sponsorSpotlightIntervalSeconds, 45, 15, 180),
+    sponsorSpotlightProgressVisible: hud.sponsorSpotlightProgressVisible !== false,
+    sponsorSpotlightIndex: Math.max(0, Number(hud.sponsorSpotlightIndex) || 0),
+    sponsorSpotlightTriggerAt: hud.sponsorSpotlightTriggerAt || 0,
     totalMaps: getSeriesMapTotal(match),
     pointsToWin: Number(match.ft) || 3,
     hudMarginTop: Number.isFinite(hudMarginTop) ? hudMarginTop : (uiMode === 'TOURNAMENT' ? 56 : 0),
@@ -198,8 +214,15 @@ const buildLegacyMatchData = project => {
     showBans: Boolean(hud.showBans),
     showPlayers: hud.showPlayers !== false,
     showTicker: Boolean(hud.showTicker),
-    tickerMode: hud.tickerMode || 'ONCE',
+    tickerMode: ['ONCE', 'SCHEDULED', 'INFINITE'].includes(String(hud.tickerMode || '').toUpperCase())
+      ? String(hud.tickerMode).toUpperCase()
+      : 'ONCE',
     tickerText: hud.tickerText || '',
+    tickerDurationSeconds: getHudNumber(hud.tickerDurationSeconds, 25, 12, 60),
+    tickerIntervalSeconds: getHudNumber(hud.tickerIntervalSeconds, 90, 30, 600),
+    tickerInitialDelaySeconds: getHudNumber(hud.tickerInitialDelaySeconds, 15, 0, 120),
+    tickerTriggerAt: hud.tickerTriggerAt || 0,
+    tickerStopAt: hud.tickerStopAt || 0,
     activeComms: hud.activeComms || '',
     teamA: clean(teamA?.name) || 'Team A',
     teamB: clean(teamB?.name) || 'Team B',

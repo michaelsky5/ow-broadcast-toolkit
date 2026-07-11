@@ -1,0 +1,166 @@
+.lockup {
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  border-top: 1px solid rgba(255,255,255,0.14);
+  color: var(--theme-text);
+  font-family: var(--theme-font-family);
+}
+
+.lockup::after {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 3px;
+  background: var(--theme-primary);
+  box-shadow: 0 0 12px var(--theme-primary-glow);
+  content: '';
+  transform: translateY(-50%);
+}
+
+.label {
+  flex: 0 0 auto;
+  color: var(--theme-muted-text);
+  font-weight: 850;
+  opacity: 0.68;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.brands,
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.brands {
+  min-width: 0;
+}
+
+.brand {
+  min-width: 0;
+}
+
+.brand + .brand {
+  border-left: 1px solid rgba(255,255,255,0.07);
+}
+
+.brand img {
+  flex: 0 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.3));
+}
+
+.brand strong {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 950;
+  line-height: 1.12;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.full {
+  min-height: 54px;
+  padding: 6px 16px 0 0;
+}
+
+.full::after {
+  height: 28px;
+}
+
+.full .label {
+  padding: 0 18px 0 2px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+.full .brand {
+  max-width: 210px;
+  gap: 10px;
+  padding-right: 16px;
+}
+
+.full .brand + .brand {
+  padding-left: 16px;
+}
+
+.full .brand img {
+  width: 40px;
+  height: 40px;
+}
+
+.full .brand strong {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.compact {
+  min-height: 42px;
+  padding: 5px 14px 0 0;
+}
+
+.compact::after {
+  height: 22px;
+}
+
+.compact .label {
+  padding: 0 14px 0 2px;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.compact .brand {
+  max-width: 176px;
+  gap: 8px;
+  padding-right: 14px;
+}
+
+.compact .brand + .brand {
+  padding-left: 14px;
+}
+
+.compact .brand img {
+  width: 32px;
+  height: 32px;
+}
+
+.compact .brand strong {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.mark {
+  min-height: 36px;
+  padding: 4px 12px 0 0;
+}
+
+.mark::after {
+  height: 18px;
+  width: 2px;
+}
+
+.mark .label {
+  padding: 0 10px 0 2px;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  opacity: 0.54;
+}
+
+.mark .brand {
+  max-width: 150px;
+  gap: 7px;
+  padding-right: 10px;
+}
+
+.mark .brand img {
+  width: 27px;
+  height: 27px;
+}
+
+.mark .brand strong {
+  font-size: 10px;
+  letter-spacing: 0.07em;
+}

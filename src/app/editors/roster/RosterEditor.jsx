@@ -3,7 +3,7 @@ import { OW_ROLE_OPTIONS } from '../../../data/overwatch'
 import { getTeamPlayers } from '../../../project/projectUtils'
 import styles from '../shared/SceneEditor.styles.js'
 import { getRosterEditorCopy } from '../shared/editorCopy'
-import { EditorDialog, Field, Panel, SegmentedControl } from '../shared/editorControls'
+import { EditorDialog, Field, Panel, SegmentedControl, ToggleField } from '../shared/editorControls'
 import { ensureSceneSettings, getHeroLabel, getHeroOptionsByRole, getSceneSettings, getTeam } from '../shared/editorHelpers'
 import TeamDatabaseEditor from './TeamDatabaseEditor'
 import {
@@ -38,6 +38,7 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
   const teamLogoInputRef = useRef(null)
   const pendingAvatarSlotRef = useRef(null)
   const [draggingPlayerId, setDraggingPlayerId] = useState('')
+  const [teamInfoExpanded, setTeamInfoExpanded] = useState(false)
   const [dialog, setDialog] = useState(null)
   const rosterText = getRosterEditorCopy(language)
 
@@ -68,6 +69,9 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
     .filter(Boolean)
   const themePrimaryColor = project.theme?.primary || '#FFD84A'
   const teamPrimaryColor = team?.primaryColor || themePrimaryColor
+  const teamInfoActionLabel = language === 'zh'
+    ? (teamInfoExpanded ? '收起' : '展开')
+    : (teamInfoExpanded ? 'Collapse' : 'Expand')
   const showBattleTagColumn = true
   const roleCounts = getRoleCounts(activePlayers)
 
@@ -347,83 +351,110 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
                 onChange={value => updateSetting({ teamSide: value })}
               />
             </Field>
+
+            <ToggleField
+              label={language === 'zh' ? '显示赞助商' : 'Show Sponsors'}
+              checked={settings.showSponsors !== false}
+              onChange={checked => updateSetting({ showSponsors: checked })}
+            />
           </Panel>
 
           <Panel title={rosterText.teamInfo}>
-            <Field label={copy.teamName}>
-              <input value={team?.name || ''} onChange={updateTeam('name')} />
-            </Field>
-            <div className={styles.twoCol}>
-              <Field label={copy.teamShortName}>
-                <input value={team?.shortName || ''} onChange={updateTeam('shortName')} />
-              </Field>
-              <Field label={copy.teamPrimaryColor}>
-                <div className={styles.teamColorControl}>
-                  <input type="color" value={teamPrimaryColor} onChange={updateTeam('primaryColor')} />
-                  <button
-                    type="button"
-                    className={!team?.primaryColor ? styles.activeOutline : ''}
-                    onClick={() => onUpdateProject(draft => {
-                      const target = draft.teams.find(item => item.id === draft.currentMatch[`${sideKey}Id`])
-                      if (target) target.primaryColor = ''
-                    })}
-                  >
-                    {rosterText.themeColor}
+            <button
+              type="button"
+              className={styles.rosterTeamInfoDisclosure}
+              aria-expanded={teamInfoExpanded}
+              onClick={() => setTeamInfoExpanded(expanded => !expanded)}
+            >
+              <span
+                className={styles.rosterTeamColorSwatch}
+                style={{ '--roster-team-color': teamPrimaryColor }}
+              />
+              <span className={styles.rosterTeamInfoIdentity}>
+                <strong>{team?.shortName || '-'}</strong>
+                <em>{team?.name || team?.id || rosterText.teamLabel}</em>
+              </span>
+              <span className={styles.rosterTeamInfoAction}>{teamInfoActionLabel}</span>
+            </button>
+
+            {teamInfoExpanded && (
+              <div className={styles.rosterTeamInfoFields}>
+                <Field label={copy.teamName}>
+                  <input value={team?.name || ''} onChange={updateTeam('name')} />
+                </Field>
+                <div className={styles.twoCol}>
+                  <Field label={copy.teamShortName}>
+                    <input value={team?.shortName || ''} onChange={updateTeam('shortName')} />
+                  </Field>
+                  <Field label={copy.teamPrimaryColor}>
+                    <div className={styles.teamColorControl}>
+                      <input type="color" value={teamPrimaryColor} onChange={updateTeam('primaryColor')} />
+                      <button
+                        type="button"
+                        className={!team?.primaryColor ? styles.activeOutline : ''}
+                        onClick={() => onUpdateProject(draft => {
+                          const target = draft.teams.find(item => item.id === draft.currentMatch[`${sideKey}Id`])
+                          if (target) target.primaryColor = ''
+                        })}
+                      >
+                        {rosterText.themeColor}
+                      </button>
+                    </div>
+                  </Field>
+                </div>
+                <div className={styles.teamLogoSaveRow}>
+                  <Field label={text.teamLogo}>
+                    <div className={styles.teamLogoInputRow}>
+                      <input value={team?.logo || ''} onChange={updateTeam('logo')} placeholder="/OW.svg" />
+                      <button type="button" onClick={() => teamLogoInputRef.current?.click()}>
+                        {text.uploadLogo}
+                      </button>
+                    </div>
+                    <input
+                      ref={teamLogoInputRef}
+                      type="file"
+                      accept="image/*,.svg"
+                      hidden
+                      onChange={event => {
+                        applyCurrentTeamLogoFile(event.target.files?.[0])
+                        event.target.value = ''
+                      }}
+                    />
+                  </Field>
+                  <button type="button" className={styles.teamDbSaveButton} onClick={saveTeamToDatabase}>
+                    {rosterText.saveTeamDb}
                   </button>
                 </div>
-              </Field>
-            </div>
-            <div className={styles.teamLogoSaveRow}>
-              <Field label={text.teamLogo}>
-                <div className={styles.teamLogoInputRow}>
-                  <input value={team?.logo || ''} onChange={updateTeam('logo')} placeholder="/OW.svg" />
-                  <button type="button" onClick={() => teamLogoInputRef.current?.click()}>
-                    {text.uploadLogo}
-                  </button>
+                <div className={styles.teamStaffDesk}>
+                  <div className={styles.teamStaffDeskHeader}>
+                    <span>{rosterText.staff}</span>
+                    <strong>{settings.showManager || settings.showCoach ? rosterText.show : rosterText.hide}</strong>
+                  </div>
+                  <div className={styles.teamStaffRow}>
+                    <span>{rosterText.manager}</span>
+                    <input value={team?.manager || ''} onChange={updateTeam('manager')} />
+                    <button
+                      type="button"
+                      className={settings.showManager ? styles.activeOutline : ''}
+                      onClick={() => updateSetting({ showManager: !settings.showManager })}
+                    >
+                      {settings.showManager ? rosterText.on : rosterText.off}
+                    </button>
+                  </div>
+                  <div className={styles.teamStaffRow}>
+                    <span>{rosterText.coach}</span>
+                    <input value={team?.coach || ''} onChange={updateTeam('coach')} />
+                    <button
+                      type="button"
+                      className={settings.showCoach ? styles.activeOutline : ''}
+                      onClick={() => updateSetting({ showCoach: !settings.showCoach })}
+                    >
+                      {settings.showCoach ? rosterText.on : rosterText.off}
+                    </button>
+                  </div>
                 </div>
-                <input
-                  ref={teamLogoInputRef}
-                  type="file"
-                  accept="image/*,.svg"
-                  hidden
-                  onChange={event => {
-                    applyCurrentTeamLogoFile(event.target.files?.[0])
-                    event.target.value = ''
-                  }}
-                />
-              </Field>
-              <button type="button" className={styles.teamDbSaveButton} onClick={saveTeamToDatabase}>
-                {rosterText.saveTeamDb}
-              </button>
-            </div>
-            <div className={styles.teamStaffDesk}>
-              <div className={styles.teamStaffDeskHeader}>
-                <span>{rosterText.staff}</span>
-                <strong>{settings.showManager || settings.showCoach ? rosterText.show : rosterText.hide}</strong>
               </div>
-              <div className={styles.teamStaffRow}>
-                <span>{rosterText.manager}</span>
-                <input value={team?.manager || ''} onChange={updateTeam('manager')} />
-                <button
-                  type="button"
-                  className={settings.showManager ? styles.activeOutline : ''}
-                  onClick={() => updateSetting({ showManager: !settings.showManager })}
-                >
-                  {settings.showManager ? rosterText.on : rosterText.off}
-                </button>
-              </div>
-              <div className={styles.teamStaffRow}>
-                <span>{rosterText.coach}</span>
-                <input value={team?.coach || ''} onChange={updateTeam('coach')} />
-                <button
-                  type="button"
-                  className={settings.showCoach ? styles.activeOutline : ''}
-                  onClick={() => updateSetting({ showCoach: !settings.showCoach })}
-                >
-                  {settings.showCoach ? rosterText.on : rosterText.off}
-                </button>
-              </div>
-            </div>
+            )}
           </Panel>
         </div>
 

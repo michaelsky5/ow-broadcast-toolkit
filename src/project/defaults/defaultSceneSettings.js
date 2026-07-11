@@ -1,3 +1,5 @@
+import { OW_DEFAULT_EVENT_MAP_POOL } from '../../data/overwatch'
+
 export const DEFAULT_SCENE_ORDER = [
   'live-hud',
   'current-map',
@@ -34,6 +36,7 @@ export const createDefaultSceneSettings = () => ({
   'starting-five': {
     title: 'STARTING FIVE',
     showHeroPool: true,
+    showSponsors: true,
     startingLineupSide: '',
     startingLineupMode: 'LIST',
     startingLineupCalloutIndex: 0,
@@ -82,7 +85,8 @@ export const createDefaultSceneSettings = () => ({
       teamB: []
     },
     showManager: false,
-    showCoach: false
+    showCoach: false,
+    showSponsors: true
   },
   stats: {
     title: 'TEAM COMPARISON',
@@ -143,7 +147,13 @@ export const createDefaultSceneSettings = () => ({
     displayMode: 'MATCH',
     mapMetaDisplayMode: 'RESULT',
     mapBanDisplayMode: 'HIDE',
-    showOverviewCurrent: false
+    showOverviewCurrent: false,
+    eventMapPool: Object.fromEntries(
+      Object.entries(OW_DEFAULT_EVENT_MAP_POOL).map(([modeId, mapIds]) => [modeId, [...mapIds]])
+    ),
+    enabledMapTypes: Object.fromEntries(
+      Object.keys(OW_DEFAULT_EVENT_MAP_POOL).map(modeId => [modeId, true])
+    )
   },
   countdown: {
     displayMode: 'standby',
@@ -208,7 +218,8 @@ export const createDefaultSceneSettings = () => ({
     statView: 'per10',
     statsDataScope: 'follow',
     note: 'CLUTCH PERFORMANCE',
-    statKeys: ['eliminations', 'damage', 'healing']
+    statKeys: ['eliminations', 'damage', 'healing'],
+    showSponsors: true
   },
   'live-hud': {
     showTeamLogo: true,
@@ -219,16 +230,19 @@ export const createDefaultSceneSettings = () => ({
     title: 'TECHNICAL PAUSE',
     description: 'The match is paused. Please stand by.',
     statusLabel: 'STANDBY',
-    showMatchFrame: true
+    showMatchFrame: true,
+    showSponsors: true
   },
   result: {
     title: 'MATCH RESULT',
-    showWinner: true
+    showWinner: true,
+    showSponsors: true
   },
   thanks: {
     title: 'THANKS FOR WATCHING',
     subtitle: 'SEE YOU NEXT MATCH',
     showSummary: true,
-    showCredits: true
+    showCredits: true,
+    showSponsors: true
   }
 })

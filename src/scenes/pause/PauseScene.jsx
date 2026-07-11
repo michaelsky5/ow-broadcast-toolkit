@@ -1,6 +1,7 @@
 import { OW_MAP_BY_ID } from '../../data/overwatch'
 import { getBroadcastCompetitionName, getEventLogo } from '../../project/branding'
 import { getCurrentTeams } from '../../project/projectUtils'
+import SponsorLockup from '../shared/SponsorLockup'
 import styles from './PauseScene.module.css'
 
 const clean = value => String(value || '').trim()
@@ -93,6 +94,10 @@ export default function PauseScene({ project }) {
       <footer className={styles.footer}>
         <span>1920 x 1080 PROGRAM CANVAS</span>
       </footer>
+
+      {settings.showSponsors !== false && (
+        <SponsorLockup className={styles.sponsorLockup} project={project} variant="full" />
+      )}
     </div>
   )
 }

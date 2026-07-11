@@ -22,6 +22,7 @@ import {
 } from '../shared/editorHelpers'
 
 const isHexColor = value => /^#[0-9a-f]{6}$/i.test(String(value || '').trim())
+const clean = value => String(value || '').trim()
 const safeColorValue = (value, fallback) => (isHexColor(value) ? String(value).trim() : fallback)
 const safePanelColorValue = value => {
   const color = String(value || '').trim().toLowerCase()
@@ -39,6 +40,79 @@ const clampNumber = (value, fallback, min, max) => {
   if (!Number.isFinite(number)) return fallback
   return Math.min(max, Math.max(min, number))
 }
+const getTickerSettings = hud => {
+  const mode = ['SCHEDULED', 'INFINITE'].includes(String(hud?.tickerMode || '').toUpperCase())
+    ? String(hud.tickerMode).toUpperCase()
+    : 'ONCE'
+  const durationSeconds = Math.max(12, Math.min(60, Number(hud?.tickerDurationSeconds) || 25))
+  const configuredIntervalSeconds = Math.max(30, Math.min(600, Number(hud?.tickerIntervalSeconds) || 90))
+  const intervalSeconds = Math.max(durationSeconds + 5, configuredIntervalSeconds)
+  const initialDelayValue = Number(hud?.tickerInitialDelaySeconds)
+  const initialDelaySeconds = Number.isFinite(initialDelayValue)
+    ? Math.max(0, Math.min(120, initialDelayValue))
+    : 15
+
+  return {
+    mode,
+    durationSeconds,
+    intervalSeconds,
+    initialDelaySeconds,
+    gapSeconds: Math.max(0, intervalSeconds - durationSeconds)
+  }
+}
+const getTickerCopy = (language, settings) => language === 'zh'
+  ? {
+      settingsTitle: '滚动条设置',
+      modeLabel: '滚动模式',
+      currentMode: '当前模式',
+      once: '单次',
+      scheduled: '定时',
+      persistent: '常驻',
+      duration: '单轮时长',
+      interval: '播放间隔',
+      initialDelay: '首次延迟',
+      seconds: '秒',
+      playNow: '立即播放',
+      startSchedule: '启动定时',
+      stopSchedule: '关闭定时',
+      scheduleRunning: '定时运行中',
+      startPersistent: '开启常驻',
+      stopPersistent: '关闭常驻',
+      persistentRunning: '常驻运行中',
+      running: '运行中',
+      ready: '待命',
+      manual: '手动',
+      stopCurrent: '停止当前',
+      onceSummary: `滚动 ${settings.durationSeconds} 秒，完成后自动隐藏`,
+      scheduledSummary: `首次延迟 ${settings.initialDelaySeconds} 秒 · 每 ${settings.intervalSeconds} 秒播放 1 轮 · 空窗 ${settings.gapSeconds} 秒`,
+      persistentSummary: `每轮 ${settings.durationSeconds} 秒，连续滚动直到手动停止`
+    }
+  : {
+      settingsTitle: 'Ticker Settings',
+      modeLabel: 'Ticker Mode',
+      currentMode: 'Current Mode',
+      once: 'Once',
+      scheduled: 'Timed',
+      persistent: 'Persistent',
+      duration: 'Pass duration',
+      interval: 'Start interval',
+      initialDelay: 'Initial delay',
+      seconds: 'sec',
+      playNow: 'Play now',
+      startSchedule: 'Start timer',
+      stopSchedule: 'Stop timer',
+      scheduleRunning: 'Timer running',
+      startPersistent: 'Start persistent',
+      stopPersistent: 'Stop persistent',
+      persistentRunning: 'Persistent on',
+      running: 'Running',
+      ready: 'Ready',
+      manual: 'Manual',
+      stopCurrent: 'Stop current',
+      onceSummary: `Scrolls for ${settings.durationSeconds}s, then hides automatically`,
+      scheduledSummary: `Starts after ${settings.initialDelaySeconds}s · repeats every ${settings.intervalSeconds}s · ${settings.gapSeconds}s clear`,
+      persistentSummary: `${settings.durationSeconds}s per pass, repeats until stopped`
+    }
 const cleanWholeNumber = value => String(value ?? '').replace(/\D+/g, '')
 const LIVE_STARTING_ROLE_ORDER = ['damage', 'damage', 'tank', 'support', 'support']
 const LIVE_STARTING_ROLE_ORDINALS = {
@@ -363,7 +437,8 @@ function LiveTeamControlPanel({
 }
 
 
-function LiveHudPackagePanel({ project, hud, liveText, updateHud }) {
+function LiveHudPackagePanel({ project, hud, liveText, text, language, updateHud, triggerHud }) {
+  const [contentExpanded, setContentExpanded] = useState(false)
   const uiMode = hud.uiMode === 'TOURNAMENT' ? 'TOURNAMENT' : 'NORMAL'
   const teamMetaMode = hud.teamMetaMode || 'HIDDEN'
   const recordA = getRecordParts(hud, 'A')
@@ -376,6 +451,82 @@ function LiveHudPackagePanel({ project, hud, liveText, updateHud }) {
   const eventName = getBroadcastCompetitionName(project)
   const eventLogo = getEventLogo(project)
   const matchFormat = `FT${Number(project.currentMatch?.ft) || 3}`
+  const tickerSettings = getTickerSettings(hud)
+  const tickerCopy = getTickerCopy(language, tickerSettings)
+  const sponsorSlots = Array.isArray(project?.assets?.sponsors?.logos)
+    ? project.assets.sponsors.logos.filter(slot => (
+      slot?.enabled !== false && (clean(slot?.logo) || clean(slot?.name))
+    ))
+    : []
+  const sponsorSpotlightMode = ['AUTO', 'PERSISTENT', 'MANUAL'].includes(String(hud.sponsorSpotlightMode || '').toUpperCase())
+    ? String(hud.sponsorSpotlightMode).toUpperCase()
+    : 'OFF'
+  const sponsorSpotlightIndex = sponsorSlots.length
+    ? Math.max(0, Number(hud.sponsorSpotlightIndex) || 0) % sponsorSlots.length
+    : 0
+  const activeSpotlightSponsor = sponsorSlots[sponsorSpotlightIndex]
+  const sponsorCopy = language === 'zh'
+    ? {
+        title: '底部赞助聚焦', mode: '运行模式', off: '关闭', auto: '自动', persistent: '常驻', manual: '手动',
+        duration: '展示秒数', interval: '间隔秒数', progress: '显示倒计时', showNow: '立即展示', next: '下一个',
+        empty: '未配置赞助商', current: '当前赞助商',
+        offNote: '当前关闭，不会在实况画面中展示。',
+        autoNote: '每个赞助商完整展示后，等待设定间隔再显示下一个。',
+        persistentNote: '赞助条保持常驻，并按展示秒数轮换每个赞助商。',
+        persistentSingleNote: '当前只有一个赞助商，将保持常驻并显示静态状态线。',
+        manualNote: '由导播手动触发，展示完成后自动收起。'
+      }
+    : {
+        title: 'Sponsor Spotlight', mode: 'Mode', off: 'Off', auto: 'Auto', persistent: 'Persistent', manual: 'Manual',
+        duration: 'Duration', interval: 'Interval', progress: 'Show Countdown', showNow: 'Show Now', next: 'Next',
+        empty: 'No Sponsors', current: 'Current Sponsor',
+        offNote: 'Disabled and hidden from the live output.',
+        autoNote: 'Shows each sponsor in full, then waits the selected interval before the next.',
+        persistentNote: 'Keeps the rail visible and rotates sponsors using the duration setting.',
+        persistentSingleNote: 'With one sponsor configured, the rail stays visible with a static status line.',
+        manualNote: 'Triggered by the operator and hides after the selected duration.'
+      }
+  const packageSectionCopy = language === 'zh'
+    ? { structure: '显示结构', content: '内容与排版', appearance: '背景与颜色' }
+    : { structure: 'Display Structure', content: 'Content & Type', appearance: 'Background & Color' }
+  const sponsorModeNote = {
+    OFF: sponsorCopy.offNote,
+    AUTO: sponsorCopy.autoNote,
+    PERSISTENT: sponsorSlots.length > 1 ? sponsorCopy.persistentNote : sponsorCopy.persistentSingleNote,
+    MANUAL: sponsorCopy.manualNote
+  }[sponsorSpotlightMode]
+  const sponsorModeLabel = {
+    OFF: sponsorCopy.off,
+    AUTO: sponsorCopy.auto,
+    PERSISTENT: sponsorCopy.persistent,
+    MANUAL: sponsorCopy.manual
+  }[sponsorSpotlightMode]
+
+  const triggerSponsorSpotlight = advance => {
+    if (!sponsorSlots.length) return
+    const nextIndex = advance ? (sponsorSpotlightIndex + 1) % sponsorSlots.length : sponsorSpotlightIndex
+    triggerHud({
+      sponsorSpotlightMode: sponsorSpotlightMode === 'OFF' ? 'MANUAL' : sponsorSpotlightMode,
+      sponsorSpotlightIndex: nextIndex,
+      sponsorSpotlightTriggerAt: Date.now()
+    })
+  }
+
+  const setTickerMode = value => {
+    triggerHud({
+      tickerMode: value,
+      showTicker: false,
+      tickerStopAt: Date.now()
+    })
+  }
+
+  const updateTickerDuration = value => {
+    const durationSeconds = Math.max(12, Math.min(60, Number(value) || 12))
+    updateHud({
+      tickerDurationSeconds: durationSeconds,
+      tickerIntervalSeconds: Math.max(durationSeconds + 5, tickerSettings.intervalSeconds)
+    })
+  }
 
   const setUiMode = value => {
     const nextMode = value === 'TOURNAMENT' ? 'TOURNAMENT' : 'NORMAL'
@@ -516,157 +667,188 @@ function LiveHudPackagePanel({ project, hud, liveText, updateHud }) {
     <div className={styles.livePackageGrid}>
       <Panel title={liveText.liveSetup} className={styles.livePackagePanel}>
         <div className={styles.livePackageStack}>
-          <div className={styles.livePackageTopRow}>
-            <Field label={liveText.liveMode}>
-              <SegmentedControl
-                value={uiMode}
-                options={[
-                  { value: 'NORMAL', label: liveText.genericMode },
-                  { value: 'TOURNAMENT', label: liveText.tournamentMode }
-                ]}
-                onChange={setUiMode}
-              />
-            </Field>
+          <div className={styles.livePackageSection}>
+            <div className={styles.livePackageSectionHeader}>
+              <span>{packageSectionCopy.structure}</span>
+              <em>01</em>
+            </div>
+            <div className={styles.livePackageTopRow}>
+              <Field label={liveText.liveMode}>
+                <SegmentedControl
+                  value={uiMode}
+                  options={[
+                    { value: 'NORMAL', label: liveText.genericMode },
+                    { value: 'TOURNAMENT', label: liveText.tournamentMode }
+                  ]}
+                  onChange={setUiMode}
+                />
+              </Field>
 
-            <div className={styles.livePackageCapsuleField}>
-              <span>{liveText.topEventCapsule}</span>
-              <div className={styles.livePackageToggleRow}>
-                <ToggleField
-                  label={liveText.showEventLogo}
-                  checked={topEventLogoVisible}
-                  onChange={checked => updateHud({ topEventLogoVisible: checked })}
-                />
-                <ToggleField
-                  label={liveText.showFtLabel}
-                  checked={topMatchFormatVisible}
-                  onChange={checked => updateHud({ topMatchFormatVisible: checked })}
-                />
-                <ToggleField
-                  label={liveText.showSponsorLogo}
-                  checked={topSponsorVisible}
-                  onChange={checked => updateHud({ topSponsorVisible: checked })}
-                />
+              <div className={styles.livePackageCapsuleField}>
+                <span>{liveText.topEventCapsule}</span>
+                <div className={styles.livePackageToggleRow}>
+                  <ToggleField
+                    label={liveText.showEventLogo}
+                    checked={topEventLogoVisible}
+                    onChange={checked => updateHud({ topEventLogoVisible: checked })}
+                  />
+                  <ToggleField
+                    label={liveText.showFtLabel}
+                    checked={topMatchFormatVisible}
+                    onChange={checked => updateHud({ topMatchFormatVisible: checked })}
+                  />
+                  <ToggleField
+                    label={liveText.showSponsorLogo}
+                    checked={topSponsorVisible}
+                    onChange={checked => updateHud({ topSponsorVisible: checked })}
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <div className={styles.livePackageThreeGrid}>
-            <PackageActionField
-              label={liveText.centerText}
-              actionLabel={liveText.auto}
-              onAction={() => updateHud({ topEventTitle: '' })}
+          <div className={styles.livePackageSection}>
+            <button
+              type="button"
+              className={`${styles.livePackageSectionHeader} ${styles.livePackageSectionToggle}`}
+              aria-expanded={contentExpanded}
+              onClick={() => setContentExpanded(current => !current)}
             >
-              <input
-                value={hud.topEventTitle || ''}
-                onChange={event => updateHud({ topEventTitle: event.target.value })}
-                placeholder={eventName}
-              />
-            </PackageActionField>
-            <PackageActionField
-              label={liveText.logoSource}
-              actionLabel={liveText.eventAction}
-              onAction={() => updateHud({ topEventLogo: '', topEventLogoVisible: true })}
-            >
-              <input
-                value={hud.topEventLogo || ''}
-                disabled={!topEventLogoVisible}
-                onChange={event => updateHud({ topEventLogo: event.target.value })}
-                placeholder={eventLogo || '/OW.svg'}
-              />
-            </PackageActionField>
-            <PackageActionField
-              label={liveText.ftLabel}
-              actionLabel={liveText.auto}
-              onAction={() => updateHud({ topMatchFormatLabel: '', topMatchFormatVisible: true })}
-            >
-              <input
-                value={hud.topMatchFormatLabel || ''}
-                disabled={!topMatchFormatVisible}
-                onChange={event => updateHud({ topMatchFormatLabel: event.target.value })}
-                placeholder={matchFormat}
-              />
-            </PackageActionField>
+              <span>{packageSectionCopy.content}</span>
+              <div>
+                <strong>{language === 'zh' ? (contentExpanded ? '收起' : '展开') : (contentExpanded ? 'Collapse' : 'Expand')}</strong>
+                <em>02</em>
+              </div>
+            </button>
+            {contentExpanded && (
+              <div className={styles.livePackageSectionBody}>
+                <div className={styles.livePackageThreeGrid}>
+              <PackageActionField
+                label={liveText.centerText}
+                actionLabel={liveText.auto}
+                onAction={() => updateHud({ topEventTitle: '' })}
+              >
+                <input
+                  value={hud.topEventTitle || ''}
+                  onChange={event => updateHud({ topEventTitle: event.target.value })}
+                  placeholder={eventName}
+                />
+              </PackageActionField>
+              <PackageActionField
+                label={liveText.logoSource}
+                actionLabel={liveText.eventAction}
+                onAction={() => updateHud({ topEventLogo: '', topEventLogoVisible: true })}
+              >
+                <input
+                  value={hud.topEventLogo || ''}
+                  disabled={!topEventLogoVisible}
+                  onChange={event => updateHud({ topEventLogo: event.target.value })}
+                  placeholder={eventLogo || '/OW.svg'}
+                />
+              </PackageActionField>
+              <PackageActionField
+                label={liveText.ftLabel}
+                actionLabel={liveText.auto}
+                onAction={() => updateHud({ topMatchFormatLabel: '', topMatchFormatVisible: true })}
+              >
+                <input
+                  value={hud.topMatchFormatLabel || ''}
+                  disabled={!topMatchFormatVisible}
+                  onChange={event => updateHud({ topMatchFormatLabel: event.target.value })}
+                  placeholder={matchFormat}
+                />
+              </PackageActionField>
+                </div>
+
+                <div className={styles.livePackageThreeGrid}>
+              <PackageActionField
+                label={liveText.hudYOffset}
+                actionLabel={liveText.reset}
+                onAction={() => updateHud({
+                  hudMarginTop: uiMode === 'TOURNAMENT' ? DEFAULT_TOURNAMENT_HUD_OFFSET : DEFAULT_HUD_OFFSET
+                })}
+              >
+                <input
+                  type="number"
+                  min="0"
+                  max="120"
+                  value={Number(hud.hudMarginTop) || 0}
+                  onChange={event => updateHud({ hudMarginTop: Number(event.target.value) || 0 })}
+                />
+              </PackageActionField>
+              <PackageActionField
+                label={liveText.teamNameSize}
+                actionLabel={liveText.reset}
+                onAction={() => updateHud({ teamNameFontSize: DEFAULT_TEAM_NAME_SIZE })}
+              >
+                <input
+                  type="number"
+                  min="14"
+                  max="28"
+                  value={teamNameFontSize}
+                  onChange={event => updateHud({ teamNameFontSize: clampNumber(event.target.value, DEFAULT_TEAM_NAME_SIZE, 14, 28) })}
+                />
+              </PackageActionField>
+              <PackageActionField
+                label={liveText.playerNameSize}
+                actionLabel={liveText.reset}
+                onAction={() => updateHud({ playerNameFontSize: DEFAULT_PLAYER_NAME_SIZE })}
+              >
+                <input
+                  type="number"
+                  min="9"
+                  max="16"
+                  value={playerNameFontSize}
+                  onChange={event => updateHud({ playerNameFontSize: clampNumber(event.target.value, DEFAULT_PLAYER_NAME_SIZE, 9, 16) })}
+                />
+              </PackageActionField>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className={styles.livePackageThreeGrid}>
-            <PackageActionField
-              label={liveText.hudYOffset}
-              actionLabel={liveText.reset}
-              onAction={() => updateHud({
-                hudMarginTop: uiMode === 'TOURNAMENT' ? DEFAULT_TOURNAMENT_HUD_OFFSET : DEFAULT_HUD_OFFSET
-              })}
-            >
-              <input
-                type="number"
-                min="0"
-                max="120"
-                value={Number(hud.hudMarginTop) || 0}
-                onChange={event => updateHud({ hudMarginTop: Number(event.target.value) || 0 })}
-              />
-            </PackageActionField>
-            <PackageActionField
-              label={liveText.teamNameSize}
-              actionLabel={liveText.reset}
-              onAction={() => updateHud({ teamNameFontSize: DEFAULT_TEAM_NAME_SIZE })}
-            >
-              <input
-                type="number"
-                min="14"
-                max="28"
-                value={teamNameFontSize}
-                onChange={event => updateHud({ teamNameFontSize: clampNumber(event.target.value, DEFAULT_TEAM_NAME_SIZE, 14, 28) })}
-              />
-            </PackageActionField>
-            <PackageActionField
-              label={liveText.playerNameSize}
-              actionLabel={liveText.reset}
-              onAction={() => updateHud({ playerNameFontSize: DEFAULT_PLAYER_NAME_SIZE })}
-            >
-              <input
-                type="number"
-                min="9"
-                max="16"
-                value={playerNameFontSize}
-                onChange={event => updateHud({ playerNameFontSize: clampNumber(event.target.value, DEFAULT_PLAYER_NAME_SIZE, 9, 16) })}
-              />
-            </PackageActionField>
+          <div className={styles.livePackageSection}>
+            <div className={styles.livePackageSectionHeader}>
+              <span>{packageSectionCopy.appearance}</span>
+              <em>03</em>
+            </div>
+            <div className={styles.livePackageThreeGrid}>
+              <PackageActionField
+                label={liveText.eventLogoBg}
+                actionLabel={liveText.reset}
+                onAction={() => updateHud({ eventLogoBg: DEFAULT_EVENT_LOGO_BG })}
+              >
+                <input
+                  type="color"
+                  value={safeColorValue(hud.eventLogoBg, DEFAULT_EVENT_LOGO_BG)}
+                  onChange={event => updateHud({ eventLogoBg: event.target.value })}
+                />
+              </PackageActionField>
+              <PackageActionField
+                label={liveText.teamALogoBg}
+                actionLabel={liveText.reset}
+                onAction={() => updateHud({ teamLogoBgA: DEFAULT_PANEL_BG })}
+              >
+                <input
+                  type="color"
+                  value={safePanelColorValue(hud.teamLogoBgA)}
+                  onChange={event => updateHud({ teamLogoBgA: event.target.value })}
+                />
+              </PackageActionField>
+              <PackageActionField
+                label={liveText.teamBLogoBg}
+                actionLabel={liveText.reset}
+                onAction={() => updateHud({ teamLogoBgB: DEFAULT_PANEL_BG })}
+              >
+                <input
+                  type="color"
+                  value={safePanelColorValue(hud.teamLogoBgB)}
+                  onChange={event => updateHud({ teamLogoBgB: event.target.value })}
+                />
+              </PackageActionField>
+            </div>
           </div>
 
-          <div className={styles.livePackageThreeGrid}>
-            <PackageActionField
-              label={liveText.eventLogoBg}
-              actionLabel={liveText.reset}
-              onAction={() => updateHud({ eventLogoBg: DEFAULT_EVENT_LOGO_BG })}
-            >
-              <input
-                type="color"
-                value={safeColorValue(hud.eventLogoBg, DEFAULT_EVENT_LOGO_BG)}
-                onChange={event => updateHud({ eventLogoBg: event.target.value })}
-              />
-            </PackageActionField>
-            <PackageActionField
-              label={liveText.teamALogoBg}
-              actionLabel={liveText.reset}
-              onAction={() => updateHud({ teamLogoBgA: DEFAULT_PANEL_BG })}
-            >
-              <input
-                type="color"
-                value={safePanelColorValue(hud.teamLogoBgA)}
-                onChange={event => updateHud({ teamLogoBgA: event.target.value })}
-              />
-            </PackageActionField>
-            <PackageActionField
-              label={liveText.teamBLogoBg}
-              actionLabel={liveText.reset}
-              onAction={() => updateHud({ teamLogoBgB: DEFAULT_PANEL_BG })}
-            >
-              <input
-                type="color"
-                value={safePanelColorValue(hud.teamLogoBgB)}
-                onChange={event => updateHud({ teamLogoBgB: event.target.value })}
-              />
-            </PackageActionField>
-          </div>
         </div>
       </Panel>
 
@@ -692,6 +874,169 @@ function LiveHudPackagePanel({ project, hud, liveText, updateHud }) {
           )}
         </div>
       </Panel>
+
+      <Panel title={tickerCopy.settingsTitle} className={`${styles.livePackagePanel} ${styles.liveTickerSettingsPanel}`}>
+        <div className={styles.liveTickerSettingsGrid}>
+          <div className={styles.liveTickerSettingsMode}>
+            <Field label={text.tickerMode}>
+              <SegmentedControl
+                value={tickerSettings.mode}
+                options={[
+                  { value: 'ONCE', label: tickerCopy.once },
+                  { value: 'SCHEDULED', label: tickerCopy.scheduled },
+                  { value: 'INFINITE', label: tickerCopy.persistent }
+                ]}
+                onChange={setTickerMode}
+              />
+            </Field>
+          </div>
+
+          <div className={styles.liveTickerSettingsTiming}>
+            <Field label={tickerCopy.duration}>
+              <div className={styles.liveTickerNumberInput}>
+                <input
+                  type="number"
+                  min="12"
+                  max="60"
+                  step="1"
+                  value={tickerSettings.durationSeconds}
+                  onChange={event => updateTickerDuration(event.target.value)}
+                />
+                <span>{tickerCopy.seconds}</span>
+              </div>
+            </Field>
+
+            {tickerSettings.mode === 'SCHEDULED' && (
+              <>
+                <Field label={tickerCopy.interval}>
+                  <div className={styles.liveTickerNumberInput}>
+                    <input
+                      type="number"
+                      min={tickerSettings.durationSeconds + 5}
+                      max="600"
+                      step="5"
+                      value={tickerSettings.intervalSeconds}
+                      onChange={event => updateHud({
+                        tickerIntervalSeconds: Math.max(
+                          tickerSettings.durationSeconds + 5,
+                          Math.min(600, Number(event.target.value) || tickerSettings.durationSeconds + 5)
+                        )
+                      })}
+                    />
+                    <span>{tickerCopy.seconds}</span>
+                  </div>
+                </Field>
+
+                <Field label={tickerCopy.initialDelay}>
+                  <div className={styles.liveTickerNumberInput}>
+                    <input
+                      type="number"
+                      min="0"
+                      max="120"
+                      step="5"
+                      value={tickerSettings.initialDelaySeconds}
+                      onChange={event => updateHud({
+                        tickerInitialDelaySeconds: Math.max(0, Math.min(120, Number(event.target.value) || 0))
+                      })}
+                    />
+                    <span>{tickerCopy.seconds}</span>
+                  </div>
+                </Field>
+              </>
+            )}
+          </div>
+
+          <div className={styles.liveTickerSettingsSummary}>
+            {tickerSettings.mode === 'SCHEDULED'
+              ? tickerCopy.scheduledSummary
+              : tickerSettings.mode === 'INFINITE'
+                ? tickerCopy.persistentSummary
+                : tickerCopy.onceSummary}
+          </div>
+        </div>
+      </Panel>
+
+      <div className={styles.liveSponsorSpotlightSection}>
+        <div className={styles.liveSponsorSpotlightIdentity}>
+          <div className={styles.liveSponsorSpotlightHeader}>
+            <span>{sponsorCopy.title}</span>
+            <strong>{sponsorModeLabel}</strong>
+          </div>
+
+          <div className={styles.liveSponsorSpotlightBrand}>
+            <div className={styles.liveSponsorSpotlightLogo}>
+              {clean(activeSpotlightSponsor?.logo) ? (
+                <img src={activeSpotlightSponsor.logo} alt="" onError={event => { event.currentTarget.style.display = 'none' }} />
+              ) : (
+                <span>SP</span>
+              )}
+            </div>
+            <div>
+              <span>{sponsorCopy.current}</span>
+              <strong>{clean(activeSpotlightSponsor?.name) || sponsorCopy.empty}</strong>
+            </div>
+            <em>{sponsorSlots.length ? `${sponsorSpotlightIndex + 1}/${sponsorSlots.length}` : '0/0'}</em>
+          </div>
+        </div>
+
+          <div className={styles.liveSponsorSpotlightControls}>
+            <div className={styles.liveSponsorSpotlightMode}>
+              <span>{sponsorCopy.mode}</span>
+              <SegmentedControl
+                value={sponsorSpotlightMode}
+                options={[
+                  { value: 'OFF', label: sponsorCopy.off },
+                  { value: 'AUTO', label: sponsorCopy.auto },
+                  { value: 'PERSISTENT', label: sponsorCopy.persistent },
+                  { value: 'MANUAL', label: sponsorCopy.manual }
+                ]}
+                onChange={value => updateHud({ sponsorSpotlightMode: value })}
+              />
+            </div>
+            <ToggleField
+              label={sponsorCopy.progress}
+              checked={hud.sponsorSpotlightProgressVisible !== false}
+              onChange={checked => updateHud({ sponsorSpotlightProgressVisible: checked })}
+              language={language}
+              className={styles.liveSponsorSpotlightProgressToggle}
+            />
+          </div>
+
+          <div className={styles.liveSponsorSpotlightTiming}>
+            {(sponsorSpotlightMode === 'AUTO' || sponsorSpotlightMode === 'PERSISTENT' || sponsorSpotlightMode === 'MANUAL') && (
+              <Field label={sponsorCopy.duration}>
+                <input
+                  type="number"
+                  min="4"
+                  max="20"
+                  value={clampNumber(hud.sponsorSpotlightDurationSeconds, 8, 4, 20)}
+                  onChange={event => updateHud({ sponsorSpotlightDurationSeconds: clampNumber(event.target.value, 8, 4, 20) })}
+                />
+              </Field>
+            )}
+            {sponsorSpotlightMode === 'AUTO' && (
+              <Field label={sponsorCopy.interval}>
+                <input
+                  type="number"
+                  min="15"
+                  max="180"
+                  value={clampNumber(hud.sponsorSpotlightIntervalSeconds, 45, 15, 180)}
+                  onChange={event => updateHud({ sponsorSpotlightIntervalSeconds: clampNumber(event.target.value, 45, 15, 180) })}
+                />
+              </Field>
+            )}
+            <p className={styles.liveSponsorSpotlightNote}>{sponsorModeNote}</p>
+          </div>
+
+          <div className={styles.liveSponsorSpotlightFooter}>
+            <button type="button" disabled={!sponsorSlots.length} onClick={() => triggerSponsorSpotlight(false)}>
+              {sponsorCopy.showNow}
+            </button>
+            <button type="button" disabled={!sponsorSlots.length} onClick={() => triggerSponsorSpotlight(true)}>
+              {sponsorCopy.next}
+            </button>
+          </div>
+      </div>
     </div>
   )
 }
@@ -708,6 +1053,9 @@ function LiveHudEditor({ project, copy, text, language, activeSection = 'match',
   const showAttackDefense = needsAttackDefense(currentMap?.mode)
   const attackSide = project.currentMatch.mapLineup?.[currentMapIndex]?.attackSide || ''
   const activeComms = hud.activeComms || ''
+  const tickerSettings = getTickerSettings(hud)
+  const tickerMode = tickerSettings.mode
+  const tickerCopy = getTickerCopy(language, tickerSettings)
 
   const updateLiveProject = (updater, options = {}) => {
     onUpdateProject(updater, {
@@ -726,6 +1074,17 @@ function LiveHudEditor({ project, copy, text, language, activeSection = 'match',
   }
 
   const updateLiveHud = patch => updateHud(patch, { live: true })
+
+  const triggerTickerNow = () => updateLiveHud({ tickerTriggerAt: Date.now() })
+
+  const stopTicker = () => {
+    updateLiveHud({
+      showTicker: false,
+      tickerStopAt: Date.now()
+    })
+  }
+
+  const stopCurrentTicker = () => updateLiveHud({ tickerStopAt: Date.now() })
 
   const setMapWinner = side => {
     updateLiveProject(draft => {
@@ -861,7 +1220,15 @@ function LiveHudEditor({ project, copy, text, language, activeSection = 'match',
   return (
     <div className={styles.liveDesk}>
       {editorTab === 'package' ? (
-        <LiveHudPackagePanel project={project} hud={hud} liveText={liveText} updateHud={updateHud} />
+        <LiveHudPackagePanel
+          project={project}
+          hud={hud}
+          liveText={liveText}
+          text={text}
+          language={language}
+          updateHud={updateHud}
+          triggerHud={updateLiveHud}
+        />
       ) : (
         <>
       <div className={styles.liveMainGrid}>
@@ -1013,33 +1380,70 @@ function LiveHudEditor({ project, copy, text, language, activeSection = 'match',
 
       <div className={styles.liveUtilityGrid}>
         <Panel title={liveText.tickerControl} className={`${styles.liveToolsPanel} ${styles.liveTickerPanel}`}>
-          <div className={styles.liveTickerGrid}>
-            <Field label={text.tickerMode}>
-              <SegmentedControl
-                value={hud.tickerMode || 'ONCE'}
-                options={[
-                  { value: 'ONCE', label: text.once },
-                  { value: 'INFINITE', label: text.loop }
-                ]}
-                onChange={value => updateLiveHud({ tickerMode: value })}
-              />
-            </Field>
-
-            <button
-              type="button"
-              className={hud.showTicker ? styles.dangerActive : styles.tickerToggleButton}
-              onClick={() => updateLiveHud({ showTicker: !hud.showTicker })}
-            >
-              {hud.showTicker ? liveText.tickerOff : liveText.tickerOn}
-            </button>
-
-            <Field label={text.tickerText}>
+          <div className={styles.liveTickerControlGrid}>
+            <div className={styles.liveTickerTextField}>
+              <span>{text.tickerText}</span>
               <input
+                aria-label={text.tickerText}
                 value={hud.tickerText || ''}
                 onChange={event => updateLiveHud({ tickerText: event.target.value })}
                 placeholder={liveText.tickerPlaceholder}
               />
-            </Field>
+            </div>
+
+            <div className={`${styles.liveTickerRuntime} ${hud.showTicker ? styles.liveTickerRuntimeActive : ''}`}>
+              <strong>{tickerMode === 'SCHEDULED'
+                ? tickerCopy.scheduled
+                : tickerMode === 'INFINITE'
+                  ? tickerCopy.persistent
+                  : tickerCopy.once}</strong>
+              <em>{tickerMode === 'ONCE'
+                ? tickerCopy.manual
+                : hud.showTicker
+                  ? tickerCopy.running
+                  : tickerCopy.ready}</em>
+            </div>
+
+            <div className={`${styles.liveTickerActions} ${tickerMode === 'SCHEDULED' ? styles.liveTickerActionsThree : ''}`}>
+              {tickerMode === 'ONCE' && (
+                <button type="button" className={styles.primaryButton} onClick={triggerTickerNow}>
+                  {tickerCopy.playNow}
+                </button>
+              )}
+
+              {tickerMode === 'SCHEDULED' && (
+                <>
+                  <button
+                    type="button"
+                    className={hud.showTicker ? styles.activeOutline : styles.primaryButton}
+                    onClick={() => (hud.showTicker
+                      ? stopTicker()
+                      : updateLiveHud({ showTicker: true }))}
+                  >
+                    {hud.showTicker ? tickerCopy.stopSchedule : tickerCopy.startSchedule}
+                  </button>
+                  <button type="button" onClick={triggerTickerNow}>{tickerCopy.playNow}</button>
+                </>
+              )}
+
+              {tickerMode === 'INFINITE' && (
+                <button
+                  type="button"
+                  className={hud.showTicker ? styles.activeOutline : styles.primaryButton}
+                  onClick={() => (hud.showTicker
+                    ? stopTicker()
+                    : updateLiveHud({ showTicker: true }))}
+                >
+                  {hud.showTicker ? tickerCopy.stopPersistent : tickerCopy.startPersistent}
+                </button>
+              )}
+
+              {tickerMode !== 'INFINITE' && (
+                <button type="button" className={styles.dangerButton} onClick={stopCurrentTicker}>
+                  {tickerCopy.stopCurrent}
+                </button>
+              )}
+            </div>
           </div>
         </Panel>
       </div>

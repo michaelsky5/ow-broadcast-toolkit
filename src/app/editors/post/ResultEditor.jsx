@@ -1,10 +1,11 @@
 import styles from '../shared/SceneEditor.styles.js'
 import { getPostEditorCopy } from '../shared/editorCopy'
-import { Field, Panel, Stepper } from '../shared/editorControls'
-import { getTeam } from '../shared/editorHelpers'
+import { Field, Panel, Stepper, ToggleField } from '../shared/editorControls'
+import { ensureSceneSettings, getSceneSettings, getTeam } from '../shared/editorHelpers'
 
 function ResultEditor({ project, copy, text, language, onUpdateProject }) {
   const postText = getPostEditorCopy(language)
+  const settings = getSceneSettings(project, 'result')
   const teamA = getTeam(project, 'teamA')
   const teamB = getTeam(project, 'teamB')
   const scoreA = Number(project.currentMatch.score.teamA) || 0
@@ -69,6 +70,14 @@ function ResultEditor({ project, copy, text, language, onUpdateProject }) {
             />
           </Field>
         </div>
+
+        <ToggleField
+          label={language === 'zh' ? '显示赞助商' : 'Show Sponsors'}
+          checked={settings.showSponsors !== false}
+          onChange={checked => onUpdateProject(draft => {
+            ensureSceneSettings(draft, 'result').showSponsors = checked
+          })}
+        />
       </Panel>
     </div>
   )

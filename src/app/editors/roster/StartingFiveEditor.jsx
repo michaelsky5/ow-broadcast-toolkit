@@ -2,7 +2,7 @@
 import { getTeamPlayers } from '../../../project/projectUtils'
 import { useState } from 'react'
 import styles from '../shared/SceneEditor.styles.js'
-import { Field, Panel, SegmentedControl, Stepper } from '../shared/editorControls'
+import { Field, Panel, SegmentedControl, Stepper, ToggleField } from '../shared/editorControls'
 import {
   ensureSceneSettings,
   getHeroLabel,
@@ -200,6 +200,14 @@ function StartingFiveEditor({ project, copy, text, language, onUpdateProject }) 
             })}
           />
         </Field>
+
+        <ToggleField
+          label={language === 'zh' ? '显示赞助商' : 'Show Sponsors'}
+          checked={settings.showSponsors !== false}
+          onChange={checked => onUpdateProject(draft => {
+            ensureSceneSettings(draft, 'starting-five').showSponsors = checked
+          })}
+        />
 
         <div className={styles.showFlowStatusStrip}>
           <span>{text.activeOutput}</span>

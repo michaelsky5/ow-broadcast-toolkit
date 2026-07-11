@@ -1,5 +1,6 @@
 import { getBroadcastCompetitionName, getEventLogo } from '../../project/branding'
 import { getCasterById } from '../../project/projectUtils'
+import SponsorLockup from '../shared/SponsorLockup'
 import styles from './ThanksScene.module.css'
 
 const clean = value => String(value || '').trim()
@@ -100,6 +101,10 @@ export default function ThanksScene({ project }) {
         <span>OWBT // SHOW FLOW // THANKS</span>
         <strong>{eventName}</strong>
       </footer>
+
+      {settings.showSponsors !== false && (
+        <SponsorLockup className={styles.sponsorLockup} project={project} variant="full" />
+      )}
     </div>
   )
 }

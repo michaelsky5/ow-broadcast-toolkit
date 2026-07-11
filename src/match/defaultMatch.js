@@ -76,6 +76,12 @@ export const createDefaultMatch = () => ({
     topMatchFormatVisible: true,
     topMatchFormatLabel: '',
     topSponsorVisible: false,
+    sponsorSpotlightMode: 'OFF',
+    sponsorSpotlightDurationSeconds: 8,
+    sponsorSpotlightIntervalSeconds: 45,
+    sponsorSpotlightProgressVisible: true,
+    sponsorSpotlightIndex: 0,
+    sponsorSpotlightTriggerAt: 0,
     eventLogoBg: '#2A2A2A',
     teamLogoBgA: '#2A2A2A',
     teamLogoBgB: '#2A2A2A',
@@ -110,7 +116,12 @@ export const createDefaultMatch = () => ({
     subIndexB: -1,
     showTicker: false,
     tickerMode: 'ONCE',
-    tickerText: ''
+    tickerText: '',
+    tickerDurationSeconds: 25,
+    tickerIntervalSeconds: 90,
+    tickerInitialDelaySeconds: 15,
+    tickerTriggerAt: 0,
+    tickerStopAt: 0
   },
 
   pause: {

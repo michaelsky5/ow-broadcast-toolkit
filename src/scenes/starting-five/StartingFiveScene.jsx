@@ -2,6 +2,7 @@ import FriesStartingLineupScene from '../legacy-fcol/FriesStartingLineupScene'
 import { OW_HERO_BY_ID, getPublicAsset } from '../../data/overwatch'
 import { getCurrentTeams, getStartingPlayers } from '../../project/projectUtils'
 import { getBroadcastCompetitionName, getEventLogo } from '../../project/branding'
+import SponsorLockup from '../shared/SponsorLockup'
 
 const DEFAULT_LOGO = getPublicAsset('/OW.svg')
 
@@ -75,5 +76,18 @@ const buildLegacyMatchData = project => {
 }
 
 export default function StartingFiveScene({ project }) {
-  return <FriesStartingLineupScene matchData={buildLegacyMatchData(project)} />
+  const settings = project?.scenes?.settings?.['starting-five'] || {}
+
+  return (
+    <div style={{ position: 'relative', width: 1920, height: 1080, overflow: 'hidden' }}>
+      <FriesStartingLineupScene matchData={buildLegacyMatchData(project)} />
+      {settings.showSponsors !== false && (
+        <SponsorLockup
+          project={project}
+          variant="mark"
+          style={{ position: 'absolute', top: 66, right: 40 }}
+        />
+      )}
+    </div>
+  )
 }

@@ -394,26 +394,31 @@ function TeamDatabaseEditor({ project, copy, text, language, rosterText, onUpdat
                 ].filter(Boolean).join(' ')}
                 key={team.id}
               >
-                <span>{teamIndex + 1}</span>
-                <strong>{team.shortName || '-'}</strong>
-                <em>{team.name || team.id}</em>
-                <span>{players.length} / {MAX_ROSTER_PLAYERS}</span>
-                <span>{rosterText.roleSummary(roleCounts)}</span>
-                <span>{staffCount ? rosterText.staffCount(staffCount) : '-'}</span>
-                <span>{activeSlots.length ? rosterText.matchSlot(activeSlots) : rosterText.library}</span>
+                <div className={styles.teamDbListIdentity}>
+                  <span>{teamIndex + 1}</span>
+                  <strong title={team.shortName || '-'}>{team.shortName || '-'}</strong>
+                  <em title={team.name || team.id}>{team.name || team.id}</em>
+                </div>
+
+                <div className={styles.teamDbListMeta}>
+                  <span>{players.length} / {MAX_ROSTER_PLAYERS}</span>
+                  <span title={rosterText.roleSummary(roleCounts)}>{rosterText.roleSummary(roleCounts)}</span>
+                  <span>{staffCount ? rosterText.staffCount(staffCount) : '-'}</span>
+                  <span>{activeSlots.length ? rosterText.matchSlot(activeSlots) : rosterText.library}</span>
+                </div>
 
                 <div className={styles.teamDbListActions}>
                   <button type="button" onClick={() => setEditingTeamId(team.id)}>
                     {rosterText.edit}
+                  </button>
+                  <button type="button" className={styles.dangerButton} disabled={!canDeleteTeam} onClick={() => deleteTeam(team.id)}>
+                    {rosterText.deleteShort}
                   </button>
                   <button type="button" onClick={() => loadMatchTeam('teamA', team.id)}>
                     A
                   </button>
                   <button type="button" onClick={() => loadMatchTeam('teamB', team.id)}>
                     B
-                  </button>
-                  <button type="button" className={styles.dangerButton} disabled={!canDeleteTeam} onClick={() => deleteTeam(team.id)}>
-                    {rosterText.deleteShort}
                   </button>
                 </div>
               </div>

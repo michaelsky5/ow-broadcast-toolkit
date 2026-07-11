@@ -39,6 +39,11 @@ function ThanksEditor({ project, text, language, onUpdateProject }) {
               onChange={checked => updateThanksSettings({ showSummary: checked })}
             />
             <ToggleField
+              label={language === 'zh' ? '显示赞助商' : 'Show Sponsors'}
+              checked={settings.showSponsors !== false}
+              onChange={checked => updateThanksSettings({ showSponsors: checked })}
+            />
+            <ToggleField
               label={postText.showCredits}
               checked={settings.showCredits !== false}
               onChange={checked => updateThanksSettings({ showCredits: checked })}

@@ -98,26 +98,55 @@
   gap: 10px;
 }
 
-.toggleField {
-  display: flex;
+.stateToggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
+  width: 100%;
+  min-width: 0;
   min-height: 40px;
   margin-top: 4px;
+  overflow: hidden;
   border: 1px solid rgba(255,255,255,0.1);
+  border-left: 2px solid rgba(255,255,255,0.16);
   background: rgba(0,0,0,0.26);
   color: var(--theme-text);
   padding: 0 11px;
-  font-size: 12px;
-  font-weight: 850;
+  text-align: left;
   cursor: pointer;
 }
 
-.toggleField input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--theme-primary);
+.stateToggle:hover {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.stateToggle span,
+.stateToggle strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stateToggle strong {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+}
+
+.stateToggleActive {
+  border-color: var(--theme-primary-border);
+  border-left-color: var(--theme-primary);
+  background:
+    linear-gradient(90deg, var(--theme-primary-softer), transparent 82%),
+    rgba(0,0,0,0.26);
+}
+
+.stateToggleActive strong {
+  color: var(--theme-primary);
 }
 
 .segmented {

@@ -44,7 +44,7 @@
   display: grid;
   grid-template-columns: clamp(340px, 21%, 360px) minmax(0, 1fr);
   gap: 12px;
-  align-items: stretch;
+  align-items: start;
   min-width: 0;
   width: 100%;
   max-width: 100%;
@@ -52,14 +52,91 @@
 
 .rosterRail {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto;
   gap: 12px;
+  align-content: start;
   min-width: 0;
-  height: 100%;
+  height: auto;
 }
 
 .rosterRail .panel:last-child {
-  height: 100%;
+  height: auto;
+}
+
+.rosterDesk .rosterTeamInfoDisclosure {
+  display: grid;
+  grid-template-columns: 12px 58px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  min-height: 54px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-left: 2px solid var(--theme-primary-border);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.24);
+  color: var(--theme-text);
+  padding: 7px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rosterDesk .rosterTeamInfoDisclosure:hover,
+.rosterDesk .rosterTeamInfoDisclosure[aria-expanded='true'] {
+  border-color: var(--theme-primary-border);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    var(--theme-primary-soft);
+}
+
+.rosterTeamColorSwatch {
+  width: 10px;
+  height: 30px;
+  background: var(--roster-team-color);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--roster-team-color) 38%, transparent);
+}
+
+.rosterTeamInfoIdentity {
+  display: contents;
+}
+
+.rosterTeamInfoIdentity strong,
+.rosterTeamInfoIdentity em,
+.rosterTeamInfoAction {
+  min-width: 0;
+  overflow: hidden;
+  font-style: normal;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rosterTeamInfoIdentity strong {
+  color: var(--theme-primary);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.rosterTeamInfoIdentity em {
+  color: var(--theme-text);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.rosterTeamInfoAction {
+  color: var(--theme-primary);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rosterTeamInfoFields {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .teamColorControl {
@@ -736,13 +813,17 @@
 
 .teamDbPanel {
   overflow: hidden;
+  container: team-db-panel / inline-size;
 }
 
 .teamDbToolbar {
   display: grid;
-  grid-template-columns: 112px 96px minmax(300px, 1fr) 108px 108px 120px 112px;
+  grid-template-columns: 112px 96px minmax(240px, 1fr) 108px 108px 120px 112px;
   gap: 8px;
   align-items: stretch;
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
   margin-bottom: 12px;
 }
 
@@ -795,14 +876,6 @@
   background: rgba(0,0,0,0.12);
 }
 
-.teamDbListHeader,
-.teamDbListRow {
-  display: grid;
-  grid-template-columns: 34px 58px minmax(142px, 1fr) 72px 50px 162px;
-  gap: 6px;
-  min-width: 0;
-}
-
 .teamDbListHeader {
   display: none;
 }
@@ -826,54 +899,47 @@
   gap: 8px;
   max-height: clamp(190px, 36vh, 420px);
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .teamDbListRow {
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 100px;
   grid-template-areas:
-    "index short name status roster actions"
-    "index short roles staff staff actions";
+    "identity actions"
+    "meta actions";
+  gap: 6px 8px;
+  align-items: stretch;
+  min-width: 0;
   border: 1px solid rgba(255,255,255,0.08);
   border-left: 2px solid rgba(255,255,255,0.16);
   background:
     repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 22px),
     rgba(0,0,0,0.22);
-  padding: 7px;
+  padding: 6px;
 }
 
-.teamDbListRow > span:nth-of-type(1) {
-  grid-area: index;
-  justify-content: center;
-  padding: 0;
+.teamDbListIdentity,
+.teamDbListMeta {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
 }
 
-.teamDbListRow > span:nth-of-type(2) {
-  grid-area: roster;
+.teamDbListIdentity {
+  grid-area: identity;
+  grid-template-columns: 34px 64px minmax(0, 1fr);
 }
 
-.teamDbListRow > span:nth-of-type(3) {
-  grid-area: roles;
+.teamDbListMeta {
+  grid-area: meta;
+  grid-template-columns: 72px minmax(0, 1.25fr) minmax(0, 0.7fr) minmax(0, 0.8fr);
 }
 
-.teamDbListRow > span:nth-of-type(4) {
-  grid-area: staff;
-}
-
-.teamDbListRow > span:nth-of-type(5) {
-  grid-area: status;
-}
-
-.teamDbListRow > strong {
-  grid-area: short;
-}
-
-.teamDbListRow > em {
-  grid-area: name;
-}
-
-.teamDbListRow > span,
-.teamDbListRow > strong,
-.teamDbListRow > em {
+.teamDbListIdentity > span,
+.teamDbListIdentity > strong,
+.teamDbListIdentity > em,
+.teamDbListMeta > span {
   display: flex;
   align-items: center;
   min-width: 0;
@@ -890,31 +956,78 @@
   white-space: nowrap;
 }
 
-.teamDbListRow > strong {
+.teamDbListIdentity > span {
+  justify-content: center;
+  padding: 0;
+}
+
+.teamDbListIdentity > strong {
   color: var(--theme-primary);
   font-size: 12px;
   justify-content: center;
   letter-spacing: 0.06em;
 }
 
-.teamDbListRow > em {
+.teamDbListIdentity > em {
   color: var(--theme-text);
 }
 
 .teamDbListActions {
   display: grid;
   grid-area: actions;
-  grid-template-columns: 52px 30px 30px 38px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, 28px);
   gap: 4px;
+  align-self: center;
   justify-self: end;
   min-width: 0;
-  width: 162px;
+  width: 100px;
 }
 
 .teamDbListActions button {
+  height: 28px;
+  min-height: 28px;
   padding: 0 5px;
   font-size: 9px;
   letter-spacing: 0;
+}
+
+@container team-db-panel (max-width: 1180px) {
+  .teamDbListRow {
+    grid-template-columns: minmax(0, 1fr) 100px;
+    grid-template-areas:
+      "identity actions"
+      "meta actions";
+    gap: 4px 7px;
+  }
+
+  .teamDbListIdentity {
+    grid-template-columns: 30px 58px minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .teamDbListActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, 28px);
+    align-self: center;
+    justify-self: end;
+    width: 100px;
+  }
+
+  .teamDbListMeta {
+    grid-template-columns: 42px minmax(0, 1.5fr) 30px minmax(0, 1fr);
+    gap: 4px;
+  }
+}
+
+@container team-db-panel (max-width: 620px) {
+  .teamDbList {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .teamDbListMeta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .teamDbEmptyState {

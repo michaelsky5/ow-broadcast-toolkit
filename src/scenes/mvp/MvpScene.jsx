@@ -11,6 +11,7 @@ import {
   toStatNumber
 } from '../../project/statsModel'
 import styles from './MvpScene.module.css'
+import SponsorLockup from '../shared/SponsorLockup'
 
 const clean = value => String(value || '').trim()
 
@@ -265,6 +266,10 @@ export default function MvpScene({ project }) {
       <footer className={styles.footer}>
         <span>SIX_CORE_STATS // MVP_PACKAGE // {totalLabel}</span>
       </footer>
+
+      {settings.showSponsors !== false && (
+        <SponsorLockup className={styles.sponsorLockup} project={project} variant="compact" />
+      )}
     </div>
   )
 }

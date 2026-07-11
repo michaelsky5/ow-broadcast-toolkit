@@ -556,6 +556,12 @@
   }
 }
 
+.sponsorLockup {
+  position: absolute;
+  right: 82px;
+  bottom: 30px;
+}
+
 @keyframes mvpInfoIn {
   from {
     opacity: 0;

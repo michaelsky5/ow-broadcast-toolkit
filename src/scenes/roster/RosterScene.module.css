@@ -482,6 +482,12 @@
   color: var(--theme-primary);
 }
 
+.sponsorLockup {
+  position: absolute;
+  right: 80px;
+  bottom: 30px;
+}
+
 @keyframes cardIn {
   to {
     opacity: 1;

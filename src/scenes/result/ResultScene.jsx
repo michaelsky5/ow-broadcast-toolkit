@@ -1,5 +1,6 @@
 import { getBroadcastCompetitionName, getEventLogo } from '../../project/branding'
 import { getCurrentTeams, getTeamById } from '../../project/projectUtils'
+import SponsorLockup from '../shared/SponsorLockup'
 
 const PRIMARY = 'var(--theme-primary)'
 const DARK = '#050505'
@@ -236,6 +237,14 @@ export default function ResultScene({ project }) {
           </div>
         </div>
       </div>
+
+      {settings.showSponsors !== false && (
+        <SponsorLockup
+          project={project}
+          variant="compact"
+          style={{ position: 'absolute', right: 120, bottom: 28 }}
+        />
+      )}
     </div>
   )
 }

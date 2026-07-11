@@ -1,6 +1,7 @@
 import { OW_HERO_BY_ID, OW_ROLE_BY_ID } from '../../data/overwatch'
 import { getBroadcastCompetitionName } from '../../project/branding'
 import { getCurrentTeams, getTeamPlayers } from '../../project/projectUtils'
+import SponsorLockup from '../shared/SponsorLockup'
 import styles from './RosterScene.module.css'
 
 const clean = value => String(value || '').trim()
@@ -168,6 +169,10 @@ export default function RosterScene({ project }) {
       <footer className={styles.footer}>
         <span>{eventName}</span>
       </footer>
+
+      {settings.showSponsors !== false && (
+        <SponsorLockup className={styles.sponsorLockup} project={project} variant="mark" />
+      )}
     </div>
   )
 }
