@@ -10,7 +10,7 @@ Check these first:
 
 - Console Settings -> Scene Transition is `Simple Wipe` or `Brand Stinger`.
 - Preview and Program are different scenes before pressing TAKE.
-- The Overlay URL uses the same origin as the Console, for example `http://localhost:5173/#overlay`.
+- The Overlay URL uses the same origin as the Console, for example `http://127.0.0.1:4174/#overlay`.
 - Browser localStorage has not kept an old `No Transition` preference.
 
 OWBT keeps TAKE transition output visible even when the operating system or browser reports `prefers-reduced-motion: reduce`. Reduced motion may still disable small scene resolve motion, but it should not hide the transition layer.

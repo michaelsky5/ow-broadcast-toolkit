@@ -48,15 +48,27 @@ function EditorDialog({
   kicker = 'System',
   message,
   tone = 'default',
+  wide = false,
+  children,
+  actions,
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
   onConfirm,
   onCancel
 }) {
+  const dialogActions = actions || [
+    ...(onCancel ? [{ label: cancelLabel, onClick: onCancel }] : []),
+    { label: confirmLabel, onClick: onConfirm, tone: tone === 'danger' ? 'danger' : 'primary' }
+  ]
+
   return (
     <div className={styles.editorDialogBackdrop} role="presentation">
       <section
-        className={`${styles.editorDialog} ${tone === 'danger' ? styles.editorDialogDanger : ''}`}
+        className={[
+          styles.editorDialog,
+          tone === 'danger' ? styles.editorDialogDanger : '',
+          wide ? styles.editorDialogWide : ''
+        ].filter(Boolean).join(' ')}
         role="dialog"
         aria-modal="true"
       >
@@ -67,17 +79,24 @@ function EditorDialog({
           </div>
         </header>
         <div className={styles.editorDialogBody}>
-          <p>{message}</p>
+          {message && <p>{message}</p>}
+          {children}
         </div>
         <footer className={styles.editorDialogActions}>
-          {onCancel && (
-            <button type="button" onClick={onCancel}>
-              {cancelLabel}
+          {dialogActions.map((action, index) => (
+            <button
+              key={action.id || `${action.label}-${index}`}
+              type="button"
+              className={[
+                action.tone === 'primary' ? styles.primaryButton : '',
+                action.tone === 'danger' ? styles.dangerButton : ''
+              ].filter(Boolean).join(' ')}
+              disabled={action.disabled}
+              onClick={action.onClick}
+            >
+              {action.label}
             </button>
-          )}
-          <button type="button" className={tone === 'danger' ? styles.dangerButton : styles.primaryButton} onClick={onConfirm}>
-            {confirmLabel}
-          </button>
+          ))}
         </footer>
       </section>
     </div>

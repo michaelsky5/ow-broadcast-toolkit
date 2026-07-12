@@ -298,6 +298,10 @@
   box-shadow: 0 28px 80px rgba(0,0,0,0.52), inset 0 0 0 1px rgba(255,255,255,0.025);
 }
 
+.editorDialogWide {
+  width: min(820px, calc(100vw - 48px));
+}
+
 .editorDialogDanger {
   border-top-color: rgba(255,77,77,0.86);
 }
@@ -348,9 +352,31 @@
   white-space: pre-line;
 }
 
+.editorDialogBody textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 280px;
+  max-height: 52vh;
+  margin-top: 12px;
+  resize: vertical;
+  border: 1px solid rgba(255,255,255,0.14);
+  outline: none;
+  background: rgba(0,0,0,0.42);
+  color: var(--theme-text);
+  padding: 12px;
+  font: 11px/1.5 Consolas, 'SFMono-Regular', monospace;
+  tab-size: 2;
+}
+
+.editorDialogBody textarea:focus {
+  border-color: var(--theme-primary-border);
+  box-shadow: 0 0 0 1px var(--theme-primary-soft);
+}
+
 .editorDialogActions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 8px;
 }
 
