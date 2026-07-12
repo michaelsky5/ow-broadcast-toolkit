@@ -28,7 +28,7 @@ The web version focuses on the core console:
 - Data Center / OCR workflow
 - Toolbox graphics and asset configuration
 - Local browser autosave
-- Project import and export
+- Project import and export through JSON files or copy/paste text
 
 The future Windows desktop version can unlock local filesystem paths, larger asset libraries, OBS scene file export, and deeper production workflows.
 
@@ -48,7 +48,7 @@ Console: https://owbt.fries-cup.com/
 Overlay: https://owbt.fries-cup.com/#overlay
 ```
 
-Use the Console and Overlay from the same origin. For example, the live Console should pair with the live Overlay above, and a local development Console should pair with `http://localhost:5173/#overlay`.
+Use the Console and Overlay from the same origin. For example, the live Console should pair with the live Overlay above, and a local development Console should pair with `http://127.0.0.1:4174/#overlay`.
 
 ## Main Routes
 
@@ -64,7 +64,7 @@ The Overlay renders the current Program state only. It does not show editing UI.
 - OWBT is a static Vite React app.
 - Project state is saved in browser `localStorage`.
 - Console and Overlay sync through same-origin browser storage/events and `BroadcastChannel` when available.
-- Export project JSON before clearing browser data or moving to another machine.
+- Export the project as a JSON file or copied project text before clearing browser data or moving to another machine. Text mode works in OBS Browser Sources that cannot create download files.
 - Uploaded assets are stored with the project as browser data URLs. URL assets can be used too, but same-origin or uploaded assets are safest for PNG export.
 - The web app does not read arbitrary local filesystem paths; that workflow is reserved for the future Windows desktop version.
 
@@ -91,13 +91,13 @@ npm run dev
 Open the Console:
 
 ```text
-http://localhost:5173/
+http://127.0.0.1:4174/
 ```
 
 Open the Overlay:
 
 ```text
-http://localhost:5173/#overlay
+http://127.0.0.1:4174/#overlay
 ```
 
 If Vite chooses another port, use the same origin shown in the startup setup screen.
@@ -146,7 +146,7 @@ Recommended Browser Source settings:
 - Use `3840 x 2160` instead if the project output is set to 4K
 - Keep the Console open in a separate browser window or monitor
 - Use TAKE to push Preview to Program
-- If testing locally, use the same local origin as the Console, for example `http://localhost:5173/#overlay`
+- If testing locally, use the same local origin as the Console, for example `http://127.0.0.1:4174/#overlay`
 
 ## Project Structure
 

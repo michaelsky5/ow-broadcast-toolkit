@@ -1,7 +1,12 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createDefaultProject } from '../project/defaultProject'
 import { getCompetitionName } from '../project/branding'
-import { exportProjectAsJson, readProjectFile } from '../project/projectUtils'
+import {
+  exportProjectAsJson,
+  readProjectFile,
+  safeParseProject,
+  stringifyProject
+} from '../project/projectUtils'
 import {
   loadStoredProgramProject,
   loadStoredProject,
@@ -454,6 +459,7 @@ function ConsoleApp() {
   const [consoleSettings, setConsoleSettings] = useState(loadConsoleSettings)
   const [rightRailCollapsed, setRightRailCollapsed] = useState(false)
   const importInputRef = useRef(null)
+  const projectTextRef = useRef(null)
   const projectRef = useRef(project)
   const programProjectRef = useRef(programProject)
   const hotkeyActionsRef = useRef({})
@@ -726,35 +732,31 @@ function ConsoleApp() {
     })
   }
 
-  const importProjectFile = async file => {
-    try {
-      const importedProject = await readProjectFile(file)
-      pushUndoSnapshot('IMPORT PROJECT')
-      const next = replaceStoredProject(importedProject)
-      setProject(next)
-      setProgramProject(next)
-      setPreviewSceneId(getConsoleSceneById(next.scenes.activeSceneId).id)
-      setEditorSceneId(getConsoleSceneById(next.scenes.activeSceneId).id)
-      pushLog(copy.logImportProject)
-    } catch (error) {
-      pushLog(copy.logImportFailed)
-      setAppDialog({
-        kicker: copy.project,
-        title: copy.importFailedTitle,
-        message: error?.message || copy.invalidProjectFile,
-        confirmLabel: copy.ok,
-        onConfirm: () => setAppDialog(null)
-      })
-    }
+  const showImportError = error => {
+    pushLog(copy.logImportFailed)
+    setAppDialog({
+      kicker: copy.project,
+      title: copy.importFailedTitle,
+      message: error?.message || copy.invalidProjectFile,
+      confirmLabel: copy.ok,
+      onConfirm: () => setAppDialog(null)
+    })
   }
 
-  const handleImportProject = event => {
-    const file = event.target.files?.[0]
-    event.target.value = ''
-    if (!file) return
+  const applyImportedProject = importedProject => {
+    pushUndoSnapshot('IMPORT PROJECT')
+    const next = replaceStoredProject(importedProject)
+    setProject(next)
+    setProgramProject(next)
+    setPreviewSceneId(getConsoleSceneById(next.scenes.activeSceneId).id)
+    setEditorSceneId(getConsoleSceneById(next.scenes.activeSceneId).id)
+    pushLog(copy.logImportProject)
+  }
 
+  const requestProjectImport = importedProject => {
     if (!consoleSettings.confirmDangerActions) {
-      importProjectFile(file)
+      setAppDialog(null)
+      applyImportedProject(importedProject)
       return
     }
 
@@ -768,8 +770,163 @@ function ConsoleApp() {
       onCancel: () => setAppDialog(null),
       onConfirm: () => {
         setAppDialog(null)
-        importProjectFile(file)
+        applyImportedProject(importedProject)
       }
+    })
+  }
+
+  const importProjectFile = async file => {
+    try {
+      requestProjectImport(await readProjectFile(file))
+    } catch (error) {
+      showImportError(error)
+    }
+  }
+
+  const handleImportProject = event => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (file) importProjectFile(file)
+  }
+
+  const showProjectTextExport = (text, message = copy.exportProjectTextMessage) => {
+    setAppDialog({
+      kicker: copy.project,
+      title: copy.exportProjectTextTitle,
+      message,
+      wide: true,
+      children: (
+        <textarea
+          ref={projectTextRef}
+          value={text}
+          aria-label={copy.exportProjectTextTitle}
+          readOnly
+          spellCheck={false}
+        />
+      ),
+      actions: [
+        { label: copy.cancel, onClick: () => setAppDialog(null) },
+        {
+          label: copy.copyProjectText,
+          tone: 'primary',
+          onClick: async () => {
+            let copied
+
+            try {
+              projectTextRef.current?.focus()
+              projectTextRef.current?.select()
+              copied = Boolean(document.execCommand?.('copy'))
+            } catch {
+              copied = false
+            }
+
+            if (!copied && navigator.clipboard?.writeText) {
+              try {
+                await navigator.clipboard.writeText(text)
+                copied = true
+              } catch {
+                // OBS Browser Sources can expose the Clipboard API while denying writes.
+                copied = false
+              }
+            }
+
+            if (copied) {
+              showProjectTextExport(text, copy.projectTextCopied)
+              return
+            }
+
+            showProjectTextExport(text, copy.projectTextCopyFallback)
+            window.setTimeout(() => {
+              projectTextRef.current?.focus()
+              projectTextRef.current?.select()
+            }, 0)
+          }
+        }
+      ]
+    })
+  }
+
+  const showProjectTextImport = (
+    initialText = '',
+    message = copy.importProjectTextMessage
+  ) => {
+    setAppDialog({
+      kicker: copy.project,
+      title: copy.importProjectTextTitle,
+      message,
+      wide: true,
+      children: (
+        <textarea
+          ref={projectTextRef}
+          defaultValue={initialText}
+          aria-label={copy.importProjectTextTitle}
+          placeholder={copy.importProjectTextPlaceholder}
+          spellCheck={false}
+        />
+      ),
+      actions: [
+        { label: copy.cancel, onClick: () => setAppDialog(null) },
+        {
+          label: copy.importProject,
+          tone: 'primary',
+          onClick: () => {
+            const text = projectTextRef.current?.value || ''
+            const importedProject = safeParseProject(text)
+            if (!importedProject) {
+              pushLog(copy.logImportFailed)
+              showProjectTextImport(text, copy.invalidProjectFile)
+              return
+            }
+            requestProjectImport(importedProject)
+          }
+        }
+      ]
+    })
+  }
+
+  const handleExportProject = () => {
+    setAppDialog({
+      kicker: copy.project,
+      title: copy.exportProject,
+      message: copy.exportProjectFormatPrompt,
+      actions: [
+        { label: copy.cancel, onClick: () => setAppDialog(null) },
+        {
+          label: copy.projectJsonFile,
+          onClick: () => {
+            setAppDialog(null)
+            exportProjectAsJson(project)
+          }
+        },
+        {
+          label: copy.projectPlainText,
+          tone: 'primary',
+          onClick: () => showProjectTextExport(stringifyProject(project))
+        }
+      ]
+    })
+  }
+
+  const handleImportProjectChoice = () => {
+    setAppDialog({
+      kicker: copy.project,
+      title: copy.importProject,
+      message: copy.importProjectFormatPrompt,
+      actions: [
+        { label: copy.cancel, onClick: () => setAppDialog(null) },
+        {
+          label: copy.projectJsonFile,
+          onClick: () => {
+            setAppDialog(null)
+            importInputRef.current?.click()
+          }
+        },
+        {
+          label: copy.projectPlainText,
+          tone: 'primary',
+          onClick: () => showProjectTextImport()
+        }
+      ]
     })
   }
 
@@ -945,8 +1102,8 @@ function ConsoleApp() {
 
           <div className={styles.actions}>
             <button className={styles.primaryAction} onClick={copyOverlayUrl}>{copy.copyOverlayUrl}</button>
-            <button onClick={() => exportProjectAsJson(project)}>{copy.exportProject}</button>
-            <button onClick={() => importInputRef.current?.click()}>{copy.importProject}</button>
+            <button onClick={handleExportProject}>{copy.exportProject}</button>
+            <button onClick={handleImportProjectChoice}>{copy.importProject}</button>
             <button className={styles.dangerAction} onClick={handleResetProject}>{copy.resetProject}</button>
             <input
               ref={importInputRef}
