@@ -306,7 +306,7 @@
 }
 
 .contextMeta {
-  grid-template-columns: minmax(0, 1fr) 116px;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 0.32fr);
 }
 
 .contextBans {
@@ -317,10 +317,14 @@
 .contextBans div,
 .contextMeta div {
   display: grid;
-  grid-template-columns: 86px minmax(0, 1fr);
+  grid-template-columns: 78px minmax(0, 1fr);
   min-height: 38px;
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(0,0,0,0.22);
+}
+
+.contextMeta div:last-child {
+  grid-template-columns: 74px minmax(46px, 1fr);
 }
 
 .contextBans span,
