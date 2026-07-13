@@ -263,7 +263,7 @@ const playerListRowStyle = { display: 'flex', gap: '3px' };
 
 const playerSlotStyle = {
   width: '121px',
-  height: '24px',
+  height: '18px',
   backgroundColor: 'rgba(42,42,42,0.94)',
   display: 'flex',
   justifyContent: 'center',
