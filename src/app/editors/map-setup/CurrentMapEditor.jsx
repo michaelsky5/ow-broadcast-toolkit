@@ -110,6 +110,9 @@ function CurrentMapEditor({ project, copy, text, language, activeSection = 'pool
       if (index + 1 === Number(draft.currentMatch.currentMapIndex || 1)) {
         const nextEntry = getMapLineupEntry(draft.currentMatch, index)
         draft.currentMatch.currentMapId = nextEntry.mapId || ''
+        draft.currentMatch.bansA = normalizeBanList(nextEntry.bansA)
+        draft.currentMatch.bansB = normalizeBanList(nextEntry.bansB)
+        draft.currentMatch.banOrderMode = nextEntry.banOrderMode || 'A_FIRST'
       }
 
       if (options.recalculateScore) recalculateScoreFromLineup(draft)
