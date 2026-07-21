@@ -191,7 +191,7 @@ npm run build
 npm run check
 ```
 
-`npm run check` runs asset validation, ESLint, and a production build.
+`npm run check` runs asset validation, ESLint, the Node test suite, and a production build.
 
 ## Usage Notice
 

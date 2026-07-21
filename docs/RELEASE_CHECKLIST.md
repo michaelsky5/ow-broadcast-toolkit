@@ -8,7 +8,7 @@ Use this checklist for the web release build. Keep UI changes frozen during this
 npm run check
 ```
 
-This runs bundled asset validation, ESLint, and the production Vite build.
+This runs bundled asset validation, ESLint, the Node test suite, and the production Vite build.
 
 ## Production Preview
 

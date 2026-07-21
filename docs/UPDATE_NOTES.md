@@ -10,6 +10,10 @@
 - Added a direct `/#control` surface for OBS docks and production operators, including current-match team assignment and five-player lineup selection.
 - Added copy/paste match-package import with refresh, side-swap, and full-replace impact previews.
 
+### Fixed
+
+- Reject unsupported future Team Library backup schema versions instead of silently importing them as v1 data.
+
 ### Changed
 
 - Separated long-lived team asset management from the current-project roster editor while keeping project teams compatible with existing scenes.

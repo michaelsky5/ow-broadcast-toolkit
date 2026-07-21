@@ -1040,7 +1040,9 @@ export default function TeamLibraryPage({
       setError('')
     } catch (backupError) {
       console.error('[OWBT] Failed to read team library backup:', backupError)
-      setError(copy.invalidBackup)
+      setError(backupError?.importCode === 'library-unsupported-version'
+        ? copy.unsupportedBackupVersion
+        : copy.invalidBackup)
     }
   }
 

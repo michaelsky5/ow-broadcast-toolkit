@@ -1,6 +1,7 @@
 import { normalizeImportedTeamDb } from '../app/editors/roster/rosterEditorUtils'
 import { getTeamPlayers } from '../project/projectUtils'
 import {
+  TEAM_LIBRARY_SCHEMA_VERSION,
   createLibraryRecordFromProject,
   findLibraryTeamMatch,
   normalizeLibraryTeam
@@ -153,7 +154,14 @@ const getSourceKind = (payload, source) => {
   const schema = clean(source?.schemaVersion || payload?.schemaVersion).toLocaleLowerCase()
   if (schema.startsWith('owbt-project')) return 'project'
   if (schema.startsWith('owbt-team-db')) return 'team-db'
-  if (schema.startsWith('owbt-team-library')) return 'library-backup'
+  if (schema.startsWith('owbt-team-library')) {
+    if (schema !== TEAM_LIBRARY_SCHEMA_VERSION) {
+      const error = new Error(`Unsupported OWBT team library version: ${schema || 'unknown'}.`)
+      error.importCode = 'library-unsupported-version'
+      throw error
+    }
+    return 'library-backup'
+  }
   return 'generic'
 }
 

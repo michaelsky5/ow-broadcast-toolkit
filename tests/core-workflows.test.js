@@ -196,6 +196,24 @@ describe('match package workflow', () => {
     assert.equal(teamProjectImport.MAX_TEAM_LIBRARY_BACKUP_BYTES, 128 * 1024 * 1024)
   })
 
+  test('rejects unsupported team-library backup schema versions', () => {
+    const futureBackup = JSON.stringify({
+      schemaVersion: 'owbt-team-library-v999',
+      exportedAt: '2026-07-21T00:00:00.000Z',
+      teams: [createTeam('future-team', 'Future', 'FTR')]
+    })
+
+    assert.equal(teamProjectImport.isOwbtTeamLibraryBackupText(futureBackup), true)
+    assert.equal(
+      teamProjectImport.getOwbtTeamSourceByteLimit(futureBackup),
+      teamProjectImport.MAX_TEAM_LIBRARY_BACKUP_BYTES
+    )
+    assert.throws(
+      () => teamProjectImport.parseOwbtTeamSource(futureBackup, []),
+      error => error.importCode === 'library-unsupported-version'
+    )
+  })
+
   test('round-trips a library backup as a non-destructive merge', () => {
     const original = {
       ...createTeam('library-a', 'Alpha', 'ALP'),
