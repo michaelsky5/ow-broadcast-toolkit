@@ -10,7 +10,7 @@ Run this before deploying:
 npm run check
 ```
 
-This verifies bundled Overwatch assets, runs ESLint, and creates a production build.
+This verifies bundled Overwatch assets, runs ESLint and the Node test suite, and creates a production build.
 
 For the full web release pass, follow [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
 

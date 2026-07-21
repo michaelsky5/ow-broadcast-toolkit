@@ -13,6 +13,7 @@
 ### Fixed
 
 - Reject unsupported future Team Library backup schema versions instead of silently importing them as v1 data.
+- Protect duplicate cleanup, match-package copying, and backup export from silently discarding or omitting unsaved team edits.
 
 ### Changed
 

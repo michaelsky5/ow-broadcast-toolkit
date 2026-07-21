@@ -555,6 +555,7 @@ export default function TeamLibraryPage({
   const discardDraftAndContinue = () => {
     const navigation = pendingNavigation
     setPendingNavigation(null)
+    setDraftTeam(storedActiveTeam ? structuredClone(storedActiveTeam) : null)
     if (navigation?.kind === 'team' && navigation.team) {
       activateTeam(navigation.team)
     } else if (navigation?.kind === 'create') {
@@ -569,6 +570,12 @@ export default function TeamLibraryPage({
       openBrandingReview()
     } else if (navigation?.kind === 'logo-folder') {
       logoFolderInputRef.current?.click()
+    } else if (navigation?.kind === 'duplicate-cleanup') {
+      openDuplicateCleanup()
+    } else if (navigation?.kind === 'match-package-copy') {
+      copySelectedMatchPackage()
+    } else if (navigation?.kind === 'backup-export') {
+      exportBackup()
     } else if (navigation?.kind === 'back') {
       onBack()
     } else if (navigation?.kind === 'route') {
@@ -586,6 +593,9 @@ export default function TeamLibraryPage({
     if (kind === 'project-save') saveCurrentProjectTeams()
     if (kind === 'branding') openBrandingReview()
     if (kind === 'logo-folder') logoFolderInputRef.current?.click()
+    if (kind === 'duplicate-cleanup') openDuplicateCleanup()
+    if (kind === 'match-package-copy') copySelectedMatchPackage()
+    if (kind === 'backup-export') exportBackup()
   }
 
   const saveCurrentProjectTeams = () => {
@@ -1442,7 +1452,7 @@ export default function TeamLibraryPage({
             <button type="button" onClick={() => requestProtectedAction('project-save')} disabled={!(project.teams || []).length}>
               {copy.saveCurrent}
             </button>
-            <button type="button" onClick={openDuplicateCleanup} disabled={!duplicateGroups.length}>
+            <button type="button" onClick={() => requestProtectedAction('duplicate-cleanup')} disabled={!duplicateGroups.length}>
               {copy.organizeDuplicates}
             </button>
           </div>
@@ -1575,7 +1585,7 @@ export default function TeamLibraryPage({
               type="button"
               className={styles.primaryButton}
               disabled={selectedIds.length !== MATCH_PACKAGE_TEAM_COUNT || packageBlocked}
-              onClick={copySelectedMatchPackage}
+              onClick={() => requestProtectedAction('match-package-copy')}
             >
               {packageCopied ? copy.copyMatchPackageAgain : copy.copyMatchPackage}
             </button>
@@ -1615,7 +1625,7 @@ export default function TeamLibraryPage({
           </div>
           <div className={styles.contextActions}>
             <button type="button" onClick={() => requestProtectedAction('backup-import')}>{copy.importBackup}</button>
-            <button type="button" onClick={exportBackup} disabled={!teams.length}>{copy.exportBackup}</button>
+            <button type="button" onClick={() => requestProtectedAction('backup-export')} disabled={!teams.length}>{copy.exportBackup}</button>
           </div>
         </section>
       </section>
