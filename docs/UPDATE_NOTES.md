@@ -14,6 +14,7 @@
 
 - Separated long-lived team asset management from the current-project roster editor while keeping project teams compatible with existing scenes.
 - Added Team Library and OBS Control addresses to Console Settings for same-origin handoff.
+- Lazy-loaded the scene editor and toolbox workspaces with visible loading and recovery states, reducing the main production JavaScript chunk from 549.12 KB to 312.86 KB.
 - Updated React, Vite, ESLint, and related development dependencies; `npm audit` now reports zero known vulnerabilities.
 
 ### Documentation
@@ -26,6 +27,7 @@
 - Ran `npm audit` and `npm audit --omit=dev`.
 - Ran `npm run check` and `git diff --check`.
 - Smoke-tested direct `/#library`, `/#control`, and `/#overlay` routes from the production build.
+- Verified first-load scene-editor and toolbox chunks settle successfully after production code splitting.
 - Verified A/B selection, match-package health checks, Console startup, TAKE, and same-origin Overlay updates without browser console errors.
 
 ## Unreleased - 2026-06-13

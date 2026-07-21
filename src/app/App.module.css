@@ -74,6 +74,60 @@
   color: var(--theme-text);
 }
 
+.workspaceLoadState {
+  display: grid;
+  min-height: 240px;
+  padding: 22px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    radial-gradient(circle at 20% 0%, var(--theme-primary-soft), transparent 38%),
+    rgba(0,0,0,0.24);
+}
+
+.workspaceLoadCard {
+  display: grid;
+  width: min(420px, 100%);
+  gap: 10px;
+  padding: 22px;
+  border: 1px solid var(--theme-primary-border);
+  background: rgba(7,7,7,0.88);
+  box-shadow: var(--theme-shadow-primary);
+}
+
+.workspaceLoadCard > span {
+  color: var(--theme-primary);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.workspaceLoadCard strong,
+.workspaceLoadCard p {
+  margin: 0;
+}
+
+.workspaceLoadCard strong {
+  font-size: 20px;
+}
+
+.workspaceLoadCard p {
+  color: var(--theme-muted-text);
+  line-height: 1.55;
+}
+
+.workspaceLoadCard button {
+  justify-self: start;
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid var(--theme-primary-border);
+  background: var(--theme-primary);
+  color: #050505;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .sidebar {
   display: flex;
   flex-direction: column;

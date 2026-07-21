@@ -31,10 +31,8 @@ import {
   normalizeSceneTransitionSettings
 } from './consolePreferences'
 import { getOverlayUrl } from './overlayUrl'
-import SceneEditor from './editors/SceneEditor'
 import { getEditorChromeCopy } from './editors/shared/editorCopy'
 import { EditorDialog } from './editors/shared/editorControls'
-import ToolboxWorkspace from './toolbox/ToolboxWorkspace'
 import {
   MATCH_PACKAGE_ERROR_CODES,
   MATCH_PACKAGE_IMPORT_MODES,
@@ -47,6 +45,8 @@ import {
 import styles from './App.module.css'
 
 const TeamLibraryPage = lazy(() => import('../team-library/TeamLibraryPage'))
+const SceneEditor = lazy(() => import('./editors/SceneEditor'))
+const ToolboxWorkspace = lazy(() => import('./toolbox/ToolboxWorkspace'))
 
 function LibraryLoadState({ failed = false, language = 'zh', onBack, onRetry }) {
   const isEnglish = language === 'en'
@@ -93,6 +93,58 @@ class LibraryLoadBoundary extends Component {
           language={this.props.language}
           onBack={this.props.onBack}
           onRetry={() => window.location.reload()}
+        />
+      )
+    }
+
+    return this.props.children
+  }
+}
+
+function WorkspaceLoadState({ failed = false, language = 'zh', workspace = 'editor' }) {
+  const isEnglish = language === 'en'
+  const workspaceName = workspace === 'toolbox'
+    ? (isEnglish ? 'Toolbox' : '工具箱')
+    : (isEnglish ? 'Scene Editor' : '场景编辑器')
+
+  return (
+    <section className={styles.workspaceLoadState} aria-live="polite">
+      <div className={styles.workspaceLoadCard}>
+        <span>OWBT // {workspace === 'toolbox' ? 'TOOLBOX' : 'SCENE EDITOR'}</span>
+        <strong>{failed
+          ? (isEnglish ? `Unable to load ${workspaceName}` : `${workspaceName}加载失败`)
+          : (isEnglish ? `Loading ${workspaceName}` : `正在加载${workspaceName}`)}</strong>
+        <p>{failed
+          ? (isEnglish ? 'Reload the page to request the workspace bundle again.' : '请重新加载页面，再次获取工作区资源。')
+          : (isEnglish ? 'Preparing the controls required for this workspace…' : '正在准备该工作区所需的控制组件…')}</p>
+        {failed && (
+          <button type="button" onClick={() => window.location.reload()}>
+            {isEnglish ? 'Reload' : '重新加载'}
+          </button>
+        )}
+      </div>
+    </section>
+  )
+}
+
+class WorkspaceLoadBoundary extends Component {
+  state = { failed: false }
+
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+
+  componentDidCatch(error, info) {
+    console.error('[OWBT] Failed to load console workspace:', error, info)
+  }
+
+  render() {
+    if (this.state.failed) {
+      return (
+        <WorkspaceLoadState
+          failed
+          language={this.props.language}
+          workspace={this.props.workspace}
         />
       )
     }
@@ -1596,12 +1648,16 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
         </section>
 
         {workspaceMode === 'toolbox' ? (
-          <ToolboxWorkspace
-            project={project}
-            language={language}
-            programScene={programScene}
-            onUpdateProject={updateProject}
-          />
+          <WorkspaceLoadBoundary key="toolbox" language={language} workspace="toolbox">
+            <Suspense fallback={<WorkspaceLoadState language={language} workspace="toolbox" />}>
+              <ToolboxWorkspace
+                project={project}
+                language={language}
+                programScene={programScene}
+                onUpdateProject={updateProject}
+              />
+            </Suspense>
+          </WorkspaceLoadBoundary>
         ) : (
           <section className={`${styles.consoleBody} ${rightRailCollapsed ? styles.consoleBodyRailCollapsed : ''}`}>
             <div className={styles.productionColumn}>
@@ -1633,21 +1689,25 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
                 </div>
               </section>
 
-              <SceneEditor
-                project={project}
-                scene={editorScene}
-                copy={copy}
-                language={language}
-                statusOptions={statusOptions}
-                onUpdateProject={updateProject}
-                onSelectScene={sceneId => selectPreviewScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene)}
-                onAutoTakeScene={(sceneId, options) => autoTakeProgramScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene, options)}
-                onTakeToProgram={takePreviewToProgram}
-                sceneModeHints={sceneModeHints}
-                onSceneModeHintChange={updateSceneModeHint}
-                controlMode={controlMode}
-                canTakeToProgram
-              />
+              <WorkspaceLoadBoundary key="editor" language={language} workspace="editor">
+                <Suspense fallback={<WorkspaceLoadState language={language} workspace="editor" />}>
+                  <SceneEditor
+                    project={project}
+                    scene={editorScene}
+                    copy={copy}
+                    language={language}
+                    statusOptions={statusOptions}
+                    onUpdateProject={updateProject}
+                    onSelectScene={sceneId => selectPreviewScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene)}
+                    onAutoTakeScene={(sceneId, options) => autoTakeProgramScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene, options)}
+                    onTakeToProgram={takePreviewToProgram}
+                    sceneModeHints={sceneModeHints}
+                    onSceneModeHintChange={updateSceneModeHint}
+                    controlMode={controlMode}
+                    canTakeToProgram
+                  />
+                </Suspense>
+              </WorkspaceLoadBoundary>
             </div>
 
             {!rightRailCollapsed && (
