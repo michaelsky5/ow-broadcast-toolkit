@@ -1,5 +1,40 @@
 # Update Notes
 
+## Unreleased - 2026-07-21
+
+### Added
+
+- Added a standalone `/#library` team asset library backed by browser IndexedDB for reusable teams, players, logos, colors, staff, and notes.
+- Added JSON library backup/restore, OWBT project-team extraction, CSV/TSV/TXT import, CSV templates, and folder-based logo matching.
+- Added A/B match-package creation with duplicate-team, roster, logo, payload-size, and schema health checks before transfer.
+- Added a direct `/#control` surface for OBS docks and production operators, including current-match team assignment and five-player lineup selection.
+- Added copy/paste match-package import with refresh, side-swap, and full-replace impact previews.
+
+### Fixed
+
+- Reject unsupported future Team Library backup schema versions instead of silently importing them as v1 data.
+- Protect duplicate cleanup, match-package copying, and backup export from silently discarding or omitting unsaved team edits.
+
+### Changed
+
+- Separated long-lived team asset management from the current-project roster editor while keeping project teams compatible with existing scenes.
+- Added Team Library and OBS Control addresses to Console Settings for same-origin handoff.
+- Lazy-loaded the scene editor and toolbox workspaces with visible loading and recovery states, reducing the main production JavaScript chunk from 549.12 KB to 312.86 KB.
+- Updated React, Vite, ESLint, and related development dependencies; `npm audit` now reports zero known vulnerabilities.
+
+### Documentation
+
+- Documented the `/#library` and `/#control` routes, team-library persistence, match-package workflow, and release smoke tests.
+- Excluded Codex remote attachment staging files from version control.
+
+### Validation
+
+- Ran `npm audit` and `npm audit --omit=dev`.
+- Ran `npm run check` and `git diff --check`.
+- Smoke-tested direct `/#library`, `/#control`, and `/#overlay` routes from the production build.
+- Verified first-load scene-editor and toolbox chunks settle successfully after production code splitting.
+- Verified A/B selection, match-package health checks, Console startup, TAKE, and same-origin Overlay updates without browser console errors.
+
 ## Unreleased - 2026-06-13
 
 ### Fixed

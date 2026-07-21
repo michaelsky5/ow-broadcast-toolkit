@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createDefaultProject } from '../project/defaultProject'
 import { getCompetitionName } from '../project/branding'
 import {
@@ -21,7 +21,9 @@ import { getBundleDisplay, getSceneDisplay } from '../scenes/sceneCopy'
 import OverlayPage from '../overlay/OverlayPage'
 import ProgramPreview from '../overlay/ProgramPreview'
 import { getAppCopy, getAppLanguage } from './appCopy'
+import { APP_ROUTES, getAppRoute, getAppRouteHash, getAppRouteUrl } from './appRoute'
 import IntroSplash from './IntroSplash'
+import { isUsageNoticeAccepted } from './usageNotice'
 import ConsoleEntry from './ConsoleEntry'
 import {
   CONSOLE_SETTINGS_STORAGE_KEY,
@@ -29,11 +31,127 @@ import {
   normalizeSceneTransitionSettings
 } from './consolePreferences'
 import { getOverlayUrl } from './overlayUrl'
-import SceneEditor from './editors/SceneEditor'
 import { getEditorChromeCopy } from './editors/shared/editorCopy'
 import { EditorDialog } from './editors/shared/editorControls'
-import ToolboxWorkspace from './toolbox/ToolboxWorkspace'
+import {
+  MATCH_PACKAGE_ERROR_CODES,
+  MATCH_PACKAGE_IMPORT_MODES,
+  MATCH_PACKAGE_SCHEMA_VERSION,
+  applyMatchPackageToProject,
+  getMatchPackageImportMode,
+  resetProjectForNewMatchPackage,
+  parseMatchPackage
+} from '../team-library/matchPackage'
 import styles from './App.module.css'
+
+const TeamLibraryPage = lazy(() => import('../team-library/TeamLibraryPage'))
+const SceneEditor = lazy(() => import('./editors/SceneEditor'))
+const ToolboxWorkspace = lazy(() => import('./toolbox/ToolboxWorkspace'))
+
+function LibraryLoadState({ failed = false, language = 'zh', onBack, onRetry }) {
+  const isEnglish = language === 'en'
+
+  return (
+    <main className={styles.libraryLoadState} aria-live="polite">
+      <div className={styles.libraryLoadCard}>
+        <span>OWBT // TEAM LIBRARY</span>
+        <h1>{failed
+          ? (isEnglish ? 'Unable to load Team Library' : '素材仓库加载失败')
+          : (isEnglish ? 'Loading Team Library' : '正在加载素材仓库')}</h1>
+        <p>{failed
+          ? (isEnglish
+              ? 'A required page resource could not be loaded. Reload the page to try again.'
+              : '页面资源加载失败，请重新加载后再试。')
+          : (isEnglish ? 'Preparing local teams and assets…' : '正在准备本地队伍与素材…')}</p>
+        {failed && (
+          <div className={styles.libraryLoadActions}>
+            <button type="button" onClick={onRetry}>{isEnglish ? 'Reload' : '重新加载'}</button>
+            <button type="button" onClick={onBack}>{isEnglish ? 'Back' : '返回'}</button>
+          </div>
+        )}
+      </div>
+    </main>
+  )
+}
+
+class LibraryLoadBoundary extends Component {
+  state = { failed: false }
+
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+
+  componentDidCatch(error, info) {
+    console.error('[OWBT] Failed to load Team Library:', error, info)
+  }
+
+  render() {
+    if (this.state.failed) {
+      return (
+        <LibraryLoadState
+          failed
+          language={this.props.language}
+          onBack={this.props.onBack}
+          onRetry={() => window.location.reload()}
+        />
+      )
+    }
+
+    return this.props.children
+  }
+}
+
+function WorkspaceLoadState({ failed = false, language = 'zh', workspace = 'editor' }) {
+  const isEnglish = language === 'en'
+  const workspaceName = workspace === 'toolbox'
+    ? (isEnglish ? 'Toolbox' : '工具箱')
+    : (isEnglish ? 'Scene Editor' : '场景编辑器')
+
+  return (
+    <section className={styles.workspaceLoadState} aria-live="polite">
+      <div className={styles.workspaceLoadCard}>
+        <span>OWBT // {workspace === 'toolbox' ? 'TOOLBOX' : 'SCENE EDITOR'}</span>
+        <strong>{failed
+          ? (isEnglish ? `Unable to load ${workspaceName}` : `${workspaceName}加载失败`)
+          : (isEnglish ? `Loading ${workspaceName}` : `正在加载${workspaceName}`)}</strong>
+        <p>{failed
+          ? (isEnglish ? 'Reload the page to request the workspace bundle again.' : '请重新加载页面，再次获取工作区资源。')
+          : (isEnglish ? 'Preparing the controls required for this workspace…' : '正在准备该工作区所需的控制组件…')}</p>
+        {failed && (
+          <button type="button" onClick={() => window.location.reload()}>
+            {isEnglish ? 'Reload' : '重新加载'}
+          </button>
+        )}
+      </div>
+    </section>
+  )
+}
+
+class WorkspaceLoadBoundary extends Component {
+  state = { failed: false }
+
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+
+  componentDidCatch(error, info) {
+    console.error('[OWBT] Failed to load console workspace:', error, info)
+  }
+
+  render() {
+    if (this.state.failed) {
+      return (
+        <WorkspaceLoadState
+          failed
+          language={this.props.language}
+          workspace={this.props.workspace}
+        />
+      )
+    }
+
+    return this.props.children
+  }
+}
 
 const updateNested = (project, updater) => {
   const next = structuredClone(project)
@@ -80,9 +198,25 @@ const markTakeTransition = project => ({
   }
 })
 
-const isOverlayRoute = () => {
-  if (typeof window === 'undefined') return false
-  return window.location.hash.startsWith('#overlay')
+const getMatchPackageErrorMessage = (copy, error) => {
+  switch (error?.code) {
+    case MATCH_PACKAGE_ERROR_CODES.EMPTY:
+      return copy.matchPackageEmpty
+    case MATCH_PACKAGE_ERROR_CODES.INVALID_JSON:
+      return copy.matchPackageInvalidJson
+    case MATCH_PACKAGE_ERROR_CODES.WRONG_KIND:
+      return copy.matchPackageWrongKind
+    case MATCH_PACKAGE_ERROR_CODES.UNSUPPORTED_VERSION:
+      return copy.matchPackageUnsupportedVersion
+    case MATCH_PACKAGE_ERROR_CODES.MISSING_TEAMS:
+      return copy.matchPackageMissingTeams
+    case MATCH_PACKAGE_ERROR_CODES.DUPLICATE_TEAMS:
+      return copy.matchPackageDuplicateTeams
+    case MATCH_PACKAGE_ERROR_CODES.TOO_LARGE:
+      return copy.matchPackageTooLarge
+    default:
+      return copy.matchPackageInvalid
+  }
 }
 
 const setDocumentSurface = showOverlay => {
@@ -190,7 +324,7 @@ const normalizeConsoleSettings = settings => {
   next.confirmDangerActions = next.confirmDangerActions !== false
   next.operationLogLimit = getOperationLogLimit(next)
   next.interfaceLanguage = VALID_INTERFACE_LANGUAGES.includes(next.interfaceLanguage) ? next.interfaceLanguage : ''
-  next.startWorkspaceMode = ['production', 'toolbox', 'settings'].includes(next.startWorkspaceMode)
+  next.startWorkspaceMode = ['production', 'toolbox'].includes(next.startWorkspaceMode)
     ? next.startWorkspaceMode
     : DEFAULT_CONSOLE_SETTINGS.startWorkspaceMode
   Object.assign(next, normalizeSceneTransitionSettings(next))
@@ -243,7 +377,8 @@ const getUndoReasonLabel = (reason, copy) => {
     TAKE: copy.logReasonTake,
     'SWAP TEAMS': copy.logReasonSwapTeams,
     'RESET PROJECT': copy.logReasonResetProject,
-    'IMPORT PROJECT': copy.logReasonImportProject
+    'IMPORT PROJECT': copy.logReasonImportProject,
+    'IMPORT MATCH PACKAGE': copy.logReasonImportMatchPackage
   }
 
   return reasonLabels[key] || reason || copy.logReasonAction
@@ -414,24 +549,94 @@ const swapGraphicTeamSettings = graphics => {
   })
 }
 
+const swapProjectMatchSides = draft => {
+  const match = draft.currentMatch
+  if (!match) return
+
+  swapObjectFields(match, 'teamAId', 'teamBId')
+  swapObjectFields(match.score, 'teamA', 'teamB')
+  swapObjectFields(match.side, 'teamA', 'teamB')
+  swapObjectFields(match, 'bansA', 'bansB')
+  swapObjectFields(match.startingFive, 'teamA', 'teamB')
+  swapObjectFields(match.substitutes, 'teamA', 'teamB')
+
+  match.banOrderMode = flipBanOrderMode(match.banOrderMode)
+  ;['winner', 'winnerSide'].forEach(key => flipObjectSideField(match, key))
+  if (match.result) flipObjectSideField(match.result, 'winnerSide')
+  if (Array.isArray(match.mapLineup)) match.mapLineup.forEach(swapMapEntrySides)
+
+  swapHudSides(match.hud)
+  swapSceneSideSettings(draft.scenes?.settings)
+  swapGraphicTeamSettings(draft.tools?.graphics)
+}
+
 export default function App() {
-  const [showOverlay, setShowOverlay] = useState(isOverlayRoute)
+  const [route, setRoute] = useState(getAppRoute)
+  const routeRef = useRef(route)
+  const routeHashRef = useRef(typeof window === 'undefined' ? '' : window.location.hash)
+  const routeBlockerRef = useRef(null)
+
+  const onRouteBlockerChange = useCallback(blocker => {
+    routeBlockerRef.current = typeof blocker === 'function' ? blocker : null
+  }, [])
+
+  const navigateRoute = useCallback((nextRoute, options = {}) => {
+    const nextHash = getAppRouteHash(nextRoute)
+    const method = options.replace === true ? 'replaceState' : 'pushState'
+    if (window.location.hash !== nextHash) {
+      window.history[method](null, '', getAppRouteUrl(window.location, nextHash))
+    }
+    routeHashRef.current = nextHash
+    routeRef.current = nextRoute
+    setRoute(nextRoute)
+  }, [])
 
   useLayoutEffect(() => {
-    setDocumentSurface(showOverlay)
-  }, [showOverlay])
+    setDocumentSurface(route === APP_ROUTES.OVERLAY)
+  }, [route])
 
   useEffect(() => {
     const handleHashChange = () => {
-      const nextShowOverlay = isOverlayRoute()
-      setDocumentSurface(nextShowOverlay)
-      setShowOverlay(nextShowOverlay)
+      const nextRoute = getAppRoute()
+      const nextHash = window.location.hash
+
+      if (nextRoute === routeRef.current) {
+        routeHashRef.current = nextHash
+        return
+      }
+
+      const canLeaveRoute = routeBlockerRef.current?.({
+        from: routeRef.current,
+        to: nextRoute,
+        proceed: () => {
+          window.history.replaceState(null, '', getAppRouteUrl(window.location, nextHash))
+          routeHashRef.current = nextHash
+          routeRef.current = nextRoute
+          setRoute(nextRoute)
+        }
+      })
+      if (canLeaveRoute === false) {
+        window.history.replaceState(null, '', getAppRouteUrl(window.location, routeHashRef.current))
+        return
+      }
+
+      routeHashRef.current = nextHash
+      routeRef.current = nextRoute
+      setRoute(nextRoute)
     }
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
-  return showOverlay ? <OverlayPage /> : <ConsoleApp />
+  return route === APP_ROUTES.OVERLAY
+    ? <OverlayPage />
+    : (
+        <ConsoleApp
+          route={route}
+          onNavigateRoute={navigateRoute}
+          onRouteBlockerChange={onRouteBlockerChange}
+        />
+      )
 }
 
 function RailPanel({ title, children }) {
@@ -445,30 +650,81 @@ function RailPanel({ title, children }) {
   )
 }
 
-function ConsoleApp() {
+function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
+  const controlMode = route === APP_ROUTES.CONTROL
   const [project, setProject] = useState(() => loadStoredProject() || createDefaultProject())
   const [programProject, setProgramProject] = useState(() => loadStoredProgramProject() || project)
-  const [consoleScreen, setConsoleScreen] = useState('intro')
+  const [consoleScreen, setConsoleScreen] = useState(() => {
+    if (route === APP_ROUTES.LIBRARY) {
+      return isUsageNoticeAccepted() ? 'library' : 'intro'
+    }
+    if (controlMode) return 'workspace'
+    return 'intro'
+  })
+  const [libraryReturnScreen, setLibraryReturnScreen] = useState('entry')
+  const [libraryReturnRoute, setLibraryReturnRoute] = useState(APP_ROUTES.ROOT)
   const [previewSceneId, setPreviewSceneId] = useState(() => getConsoleSceneById(project.scenes.activeSceneId).id)
   const [editorSceneId, setEditorSceneId] = useState(() => getConsoleSceneById(project.scenes.activeSceneId).id)
   const [operationLog, setOperationLog] = useState([])
   const [undoStack, setUndoStack] = useState([])
   const [appDialog, setAppDialog] = useState(null)
+  const [matchPackageNotice, setMatchPackageNotice] = useState(null)
   const [workspaceMode, setWorkspaceMode] = useState('production')
-  const [sceneModeHints, setSceneModeHints] = useState({ 'live-hud': 'match', roster: 'roster' })
+  const [entrySection, setEntrySection] = useState('system')
+  const [sceneModeHints, setSceneModeHints] = useState({
+    'live-hud': 'match',
+    roster: controlMode ? 'teams' : 'roster'
+  })
   const [consoleSettings, setConsoleSettings] = useState(loadConsoleSettings)
-  const [rightRailCollapsed, setRightRailCollapsed] = useState(false)
+  const [rightRailCollapsed, setRightRailCollapsed] = useState(controlMode)
   const importInputRef = useRef(null)
   const projectTextRef = useRef(null)
+  const matchPackageTextRef = useRef(null)
   const projectRef = useRef(project)
   const programProjectRef = useRef(programProject)
   const hotkeyActionsRef = useRef({})
+  const consoleScreenRef = useRef(consoleScreen)
+  const libraryReturnScreenRef = useRef(libraryReturnScreen)
+  const previousRouteRef = useRef(route)
+  const internalLibraryNavigationRef = useRef(false)
   const copy = getAppCopy(project, consoleSettings.interfaceLanguage)
   const language = getAppLanguage(project, consoleSettings.interfaceLanguage)
   const competitionName = getCompetitionName(project, language)
   const overlayUrl = getOverlayUrl(project)
   const statusOptions = getStatusOptions(copy)
   const showRightRailControls = workspaceMode === 'production'
+
+  useEffect(() => {
+    consoleScreenRef.current = consoleScreen
+  }, [consoleScreen])
+
+  useEffect(() => {
+    libraryReturnScreenRef.current = libraryReturnScreen
+  }, [libraryReturnScreen])
+
+  useEffect(() => {
+    const previousRoute = previousRouteRef.current
+
+    if (route === APP_ROUTES.LIBRARY) {
+      if (!internalLibraryNavigationRef.current) {
+        setLibraryReturnRoute(previousRoute === APP_ROUTES.CONTROL ? APP_ROUTES.CONTROL : APP_ROUTES.ROOT)
+        setLibraryReturnScreen(previousRoute === APP_ROUTES.CONTROL || consoleScreenRef.current === 'workspace' ? 'workspace' : 'entry')
+      }
+      internalLibraryNavigationRef.current = false
+      setConsoleScreen(isUsageNoticeAccepted() ? 'library' : 'intro')
+    } else if (route === APP_ROUTES.CONTROL) {
+      setConsoleScreen('workspace')
+      setWorkspaceMode('production')
+      setSceneModeHints(previous => ({ ...previous, roster: 'teams' }))
+      setRightRailCollapsed(true)
+    } else if (previousRoute === APP_ROUTES.LIBRARY) {
+      setConsoleScreen(consoleScreenRef.current === 'intro' ? 'intro' : libraryReturnScreenRef.current)
+    } else if (previousRoute === APP_ROUTES.CONTROL) {
+      setConsoleScreen('intro')
+    }
+
+    previousRouteRef.current = route
+  }, [route])
 
   const programScene = useMemo(() => {
     return getSceneById(programProject.scenes.activeSceneId)
@@ -524,6 +780,7 @@ function ConsoleApp() {
     window.addEventListener('pagehide', flushProjectState)
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => {
+      flushProjectState()
       window.removeEventListener('pagehide', flushProjectState)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
@@ -544,10 +801,22 @@ function ConsoleApp() {
   const updateProject = (updater, options = {}) => {
     if (!options.skipUndo) pushUndoSnapshot(options.undoReason || 'EDIT')
 
-    setProject(prev => updateNested(prev, updater))
+    const nextProject = updateNested(projectRef.current, updater)
+    projectRef.current = nextProject
+    setProject(nextProject)
+
+    if (options.persistImmediately === true) {
+      publishProjectState(nextProject, 'console')
+    }
 
     if (options.live === true) {
-      setProgramProject(prev => updateNested(prev, options.programUpdater || updater))
+      const nextProgramProject = updateNested(programProjectRef.current, options.programUpdater || updater)
+      programProjectRef.current = nextProgramProject
+      setProgramProject(nextProgramProject)
+
+      if (options.persistImmediately === true) {
+        publishProgramState(nextProgramProject, 'console-program')
+      }
     }
   }
 
@@ -579,7 +848,21 @@ function ConsoleApp() {
 
   const enterWorkspace = () => {
     setConsoleScreen('workspace')
-    setWorkspaceMode(consoleSettings.startWorkspaceMode)
+    setWorkspaceMode(consoleSettings.startWorkspaceMode === 'toolbox' ? 'toolbox' : 'production')
+  }
+
+  const openTeamLibrary = returnScreen => {
+    const nextReturnScreen = returnScreen === 'workspace' ? 'workspace' : 'entry'
+    setLibraryReturnScreen(nextReturnScreen)
+    setLibraryReturnRoute(route === APP_ROUTES.CONTROL ? APP_ROUTES.CONTROL : APP_ROUTES.ROOT)
+    internalLibraryNavigationRef.current = true
+    setConsoleScreen('library')
+    onNavigateRoute(APP_ROUTES.LIBRARY)
+  }
+
+  const closeTeamLibrary = () => {
+    setConsoleScreen(libraryReturnScreen)
+    onNavigateRoute(libraryReturnRoute, { replace: true })
   }
 
   const selectPreviewScene = scene => {
@@ -593,6 +876,7 @@ function ConsoleApp() {
   }
 
   const openSetup = () => {
+    setEntrySection('system')
     setConsoleScreen('entry')
     pushLog(copy.logOpenSetup)
   }
@@ -603,7 +887,8 @@ function ConsoleApp() {
   }
 
   const openSettings = () => {
-    setWorkspaceMode('settings')
+    setEntrySection('system')
+    setConsoleScreen('entry')
     pushLog(copy.logOpenSettings)
   }
 
@@ -612,27 +897,30 @@ function ConsoleApp() {
   }
 
   const autoTakeProgramScene = (scene, options = {}) => {
-    setProgramProject(prev => {
-      const nextProject = {
-        ...prev,
-        scenes: {
-          ...prev.scenes,
-          activeSceneId: scene.id
-        }
+    const previousProgramProject = programProjectRef.current
+    const nextProject = {
+      ...previousProgramProject,
+      scenes: {
+        ...previousProgramProject.scenes,
+        activeSceneId: scene.id
       }
+    }
 
-      const isSameProgramScene = prev.scenes?.activeSceneId === scene.id
-      return options.suppressSameSceneTransition && isSameProgramScene
-        ? nextProject
-        : markTakeTransition(nextProject)
-    })
+    const isSameProgramScene = previousProgramProject.scenes?.activeSceneId === scene.id
+    const nextProgramProject = options.suppressSameSceneTransition && isSameProgramScene
+      ? nextProject
+      : markTakeTransition(nextProject)
+    programProjectRef.current = nextProgramProject
+    setProgramProject(nextProgramProject)
     setPreviewSceneId('live-hud')
     pushLog(copy.logAutoTake(getSceneName(scene, language)))
   }
 
   const takePreviewToProgram = () => {
     pushUndoSnapshot('TAKE')
-    setProgramProject(markTakeTransition(structuredClone(previewProject)))
+    const nextProgramProject = markTakeTransition(structuredClone(previewProject))
+    programProjectRef.current = nextProgramProject
+    setProgramProject(nextProgramProject)
     pushLog(copy.logTake(getSceneName(previewScene, language)))
   }
 
@@ -646,24 +934,7 @@ function ConsoleApp() {
 
   const swapMatchSides = () => {
     updateProject(draft => {
-      const match = draft.currentMatch
-      if (!match) return
-
-      swapObjectFields(match, 'teamAId', 'teamBId')
-      swapObjectFields(match.score, 'teamA', 'teamB')
-      swapObjectFields(match.side, 'teamA', 'teamB')
-      swapObjectFields(match, 'bansA', 'bansB')
-      swapObjectFields(match.startingFive, 'teamA', 'teamB')
-      swapObjectFields(match.substitutes, 'teamA', 'teamB')
-
-      match.banOrderMode = flipBanOrderMode(match.banOrderMode)
-      ;['winner', 'winnerSide'].forEach(key => flipObjectSideField(match, key))
-      if (match.result) flipObjectSideField(match.result, 'winnerSide')
-      if (Array.isArray(match.mapLineup)) match.mapLineup.forEach(swapMapEntrySides)
-
-      swapHudSides(match.hud)
-      swapSceneSideSettings(draft.scenes?.settings)
-      swapGraphicTeamSettings(draft.tools?.graphics)
+      swapProjectMatchSides(draft)
     }, { live: true, undoReason: 'SWAP TEAMS' })
     pushLog(copy.logSwapTeams)
   }
@@ -677,11 +948,14 @@ function ConsoleApp() {
     }
 
     setUndoStack(prev => prev.slice(1))
+    projectRef.current = snapshot.project
+    programProjectRef.current = snapshot.programProject
     setProject(snapshot.project)
     setProgramProject(snapshot.programProject)
+    setMatchPackageNotice(null)
     setPreviewSceneId(snapshot.previewSceneId)
     setEditorSceneId(snapshot.editorSceneId)
-    setWorkspaceMode(snapshot.workspaceMode)
+    setWorkspaceMode(snapshot.workspaceMode === 'toolbox' ? 'toolbox' : 'production')
     pushLog(copy.logUndo(getUndoReasonLabel(snapshot.reason, copy)))
   }
 
@@ -704,8 +978,11 @@ function ConsoleApp() {
   const performResetProject = () => {
     pushUndoSnapshot('RESET PROJECT')
     const next = resetStoredProject()
+    projectRef.current = next
+    programProjectRef.current = next
     setProject(next)
     setProgramProject(next)
+    setMatchPackageNotice(null)
     setPreviewSceneId(next.scenes.activeSceneId)
     setEditorSceneId(next.scenes.activeSceneId)
     pushLog(copy.logResetProject)
@@ -746,8 +1023,11 @@ function ConsoleApp() {
   const applyImportedProject = importedProject => {
     pushUndoSnapshot('IMPORT PROJECT')
     const next = replaceStoredProject(importedProject)
+    projectRef.current = next
+    programProjectRef.current = next
     setProject(next)
     setProgramProject(next)
+    setMatchPackageNotice(null)
     setPreviewSceneId(getConsoleSceneById(next.scenes.activeSceneId).id)
     setEditorSceneId(getConsoleSceneById(next.scenes.activeSceneId).id)
     pushLog(copy.logImportProject)
@@ -884,6 +1164,182 @@ function ConsoleApp() {
     })
   }
 
+  const applyPastedMatchPackage = (matchPackage, importMode) => {
+    updateProject(draft => {
+      if (importMode === MATCH_PACKAGE_IMPORT_MODES.SWAP) {
+        swapProjectMatchSides(draft)
+      } else if (importMode === MATCH_PACKAGE_IMPORT_MODES.REPLACE) {
+        resetProjectForNewMatchPackage(draft)
+      }
+
+      applyMatchPackageToProject(draft, matchPackage, {
+        preservePlayerIds: importMode !== MATCH_PACKAGE_IMPORT_MODES.REPLACE
+      })
+    }, {
+      persistImmediately: true,
+      undoReason: 'IMPORT MATCH PACKAGE'
+    })
+    setAppDialog(null)
+    setMatchPackageNotice({
+      title: copy.matchPackageImported(matchPackage.teams.teamA.name, matchPackage.teams.teamB.name),
+      message: importMode === MATCH_PACKAGE_IMPORT_MODES.REFRESH
+        ? copy.matchPackageImportedRefreshMeta
+        : importMode === MATCH_PACKAGE_IMPORT_MODES.SWAP
+          ? copy.matchPackageImportedSwapMeta
+          : copy.matchPackageImportedReplaceMeta
+    })
+    pushLog(copy.logImportMatchPackage)
+  }
+
+  const showMatchPackagePreview = matchPackage => {
+    const importMode = getMatchPackageImportMode(project, matchPackage)
+    const impact = importMode === MATCH_PACKAGE_IMPORT_MODES.REFRESH
+      ? {
+          message: copy.matchPackageRefreshMessage,
+          label: copy.matchPackageRefreshImpactLabel,
+          fields: copy.matchPackageRefreshImpact,
+          confirm: copy.matchPackageRefreshConfirm
+        }
+      : importMode === MATCH_PACKAGE_IMPORT_MODES.SWAP
+        ? {
+            message: copy.matchPackageSwapMessage,
+            label: copy.matchPackageSwapImpactLabel,
+            fields: copy.matchPackageSwapImpact,
+            confirm: copy.matchPackageSwapConfirm
+          }
+        : {
+            message: copy.matchPackageReplaceMessage,
+            label: copy.matchPackageReplaceImpactLabel,
+            fields: copy.matchPackageReplaceImpact,
+            confirm: copy.matchPackageReplaceConfirm
+          }
+    const previewTeams = [
+      { side: copy.matchPackageSideA, team: matchPackage.teams.teamA },
+      { side: copy.matchPackageSideB, team: matchPackage.teams.teamB }
+    ]
+
+    setAppDialog({
+      kicker: copy.matchPackage,
+      title: copy.matchPackagePreviewTitle,
+      message: impact.message,
+      wide: true,
+      children: (
+        <div className={styles.matchPackagePreview}>
+          {previewTeams.map(({ side, team }) => (
+            <article key={side}>
+              <div className={styles.matchPackagePreviewMark} style={{ '--match-team-color': team.primaryColor || 'var(--theme-primary)' }}>
+                {team.logo
+                  ? <img src={team.logo} alt="" />
+                  : <strong>{String(team.shortName || team.name || side).slice(0, 3)}</strong>}
+              </div>
+              <div>
+                <span>{side}</span>
+                <strong>{team.name}</strong>
+                <em>{team.shortName} / {copy.matchPackagePlayers(team.players.length)}</em>
+                <div className={styles.matchPackagePreviewRoster}>
+                  <span>{copy.matchPackageRoster}</span>
+                  <div>
+                    {team.players.slice(0, 5).map((player, index) => (
+                      <small key={`${player.id}-${index}`}>{player.name}</small>
+                    ))}
+                  </div>
+                  <em className={team.players.length >= 5 ? styles.matchPackageLineupReady : styles.matchPackageLineupWarning}>
+                    {team.players.length >= 5
+                      ? copy.matchPackageLineupReady
+                      : copy.matchPackageLineupShort(team.players.length)}
+                  </em>
+                </div>
+              </div>
+            </article>
+          ))}
+          <div
+            className={`${styles.matchPackagePreservedState} ${
+              importMode === MATCH_PACKAGE_IMPORT_MODES.REPLACE ? styles.matchPackageResetState : ''
+            }`}
+          >
+            <span>{impact.label}</span>
+            <strong>{impact.fields}</strong>
+          </div>
+        </div>
+      ),
+      actions: [
+        { label: copy.cancel, onClick: () => setAppDialog(null) },
+        {
+          label: impact.confirm,
+          tone: 'primary',
+          onClick: () => applyPastedMatchPackage(matchPackage, importMode)
+        }
+      ]
+    })
+  }
+
+  const showMatchPackageTextImport = (
+    initialText = '',
+    message = copy.matchPackagePasteMessage
+  ) => {
+    setAppDialog({
+      kicker: copy.matchPackage,
+      title: copy.matchPackagePasteTitle,
+      message,
+      wide: true,
+      children: (
+        <div className={styles.matchPackagePasteEditor}>
+          <textarea
+            key={`${message}-${initialText.length}`}
+            ref={matchPackageTextRef}
+            defaultValue={initialText}
+            aria-label={copy.matchPackagePasteTitle}
+            placeholder={copy.matchPackagePastePlaceholder}
+            spellCheck={false}
+          />
+          <div>
+            <span>{copy.matchPackageExpectedFormat}</span>
+            <strong>{MATCH_PACKAGE_SCHEMA_VERSION}</strong>
+          </div>
+        </div>
+      ),
+      actions: [
+        { label: copy.cancel, onClick: () => setAppDialog(null) },
+        {
+          label: copy.matchPackagePreview,
+          tone: 'primary',
+          onClick: () => {
+            const text = matchPackageTextRef.current?.value || ''
+            try {
+              showMatchPackagePreview(parseMatchPackage(text))
+            } catch (error) {
+              showMatchPackageTextImport(text, getMatchPackageErrorMessage(copy, error))
+            }
+          }
+        }
+      ]
+    })
+  }
+
+  const handlePasteMatchPackage = async () => {
+    let text = ''
+    let clipboardDenied = false
+    setMatchPackageNotice(null)
+    try {
+      if (!navigator.clipboard?.readText) throw new Error('Clipboard unavailable')
+      text = await navigator.clipboard.readText()
+    } catch {
+      // OBS browser docks can deny clipboard reads; the manual paste dialog remains available.
+      clipboardDenied = true
+    }
+
+    if (!text.trim()) {
+      showMatchPackageTextImport('', clipboardDenied ? copy.matchPackageClipboardDenied : copy.matchPackageClipboardEmpty)
+      return
+    }
+
+    try {
+      showMatchPackagePreview(parseMatchPackage(text))
+    } catch (error) {
+      showMatchPackageTextImport(text, getMatchPackageErrorMessage(copy, error))
+    }
+  }
+
   const handleExportProject = () => {
     setAppDialog({
       kicker: copy.project,
@@ -975,7 +1431,7 @@ function ConsoleApp() {
         project={project}
         languageOverride={consoleSettings.interfaceLanguage}
         duration={project.event?.startupMotion === 'reduced' ? 650 : 1450}
-        onFinish={() => setConsoleScreen('entry')}
+        onFinish={() => setConsoleScreen(route === APP_ROUTES.LIBRARY ? 'library' : 'entry')}
       />
     )
   }
@@ -984,16 +1440,45 @@ function ConsoleApp() {
     return (
       <ConsoleEntry
         project={project}
+        activeSection={entrySection}
         consoleLanguage={language}
+        consoleSettingsPanel={(
+          <ConsoleSettingsWorkspace
+            copy={copy}
+            language={language}
+            settings={consoleSettings}
+            onLanguageChange={updateConsoleLanguage}
+            onReset={resetConsoleSettings}
+            onUpdate={updateConsoleSettings}
+          />
+        )}
+        onSectionChange={setEntrySection}
         onUpdateConsoleLanguage={updateConsoleLanguage}
         onUpdateProject={updateProject}
+        onOpenTeamLibrary={() => openTeamLibrary('entry')}
         onEnterConsole={enterWorkspace}
       />
     )
   }
 
+  if (consoleScreen === 'library') {
+    return (
+      <LibraryLoadBoundary language={language} onBack={closeTeamLibrary}>
+        <Suspense fallback={<LibraryLoadState language={language} />}>
+          <TeamLibraryPage
+            project={project}
+            language={language}
+            onBack={closeTeamLibrary}
+            onRouteBlockerChange={onRouteBlockerChange}
+            onUpdateProject={updateProject}
+          />
+        </Suspense>
+      </LibraryLoadBoundary>
+    )
+  }
+
   return (
-    <div className={styles.app}>
+    <div className={`${styles.app} ${controlMode ? styles.controlApp : ''}`}>
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
           <div className={styles.logo}>
@@ -1073,6 +1558,10 @@ function ConsoleApp() {
               <span>{copy.setupDock}</span>
               <em>{copy.setupDockMeta}</em>
             </button>
+            <button type="button" onClick={() => openTeamLibrary('workspace')}>
+              <span>{copy.assetLibraryDock}</span>
+              <em>{copy.assetLibraryDockMeta}</em>
+            </button>
             <button
               type="button"
               className={workspaceMode === 'toolbox' ? styles.activeDockButton : ''}
@@ -1080,14 +1569,6 @@ function ConsoleApp() {
             >
               <span>{copy.toolbox}</span>
               <em>{copy.toolboxDockMeta}</em>
-            </button>
-            <button
-              type="button"
-              className={workspaceMode === 'settings' ? styles.activeDockButton : ''}
-              onClick={openSettings}
-            >
-              <span>{copy.settingsDock}</span>
-              <em>{copy.settingsDockMeta}</em>
             </button>
           </div>
         </section>
@@ -1101,10 +1582,11 @@ function ConsoleApp() {
           </div>
 
           <div className={styles.actions}>
+            <button className={styles.primaryAction} onClick={handlePasteMatchPackage}>{copy.pasteMatchPackage}</button>
             <button className={styles.primaryAction} onClick={copyOverlayUrl}>{copy.copyOverlayUrl}</button>
-            <button onClick={handleExportProject}>{copy.exportProject}</button>
-            <button onClick={handleImportProjectChoice}>{copy.importProject}</button>
-            <button className={styles.dangerAction} onClick={handleResetProject}>{copy.resetProject}</button>
+            <button className={styles.projectFileAction} onClick={handleExportProject}>{copy.exportProject}</button>
+            <button className={styles.projectFileAction} onClick={handleImportProjectChoice}>{copy.importProject}</button>
+            <button className={`${styles.dangerAction} ${styles.projectFileAction}`} onClick={handleResetProject}>{copy.resetProject}</button>
             <input
               ref={importInputRef}
               type="file"
@@ -1114,6 +1596,17 @@ function ConsoleApp() {
             />
           </div>
         </header>
+
+        {matchPackageNotice && (
+          <section className={styles.consoleNotice} role="status">
+            <div>
+              <span>{copy.matchPackage}</span>
+              <strong>{matchPackageNotice.title}</strong>
+              <em>{matchPackageNotice.message}</em>
+            </div>
+            <button type="button" aria-label={copy.dismissNotice} onClick={() => setMatchPackageNotice(null)}>×</button>
+          </section>
+        )}
 
         <section className={styles.statusGrid}>
           <div className={styles.statBox}>
@@ -1155,21 +1648,16 @@ function ConsoleApp() {
         </section>
 
         {workspaceMode === 'toolbox' ? (
-          <ToolboxWorkspace
-            project={project}
-            language={language}
-            programScene={programScene}
-            onUpdateProject={updateProject}
-          />
-        ) : workspaceMode === 'settings' ? (
-          <ConsoleSettingsWorkspace
-            copy={copy}
-            language={language}
-            settings={consoleSettings}
-            onLanguageChange={updateConsoleLanguage}
-            onReset={resetConsoleSettings}
-            onUpdate={updateConsoleSettings}
-          />
+          <WorkspaceLoadBoundary key="toolbox" language={language} workspace="toolbox">
+            <Suspense fallback={<WorkspaceLoadState language={language} workspace="toolbox" />}>
+              <ToolboxWorkspace
+                project={project}
+                language={language}
+                programScene={programScene}
+                onUpdateProject={updateProject}
+              />
+            </Suspense>
+          </WorkspaceLoadBoundary>
         ) : (
           <section className={`${styles.consoleBody} ${rightRailCollapsed ? styles.consoleBodyRailCollapsed : ''}`}>
             <div className={styles.productionColumn}>
@@ -1201,20 +1689,25 @@ function ConsoleApp() {
                 </div>
               </section>
 
-              <SceneEditor
-                project={project}
-                scene={editorScene}
-                copy={copy}
-                language={language}
-                statusOptions={statusOptions}
-                onUpdateProject={updateProject}
-                onSelectScene={sceneId => selectPreviewScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene)}
-                onAutoTakeScene={(sceneId, options) => autoTakeProgramScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene, options)}
-                onTakeToProgram={takePreviewToProgram}
-                sceneModeHints={sceneModeHints}
-                onSceneModeHintChange={updateSceneModeHint}
-                canTakeToProgram
-              />
+              <WorkspaceLoadBoundary key="editor" language={language} workspace="editor">
+                <Suspense fallback={<WorkspaceLoadState language={language} workspace="editor" />}>
+                  <SceneEditor
+                    project={project}
+                    scene={editorScene}
+                    copy={copy}
+                    language={language}
+                    statusOptions={statusOptions}
+                    onUpdateProject={updateProject}
+                    onSelectScene={sceneId => selectPreviewScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene)}
+                    onAutoTakeScene={(sceneId, options) => autoTakeProgramScene(SCENE_REGISTRY.find(scene => scene.id === sceneId) || previewScene, options)}
+                    onTakeToProgram={takePreviewToProgram}
+                    sceneModeHints={sceneModeHints}
+                    onSceneModeHintChange={updateSceneModeHint}
+                    controlMode={controlMode}
+                    canTakeToProgram
+                  />
+                </Suspense>
+              </WorkspaceLoadBoundary>
             </div>
 
             {!rightRailCollapsed && (
@@ -1266,7 +1759,15 @@ function ConsoleApp() {
 
 function ConsoleSettingsWorkspace({ copy, language, settings, onLanguageChange, onReset, onUpdate }) {
   const [recordingCommandId, setRecordingCommandId] = useState('')
+  const [copiedAddress, setCopiedAddress] = useState('')
   const hotkeyConflicts = useMemo(() => getHotkeyConflicts(settings.hotkeys), [settings.hotkeys])
+  const surfaceBaseUrl = typeof window === 'undefined'
+    ? ''
+    : `${window.location.origin}${window.location.pathname}${window.location.search}`
+  const surfaceAddresses = {
+    library: `${surfaceBaseUrl}#library`,
+    control: `${surfaceBaseUrl}#control`
+  }
   const hotkeyRows = HOTKEY_COMMANDS.map(command => ({
     ...command,
     keys: settings.hotkeys?.[command.id] || command.defaultKeys,
@@ -1275,8 +1776,7 @@ function ConsoleSettingsWorkspace({ copy, language, settings, onLanguageChange, 
   }))
   const startWorkspaceLabels = {
     production: copy.startWorkspaceProduction,
-    toolbox: copy.startWorkspaceToolbox,
-    settings: copy.startWorkspaceSettings
+    toolbox: copy.startWorkspaceToolbox
   }
   const transitionModeLabels = {
     none: copy.transitionNone,
@@ -1341,6 +1841,16 @@ function ConsoleSettingsWorkspace({ copy, language, settings, onLanguageChange, 
     })
   }
 
+  const copySurfaceAddress = async addressId => {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable')
+      await navigator.clipboard.writeText(surfaceAddresses[addressId])
+      setCopiedAddress(addressId)
+    } catch {
+      setCopiedAddress('fallback')
+    }
+  }
+
   return (
     <section className={styles.consoleSettings}>
       <section className={`${styles.panel} ${styles.settingsOverview}`}>
@@ -1377,6 +1887,26 @@ function ConsoleSettingsWorkspace({ copy, language, settings, onLanguageChange, 
             <strong>{copy.settingDesktopRuntimeMeta}</strong>
           </div>
         </div>
+      </section>
+
+      <section className={`${styles.panel} ${styles.settingsAccessPanel}`}>
+        <div className={styles.panelTitle}>{copy.settingAccessAddresses}</div>
+        <p>{copy.settingAccessMeta}</p>
+        <div className={styles.settingsAddressGrid}>
+          {[
+            { id: 'library', label: copy.settingLibraryAddress },
+            { id: 'control', label: copy.settingControlAddress }
+          ].map(address => (
+            <label className={styles.settingsAddressRow} key={address.id}>
+              <span>{address.label}</span>
+              <input value={surfaceAddresses[address.id]} readOnly onFocus={event => event.target.select()} />
+              <button type="button" onClick={() => copySurfaceAddress(address.id)}>
+                {copiedAddress === address.id ? copy.settingAddressCopied : copy.copyAddress}
+              </button>
+            </label>
+          ))}
+        </div>
+        {copiedAddress === 'fallback' && <em className={styles.settingsAddressFallback}>{copy.settingCopyFallback}</em>}
       </section>
 
       <section className={styles.settingsGridPanel}>
@@ -1430,7 +1960,6 @@ function ConsoleSettingsWorkspace({ copy, language, settings, onLanguageChange, 
                 >
                   <option value="production">{copy.startWorkspaceProduction}</option>
                   <option value="toolbox">{copy.startWorkspaceToolbox}</option>
-                  <option value="settings">{copy.startWorkspaceSettings}</option>
                 </select>
               </label>
               <label className={styles.field}>

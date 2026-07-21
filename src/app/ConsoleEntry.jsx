@@ -21,15 +21,32 @@ const isSupportedLogoFile = file => (
 
 export default function ConsoleEntry({
   project,
+  activeSection = 'system',
   consoleLanguage = '',
+  consoleSettingsPanel,
+  onSectionChange,
   onUpdateConsoleLanguage,
   onUpdateProject,
+  onOpenTeamLibrary,
   onEnterConsole
 }) {
   const logoInputRef = useRef(null)
   const [entryDialog, setEntryDialog] = useState(null)
   const copy = getAppCopy(project, consoleLanguage)
   const language = getAppLanguage(project, consoleLanguage)
+  const sectionCopy = language === 'en'
+    ? {
+        title: 'System Settings',
+        system: 'System Settings',
+        opening: 'Opening Settings',
+        library: 'Asset Library'
+      }
+    : {
+        title: '系统设置',
+        system: '系统设置',
+        opening: '开场设置',
+        library: '素材仓库'
+      }
   const names = getCompetitionNamePair(project)
   const overlayUrl = getOverlayUrl(project)
   const outputWidth = project.output?.width || 1920
@@ -210,7 +227,7 @@ export default function ConsoleEntry({
       <header className={styles.topbar}>
         <div className={styles.titleBlock}>
           <span>{copy.startupKicker}</span>
-          <h1>{copy.consoleTitle}</h1>
+          <h1>{sectionCopy.title}</h1>
         </div>
 
         <div className={styles.topStatus}>
@@ -222,13 +239,38 @@ export default function ConsoleEntry({
             <span>{copy.status}</span>
             <strong>{copy.statusStandby}</strong>
           </div>
+          <button type="button" className={styles.libraryButton} onClick={onOpenTeamLibrary}>
+            {sectionCopy.library}
+          </button>
           <button className={styles.enterButton} onClick={onEnterConsole}>
             {copy.enterConsole}
           </button>
         </div>
       </header>
 
-      <section className={styles.workspace}>
+      <nav className={styles.sectionTabs} aria-label={sectionCopy.title}>
+        <button
+          type="button"
+          className={activeSection === 'system' ? styles.sectionTabActive : ''}
+          onClick={() => onSectionChange?.('system')}
+        >
+          {sectionCopy.system}
+        </button>
+        <button
+          type="button"
+          className={activeSection === 'opening' ? styles.sectionTabActive : ''}
+          onClick={() => onSectionChange?.('opening')}
+        >
+          {sectionCopy.opening}
+        </button>
+      </nav>
+
+      {activeSection === 'system' ? (
+        <section className={styles.preferencesWorkspace}>
+          {consoleSettingsPanel}
+        </section>
+      ) : (
+        <section className={styles.workspace}>
         <section className={styles.setupColumn}>
           <section className={`${styles.panel} ${styles.eventPanel}`}>
             <div className={styles.panelTitle}>
@@ -519,7 +561,8 @@ export default function ConsoleEntry({
             </div>
           </section>
         </aside>
-      </section>
+        </section>
+      )}
       {entryDialog && <EditorDialog {...entryDialog} />}
     </main>
   )
