@@ -24,9 +24,48 @@
 }
 
 .topbar,
-.workspace {
+.workspace,
+.sectionTabs,
+.preferencesWorkspace {
   max-width: 1540px;
   margin-inline: auto;
+}
+
+.sectionTabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 44px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid var(--theme-primary);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.sectionTabs button {
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.sectionTabs button:last-child {
+  border-right: 0;
+}
+
+.sectionTabs button:hover,
+.sectionTabs .sectionTabActive {
+  background: var(--theme-primary-softer);
+  box-shadow: inset 0 -3px 0 var(--theme-primary);
+  color: var(--theme-primary);
+}
+
+.preferencesWorkspace {
+  min-width: 0;
 }
 
 .topbar {
@@ -79,7 +118,7 @@
 
 .topStatus {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 112px 172px;
+  grid-template-columns: minmax(0, 1fr) 112px 150px 172px;
   min-height: 64px;
 }
 
@@ -105,6 +144,7 @@
 }
 
 .enterButton,
+.libraryButton,
 .panelTitle button,
 .urlRow button,
 .inputActionRow button {
@@ -122,7 +162,15 @@
   min-height: 64px;
 }
 
+.libraryButton {
+  min-height: 64px;
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.045);
+  color: #fff;
+}
+
 .enterButton:hover,
+.libraryButton:hover,
 .panelTitle button:hover,
 .urlRow button:hover,
 .inputActionRow button:hover {
@@ -757,7 +805,7 @@
   }
 
   .topStatus {
-    grid-template-columns: minmax(0, 1fr) 112px 172px;
+    grid-template-columns: minmax(0, 1fr) 112px 150px 172px;
   }
 
   .noteGrid {

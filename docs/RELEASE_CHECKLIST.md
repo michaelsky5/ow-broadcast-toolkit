@@ -20,15 +20,21 @@ Open:
 
 ```text
 http://localhost:4173/
+http://localhost:4173/#library
+http://localhost:4173/#control
 http://localhost:4173/#overlay
 ```
 
-If the preview server selects a different port, use that origin for both routes.
+If the preview server selects a different port, use that origin for all routes.
 
 ## Smoke Test
 
 - Enter the startup flow and accept the community usage notice.
 - Open startup setup and confirm event identity, logo controls, theme color, output settings, Overlay URL, transparent overlay, and the preflight panel appear.
+- Open `/#library` directly and confirm the reusable team library loads without entering the Console first.
+- Create or import two teams, assign A/B, open match-package health checks, and confirm warnings do not block a valid package.
+- Copy a valid match package, open `/#control`, paste it, and confirm refresh/swap/replace impact is shown before applying.
+- Confirm the applied A/B teams, roster selections, logos, and colors appear in the current-match editor.
 - Enter the Console and confirm Scene Selector, Workspace, Preview, Program, editor, Quick Actions, Real-Time Status, and Operation Log appear.
 - Select a scene, press TAKE, and confirm Program updates.
 - Set Scene Transition to Brand Stinger, press TAKE between two different scenes, and confirm the transition is visible.
@@ -50,7 +56,7 @@ If the preview server selects a different port, use that origin for both routes.
 
 - `vercel.json` uses `npm run build:web`, publishes `dist`, and rewrites paths to `/index.html`.
 - `netlify.toml` uses `npm run build:web`, publishes `dist`, and redirects paths to `/index.html`.
-- The OBS Overlay route uses the hash URL `/#overlay`, so static hosts do not need a separate `/overlay` route.
+- Team Library, OBS Control, and Overlay use the hash URLs `/#library`, `/#control`, and `/#overlay`, so static hosts do not need separate rewrites for those surfaces.
 
 ## Metadata And Icons
 
@@ -64,5 +70,6 @@ If the preview server selects a different port, use that origin for both routes.
 ## Known Web Limitations
 
 - The web app cannot read arbitrary local filesystem paths.
+- Team-library records live in browser IndexedDB; export a library backup before clearing site data or moving to another browser profile.
 - Browser clipboard writes may fall back to showing the Overlay URL in a dialog when the browser blocks clipboard access.
 - Full local asset roots, batch asset management, OBS scene export paths, and deeper filesystem workflows belong to the future Windows desktop version.

@@ -816,6 +816,281 @@
   container: team-db-panel / inline-size;
 }
 
+.currentMatchPanel {
+  overflow: hidden;
+  container: current-match-panel / inline-size;
+}
+
+.currentMatchIntro {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.5fr) minmax(0, 1.5fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.currentMatchIntro > div,
+.currentMatchIntro > p {
+  min-width: 0;
+  min-height: 48px;
+  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(0,0,0,0.26);
+  margin: 0;
+  padding: 8px 10px;
+}
+
+.currentMatchIntro > div {
+  display: grid;
+  gap: 5px;
+}
+
+.currentMatchIntro span,
+.currentMatchTeamFields span,
+.currentMatchLineup header span {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.currentMatchIntro strong {
+  color: var(--theme-primary);
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.currentMatchIntro > p {
+  display: flex;
+  align-items: center;
+  color: var(--theme-muted-text);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.currentMatchTeamsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.currentMatchTeamCard {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-top: 2px solid var(--theme-primary);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 22px),
+    rgba(0,0,0,0.24);
+  padding: 10px;
+}
+
+.currentMatchTeamHeader {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 116px;
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+  margin-bottom: 10px;
+}
+
+.currentMatchTeamMark {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--current-team-color) 64%, transparent);
+  background: rgba(0,0,0,0.42);
+  color: var(--current-team-color);
+}
+
+.currentMatchTeamMark img {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+}
+
+.currentMatchTeamMark strong {
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.currentMatchTeamHeader > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.currentMatchSide {
+  color: var(--theme-primary);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.currentMatchTeamHeader > div > strong,
+.currentMatchTeamHeader > div > em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.currentMatchTeamHeader > div > strong {
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.currentMatchTeamHeader > div > em {
+  color: var(--theme-muted-text);
+  font-size: 10px;
+  font-style: normal;
+}
+
+.currentMatchTeamHeader .currentMatchDisplayActive {
+  border-color: var(--theme-primary);
+  background: var(--theme-primary);
+  color: #050505;
+}
+
+.currentMatchTeamFields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(110px, 0.38fr);
+  gap: 8px;
+}
+
+.currentMatchTeamFields label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.currentMatchLineup {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.09);
+  padding-top: 10px;
+}
+
+.currentMatchLineup > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.currentMatchLineup header > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.currentMatchLineup header strong {
+  color: var(--theme-primary);
+  font-size: 11px;
+}
+
+.currentMatchLineup header em {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-style: normal;
+}
+
+.currentMatchPlayerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+  gap: 6px;
+}
+
+.currentMatchPlayerGrid button {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  gap: 7px;
+  align-items: center;
+  height: 36px;
+  min-height: 36px;
+  text-align: left;
+}
+
+.currentMatchPlayerGrid button span,
+.currentMatchPlayerGrid button em {
+  color: var(--theme-muted-text);
+  font-size: 9px;
+  font-style: normal;
+}
+
+.currentMatchPlayerGrid button strong {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.currentMatchPlayerGrid .currentMatchPlayerActive {
+  border-color: var(--theme-primary-border);
+  background: var(--theme-primary-softer);
+}
+
+.currentMatchPlayerGrid .currentMatchPlayerActive span,
+.currentMatchPlayerGrid .currentMatchPlayerActive em {
+  color: var(--theme-primary);
+}
+
+.currentMatchNoPlayers,
+.currentMatchTeamMissing {
+  color: var(--theme-muted-text);
+}
+
+.currentMatchNoPlayers {
+  grid-column: 1 / -1;
+  border: 1px dashed rgba(255,255,255,0.12);
+  padding: 14px;
+  text-align: center;
+}
+
+.currentMatchTeamMissing {
+  display: grid;
+  align-content: center;
+  min-height: 220px;
+  gap: 8px;
+  text-align: center;
+}
+
+.currentMatchTeamMissing > strong {
+  color: var(--theme-text);
+  font-size: 16px;
+}
+
+.currentMatchTeamMissing > p {
+  margin: 0;
+  font-size: 11px;
+}
+
+@container current-match-panel (max-width: 840px) {
+  .currentMatchIntro,
+  .currentMatchTeamsGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container current-match-panel (max-width: 480px) {
+  .currentMatchTeamHeader {
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+
+  .currentMatchTeamMark {
+    width: 46px;
+    height: 46px;
+  }
+
+  .currentMatchTeamHeader > button {
+    grid-column: 1 / -1;
+  }
+
+  .currentMatchTeamFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .teamDbToolbar {
   display: grid;
   grid-template-columns: 112px 96px minmax(240px, 1fr) 108px 108px 120px 112px;

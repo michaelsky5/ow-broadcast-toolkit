@@ -684,7 +684,21 @@ const getCasterEditorCopy = language => CASTER_EDITOR_COPY[language] || CASTER_E
 const ROSTER_EDITOR_COPY = {
   zh: {
     sceneCopy: '阵容包装',
-    teamDatabase: '队伍库',
+    teamDatabase: '当前对阵',
+    currentMatchTeams: '当前对阵',
+    currentMatchMeta: '导播项目',
+    currentSide: side => `${side} 队`,
+    projectTeamCount: count => `${count} / 2 支队伍`,
+    matchPackageOnly: '完整队伍资料由素材仓库维护，导播台只保留当前 A/B 两队。',
+    legacyTeamNotice: count => `旧项目仍包含 ${count} 支队伍；粘贴新对阵包后会收敛为 A/B 两队。`,
+    displayTeam: '设为展示队伍',
+    displayedTeam: '当前展示',
+    startingLineup: '当前首发',
+    lineupHint: '最多选择 5 人',
+    lineupCount: (count, max) => `${count} / ${max}`,
+    noCurrentTeam: '尚未载入队伍',
+    pastePackageHint: '请从素材仓库复制并粘贴两队对阵包。',
+    noPlayers: '该队伍还没有选手资料。',
     teamTarget: '展示队伍',
     teamInfo: '队伍信息',
     playerList: '选手阵容',
@@ -764,7 +778,21 @@ const ROSTER_EDITOR_COPY = {
   },
   en: {
     sceneCopy: 'Roster Package',
-    teamDatabase: 'Team Database',
+    teamDatabase: 'Current Match',
+    currentMatchTeams: 'Current Match',
+    currentMatchMeta: 'Production Project',
+    currentSide: side => `Team ${side}`,
+    projectTeamCount: count => `${count} / 2 teams`,
+    matchPackageOnly: 'Full team assets live in the Asset Library. The console keeps only the current Team A and Team B.',
+    legacyTeamNotice: count => `This legacy project still has ${count} teams. Pasting a new match package will reduce it to Team A and Team B.`,
+    displayTeam: 'Set Display Team',
+    displayedTeam: 'On Display',
+    startingLineup: 'Starting Lineup',
+    lineupHint: 'Select up to 5',
+    lineupCount: (count, max) => `${count} / ${max}`,
+    noCurrentTeam: 'No Team Loaded',
+    pastePackageHint: 'Copy and paste a two-team package from the Asset Library.',
+    noPlayers: 'This team has no player assets yet.',
     teamTarget: 'Display Team',
     teamInfo: 'Team Info',
     playerList: 'Roster Players',
@@ -1042,7 +1070,7 @@ const EDITOR_CHROME_COPY = {
     ],
     rosterModes: [
       { id: 'roster', label: '阵容', meta: 'A / B 队' },
-      { id: 'teams', label: '队伍库', meta: '全部队伍' }
+      { id: 'teams', label: '当前对阵', meta: 'A / B 队' }
     ],
     mediaModes: [
       { id: 'HIGHLIGHT', label: '高光画面', meta: 'OBS 叠加层' },
@@ -1096,7 +1124,7 @@ const EDITOR_CHROME_COPY = {
     ],
     rosterModes: [
       { id: 'roster', label: 'Roster', meta: 'Team A / B' },
-      { id: 'teams', label: 'Team DB', meta: 'All teams' }
+      { id: 'teams', label: 'Current Match', meta: 'Team A / B' }
     ],
     mediaModes: [
       { id: 'HIGHLIGHT', label: 'Highlight', meta: 'OBS overlay' },

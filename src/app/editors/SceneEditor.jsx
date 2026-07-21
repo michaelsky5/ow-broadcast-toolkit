@@ -41,12 +41,15 @@ export default function SceneEditor({
   onTakeToProgram,
   sceneModeHints,
   onSceneModeHintChange,
+  controlMode = false,
   canTakeToProgram
 }) {
   const [casterEditorMode, setCasterEditorMode] = useState(() => getCasterEditorMode(project))
   const [liveEditorMode, setLiveEditorMode] = useState(() => sceneModeHints?.['live-hud'] || 'match')
   const [mapEditorMode, setMapEditorMode] = useState(() => getMapEditorMode(project))
-  const [rosterEditorMode, setRosterEditorMode] = useState(() => sceneModeHints?.roster || 'roster')
+  const [rosterEditorMode, setRosterEditorMode] = useState(() => (
+    controlMode ? 'teams' : (sceneModeHints?.roster || 'roster')
+  ))
   const text = getEditorCopy(language)
   const chrome = getEditorChromeCopy(language)
   const isShowFlowScene = ['matchup', 'starting-five', 'result', 'thanks'].includes(scene.id)
@@ -178,7 +181,7 @@ export default function SceneEditor({
               ))}
             </div>
           )}
-          {scene.id === 'roster' && (
+          {scene.id === 'roster' && !controlMode && (
             <div className={`${styles.editorSceneTabs} ${styles.rosterHeaderTabs}`}>
               {chrome.rosterModes.map(mode => (
                 <button
@@ -266,7 +269,7 @@ export default function SceneEditor({
           copy={copy}
           text={text}
           language={language}
-          activeSection={rosterEditorMode}
+          activeSection={controlMode ? 'teams' : rosterEditorMode}
           onUpdateProject={onUpdateProject}
         />
       )}

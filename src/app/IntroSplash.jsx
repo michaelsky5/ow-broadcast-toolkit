@@ -1,20 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { getAppCopy } from './appCopy'
+import { acceptUsageNotice, isUsageNoticeAccepted } from './usageNotice'
 import styles from './IntroSplash.module.css'
-
-const USAGE_NOTICE_KEY = 'owbt-usage-notice-accepted'
 
 export default function IntroSplash({ project, languageOverride = '', duration = 1450, onFinish }) {
   const onFinishRef = useRef(onFinish)
   const [isReady, setIsReady] = useState(false)
   const [showNotice, setShowNotice] = useState(false)
-  const [noticeAccepted, setNoticeAccepted] = useState(() => {
-    try {
-      return window.localStorage.getItem(USAGE_NOTICE_KEY) === 'true'
-    } catch {
-      return false
-    }
-  })
+  const [noticeAccepted, setNoticeAccepted] = useState(isUsageNoticeAccepted)
   const copy = getAppCopy(project, languageOverride)
 
   useEffect(() => {
@@ -35,21 +28,13 @@ export default function IntroSplash({ project, languageOverride = '', duration =
       return
     }
 
-    try {
-      window.localStorage.setItem(USAGE_NOTICE_KEY, 'true')
-    } catch {
-      // Local storage is optional; the notice still gates the current entry.
-    }
+    acceptUsageNotice()
 
     onFinishRef.current?.()
   }
 
   const acceptAndEnter = () => {
-    try {
-      window.localStorage.setItem(USAGE_NOTICE_KEY, 'true')
-    } catch {
-      // Local storage is optional; the notice still gates the current entry.
-    }
+    acceptUsageNotice()
 
     setNoticeAccepted(true)
     setShowNotice(false)

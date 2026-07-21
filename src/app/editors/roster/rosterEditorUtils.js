@@ -14,10 +14,10 @@ export const MAX_ACTIVE_ROSTER_PLAYERS = 7
 const TEAM_DB_EXPORT_VERSION = 'owbt-team-db-v1'
 
 export const normalizeRosterRole = role => {
-  const value = String(role || '').trim().toLowerCase()
-  if (['damage', 'dps', 'attack'].includes(value)) return 'damage'
-  if (['tank', 'main tank', 'off tank'].includes(value)) return 'tank'
-  if (['support', 'sup', 'healer'].includes(value)) return 'support'
+  const value = String(role || '').trim().normalize('NFKC').toLowerCase()
+  if (['damage', 'dps', 'attack', 'd', '输出', '伤害'].includes(value)) return 'damage'
+  if (['tank', 'main tank', 'off tank', 't', '坦克', '重装'].includes(value)) return 'tank'
+  if (['support', 'sup', 'healer', 's', '支援', '辅助', '治疗'].includes(value)) return 'support'
   return value || 'damage'
 }
 
@@ -125,9 +125,50 @@ export const buildTeamDbExport = project => ({
   }))
 })
 
+const toRecordArray = value => {
+  if (Array.isArray(value)) return value
+  if (!value || typeof value !== 'object') return []
+  return Object.values(value).flatMap(item => (Array.isArray(item) ? item : [item]))
+}
+
+const getFirstRecordArray = (...values) => {
+  for (const value of values) {
+    const records = toRecordArray(value)
+    if (records.length) return records
+  }
+  return []
+}
+
+const getPlayerTeamReference = player => String(
+  player?.teamId || player?.team_id || player?.teamCode || player?.team_code ||
+  player?.teamName || player?.team_name || player?.team || ''
+).trim()
+
+const normalizeImportIdentity = value => String(value || '').trim().toLocaleLowerCase()
+
 export const normalizeImportedTeamDb = payload => {
-  const sourceTeams = Array.isArray(payload) ? payload : payload?.teams
-  const sourcePlayers = Array.isArray(payload?.players) ? payload.players : []
+  const sourceTeams = Array.isArray(payload)
+    ? payload
+    : getFirstRecordArray(
+        payload?.teams,
+        payload?.teamList,
+        payload?.team_list,
+        payload?.teamDatabase?.teams,
+        payload?.teamDatabase?.teamList,
+        payload?.teamDb?.teams,
+        payload?.teamDb?.teamList,
+        payload?.participants?.teams
+      )
+  const sourcePlayers = getFirstRecordArray(
+    payload?.players,
+    payload?.playerList,
+    payload?.player_list,
+    payload?.teamDatabase?.players,
+    payload?.teamDatabase?.playerList,
+    payload?.teamDb?.players,
+    payload?.teamDb?.playerList,
+    payload?.participants?.players
+  )
 
   if (!Array.isArray(sourceTeams) || !sourceTeams.length) {
     throw new Error('Invalid Team DB file.')
@@ -139,51 +180,86 @@ export const normalizeImportedTeamDb = payload => {
   const players = []
 
   sourceTeams.forEach((team, teamIndex) => {
-    const previousTeamId = String(team?.id || '').trim()
+    const previousTeamId = String(team?.id || team?.teamId || team?.team_id || '').trim()
+    const previousTeamShortName = String(
+      team?.shortName || team?.teamShortName || team?.short_name || team?.team_short_name ||
+      team?.code || team?.abbr || team?.abbreviation || ''
+    ).trim()
+    const previousTeamName = String(team?.name || team?.teamName || team?.team_name || '').trim()
     const teamId = getUniqueId(
-      previousTeamId || team?.shortName || team?.name,
+      previousTeamId || previousTeamShortName || previousTeamName,
       usedTeamIds,
       'team'
     )
-    const declaredPlayerIds = new Set(Array.isArray(team?.playerIds) ? team.playerIds : [])
-    const embeddedPlayers = Array.isArray(team?.players)
-      ? team.players
-      : sourcePlayers.filter(player => player?.teamId === previousTeamId || declaredPlayerIds.has(player?.id))
+    const declaredPlayerIds = new Set(getFirstRecordArray(
+      team?.playerIds,
+      team?.player_ids,
+      team?.memberIds,
+      team?.member_ids
+    ).map(String))
+    const embeddedPlayers = getFirstRecordArray(
+      team?.players,
+      team?.roster,
+      team?.members,
+      team?.lineup,
+      team?.athletes
+    )
+    const linkedPlayers = embeddedPlayers.length
+      ? embeddedPlayers
+      : sourcePlayers.filter(player => {
+          const teamReference = getPlayerTeamReference(player)
+          const normalizedReference = normalizeImportIdentity(teamReference)
+          const teamReferences = [previousTeamId, previousTeamShortName, previousTeamName]
+            .map(normalizeImportIdentity)
+            .filter(Boolean)
+          return (
+            (normalizedReference && teamReferences.includes(normalizedReference)) ||
+            declaredPlayerIds.has(String(player?.id || player?.playerId || player?.player_id || ''))
+          )
+        })
     const playerIds = []
 
-    embeddedPlayers.forEach((player, playerIndex) => {
+    linkedPlayers.forEach((player, playerIndex) => {
       const playerId = getUniqueId(
-        player?.id || `${teamId}-player-${playerIndex + 1}`,
+        player?.id || player?.playerId || player?.player_id || `${teamId}-player-${playerIndex + 1}`,
         usedPlayerIds,
         `${teamId}-player`
       )
-      const role = normalizeRosterRole(player?.role)
+      const role = normalizeRosterRole(player?.role || player?.position || player?.playerRole || player?.player_role)
       const primaryHeroes = Array.isArray(player?.primaryHeroes)
         ? player.primaryHeroes
-        : [player?.primaryHero || player?.hero || getDefaultHeroForRole(role)].filter(Boolean)
+        : Array.isArray(player?.heroes)
+          ? player.heroes
+          : String(player?.primaryHeroes || player?.primaryHero || player?.primary_hero || player?.hero || '')
+              .split(/[,，;/]/)
+              .map(value => value.trim())
+              .filter(Boolean)
+      const normalizedHeroes = primaryHeroes.length ? primaryHeroes : [getDefaultHeroForRole(role)].filter(Boolean)
 
       players.push({
         id: playerId,
-        name: player?.name || player?.nickname || `Player ${playerIndex + 1}`,
-        battleTag: player?.battleTag || player?.battle_tag || player?.battletag || '',
+        name: player?.name || player?.playerName || player?.player_name || player?.nickname || player?.gamertag || `Player ${playerIndex + 1}`,
+        battleTag: player?.battleTag || player?.battle_tag || player?.battletag || player?.battleId || player?.battle_id || player?.gameId || player?.game_id || '',
         role,
         teamId,
-        avatar: player?.avatar || player?.image || player?.playerImage || '',
-        portraitXPct: normalizePortraitXPct(player?.portraitXPct ?? player?.portraitX ?? player?.xPct),
-        primaryHeroes
+        avatar: player?.avatar || player?.image || player?.playerImage || player?.player_image || player?.photo || '',
+        portraitXPct: normalizePortraitXPct(
+          player?.portraitXPct ?? player?.portrait_x_pct ?? player?.portraitX ?? player?.xPct
+        ),
+        primaryHeroes: normalizedHeroes
       })
       playerIds.push(playerId)
     })
 
     teams.push({
       id: teamId,
-      name: team?.name || team?.teamName || `Team ${teamIndex + 1}`,
-      shortName: team?.shortName || team?.teamShortName || team?.code || `T${teamIndex + 1}`,
-      logo: team?.logo || team?.teamLogo || '',
-      primaryColor: team?.primaryColor || team?.color || '',
-      description: team?.description || '',
-      coach: team?.coach || '',
-      manager: team?.manager || '',
+      name: previousTeamName || `Team ${teamIndex + 1}`,
+      shortName: previousTeamShortName || `T${teamIndex + 1}`,
+      logo: team?.logo || team?.teamLogo || team?.team_logo || team?.logoUrl || team?.logo_url || '',
+      primaryColor: team?.primaryColor || team?.primary_color || team?.teamColor || team?.team_color || team?.color || '',
+      description: team?.description || team?.notes || team?.note || '',
+      coach: team?.coach || team?.headCoach || team?.head_coach || '',
+      manager: team?.manager || team?.teamManager || team?.team_manager || team?.leader || '',
       playerIds
     })
   })

@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .codex-snapshots
+.codex-remote-attachments/
 owbt-*.png
 !public/brand/icon/owbt-transition-mono.png
 
