@@ -1,12 +1,12 @@
 ﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import { getCurrentTeams, getStartingPlayers, getTeamPlayers } from '../../../project/projectUtils'
 import { CORE_STATS, formatStatNumber, normalizeStatsRows } from '../../../project/statsModel'
+import { getProjectImageUploadErrorMessage, prepareProjectImage } from '../../imageUpload'
 import styles from '../shared/SceneEditor.styles.js'
 import {
   DEFAULT_CAPTURE,
   buildCropAssets,
   countFilledRows,
-  fileToDataUrl,
   formatDurationInput,
   formatDurationMinutes,
   getTeamTotals,
@@ -18,7 +18,7 @@ import {
   resolveTimeCrop
 } from './statsCaptureUtils'
 
-function StatsCaptureModal({ project, settings, onApplyRows, onClose, onUpdateCapture, text }) {
+function StatsCaptureModal({ project, settings, onApplyRows, onClose, onUpdateCapture, text, language = 'en' }) {
   const { teamA, teamB } = getCurrentTeams(project)
   const inputRef = useRef(null)
   const sourceImage = settings.capture?.imageDataUrl || ''
@@ -117,19 +117,24 @@ function StatsCaptureModal({ project, settings, onApplyRows, onClose, onUpdateCa
   }
 
   const handleImageFile = async file => {
-    if (!file?.type?.startsWith('image/')) {
-      setStatus(text.statusInvalidImage)
-      return
-    }
+    if (!file) return
 
-    const dataUrl = await fileToDataUrl(file)
-    setImageDataUrl(dataUrl)
-    onUpdateCapture({ ...capture, dataMinutes, timeText: timeInput, imageDataUrl: dataUrl })
-    setZones([])
-    setSnippets({ teamA: [], teamB: [] })
-    setPlayerSnippets({ teamA: [], teamB: [] })
-    setTimeZone('')
-    setStatus(text.statusImageLoaded)
+    try {
+      const { dataUrl } = await prepareProjectImage(file, {
+        maxDimension: 1920,
+        minDimension: 1280,
+        maxOutputBytes: 512 * 1024
+      })
+      setImageDataUrl(dataUrl)
+      onUpdateCapture({ ...capture, dataMinutes, timeText: timeInput, imageDataUrl: dataUrl })
+      setZones([])
+      setSnippets({ teamA: [], teamB: [] })
+      setPlayerSnippets({ teamA: [], teamB: [] })
+      setTimeZone('')
+      setStatus(text.statusImageLoaded)
+    } catch (error) {
+      setStatus(getProjectImageUploadErrorMessage(error, language))
+    }
   }
 
   useEffect(() => {

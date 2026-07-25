@@ -7,8 +7,8 @@ import {
 } from '../project/branding'
 import { getAppCopy, getAppLanguage } from './appCopy'
 import { EditorDialog } from './editors/shared/editorControls'
+import { getProjectImageUploadErrorMessage, prepareProjectImage } from './imageUpload'
 import { getOverlayUrl } from './overlayUrl'
-import { fileToDataUrl } from './toolbox/toolboxModel'
 import styles from './ConsoleEntry.module.css'
 
 const isSupportedLogoFile = file => (
@@ -167,12 +167,22 @@ export default function ConsoleEntry({
       return
     }
 
-    const dataUrl = await fileToDataUrl(file)
+    try {
+      const { dataUrl } = await prepareProjectImage(file, { maxDimension: 1024 })
 
-    onUpdateProject(draft => {
-      draft.event.logo = dataUrl
-      if (!draft.event.logoBackdrop) draft.event.logoBackdrop = 'auto'
-    })
+      onUpdateProject(draft => {
+        draft.event.logo = dataUrl
+        if (!draft.event.logoBackdrop) draft.event.logoBackdrop = 'auto'
+      })
+    } catch (error) {
+      setEntryDialog({
+        kicker: copy.eventLogoPreview,
+        title: copy.eventLogo,
+        message: getProjectImageUploadErrorMessage(error, language),
+        confirmLabel: copy.ok,
+        onConfirm: () => setEntryDialog(null)
+      })
+    }
   }
 
   const resetBrand = () => {

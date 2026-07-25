@@ -6,9 +6,10 @@ import {
   findLibraryTeamMatch,
   normalizeLibraryTeam
 } from './teamLibraryModel'
+import { assertTeamLibraryRecordsSafe } from './teamLibraryStorageSafety'
 
 export const MAX_OWBT_TEAM_SOURCE_BYTES = 24 * 1024 * 1024
-export const MAX_TEAM_LIBRARY_BACKUP_BYTES = 128 * 1024 * 1024
+export const MAX_TEAM_LIBRARY_BACKUP_BYTES = 32 * 1024 * 1024
 
 const clean = value => String(value || '').trim()
 
@@ -191,6 +192,7 @@ export const parseOwbtTeamSource = (input, existingRecords = []) => {
         ? source.teams
         : Object.values(source.teams || {})
     const records = sourceTeams.map(normalizeLibraryTeam)
+    assertTeamLibraryRecordsSafe(records)
     return {
       records,
       sourceKind,
@@ -220,6 +222,7 @@ export const parseOwbtTeamSource = (input, existingRecords = []) => {
       existing
     ).record
   })
+  assertTeamLibraryRecordsSafe(records)
 
   return {
     records,

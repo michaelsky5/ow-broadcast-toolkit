@@ -1,4 +1,8 @@
 import { normalizeLibraryTeam } from './teamLibraryModel'
+import {
+  assertTeamLibraryRecordsSafe,
+  assertTeamLibraryWriteSafe
+} from './teamLibraryStorageSafety'
 
 const DATABASE_NAME = 'owbt-team-library'
 const DATABASE_VERSION = 1
@@ -63,7 +67,10 @@ export const saveLibraryTeam = async rawTeam => {
   const database = await openDatabase()
   const team = normalizeLibraryTeam({ ...rawTeam, updatedAt: new Date().toISOString() })
   const transaction = database.transaction(TEAM_STORE, 'readwrite')
-  transaction.objectStore(TEAM_STORE).put(team)
+  const store = transaction.objectStore(TEAM_STORE)
+  const existingRecords = await requestToPromise(store.getAll())
+  assertTeamLibraryWriteSafe(existingRecords, [team])
+  store.put(team)
   await transactionToPromise(transaction)
   return team
 }
@@ -78,16 +85,19 @@ export const saveLibraryTeams = async rawTeams => {
     updatedAt
   }))
 
+  const existingRecords = await requestToPromise(store.getAll())
+  assertTeamLibraryWriteSafe(existingRecords, teams)
   teams.forEach(team => store.put(team))
   await transactionToPromise(transaction)
   return teams
 }
 
 export const replaceLibraryTeams = async rawTeams => {
+  const teams = rawTeams.map(normalizeLibraryTeam)
+  assertTeamLibraryRecordsSafe(teams)
   const database = await openDatabase()
   const transaction = database.transaction(TEAM_STORE, 'readwrite')
   const store = transaction.objectStore(TEAM_STORE)
-  const teams = rawTeams.map(normalizeLibraryTeam)
 
   store.clear()
   teams.forEach(team => store.put(team))
@@ -107,7 +117,12 @@ export const mergeLibraryTeamGroups = async mergePlans => {
   const transaction = database.transaction(TEAM_STORE, 'readwrite')
   const store = transaction.objectStore(TEAM_STORE)
   const records = (mergePlans || []).map(plan => normalizeLibraryTeam(plan.record))
+  const removedIds = (mergePlans || []).flatMap(plan => (
+    (plan.removedIds || []).filter(teamId => teamId && teamId !== plan.keeperId)
+  ))
+  const existingRecords = await requestToPromise(store.getAll())
 
+  assertTeamLibraryWriteSafe(existingRecords, records, { removedIds })
   records.forEach(record => store.put(record))
   const plans = mergePlans || []
   plans.forEach(plan => {

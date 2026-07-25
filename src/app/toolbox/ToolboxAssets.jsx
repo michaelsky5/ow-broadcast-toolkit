@@ -1,10 +1,13 @@
 import { useRef, useState } from 'react'
 import { getCurrentTeams } from '../../project/projectUtils'
 import {
+  getBilingualProjectImageUploadErrorMessage,
+  prepareProjectImage
+} from '../imageUpload'
+import {
   clean,
   createSponsorLogo,
   ensureAssetSettings,
-  fileToDataUrl,
   getTeamShort,
   isVideoSource
 } from './toolboxModel'
@@ -42,12 +45,22 @@ function AssetPathField({
 }) {
   const inputRef = useRef(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [uploadError, setUploadError] = useState('')
   const isLogoPreview = previewVariant === 'logo'
 
   const applyFile = async file => {
     if (!allowUpload || !file) return
-    const dataUrl = await fileToDataUrl(file)
-    onUpload(dataUrl, file)
+
+    try {
+      const { dataUrl } = await prepareProjectImage(file, {
+        maxDimension: isLogoPreview ? 1024 : 1920,
+        minDimension: isLogoPreview ? 512 : 960
+      })
+      setUploadError('')
+      onUpload(dataUrl, file)
+    } catch (error) {
+      setUploadError(getBilingualProjectImageUploadErrorMessage(error))
+    }
   }
 
   return (
@@ -98,6 +111,14 @@ function AssetPathField({
             event.target.value = ''
           }}
         />
+      )}
+      {uploadError && (
+        <div
+          role="alert"
+          style={{ color: '#ff9c9c', fontSize: '11px', lineHeight: 1.45, whiteSpace: 'pre-line' }}
+        >
+          {uploadError}
+        </div>
       )}
     </div>
   )
@@ -211,11 +232,18 @@ function SponsorAssetsTable({ sponsors, text, onUpdateSponsor, onRemoveSponsor }
 
 function SponsorLogoPathCell({ slot, index, text, onUpdateSponsor }) {
   const inputRef = useRef(null)
+  const [uploadError, setUploadError] = useState('')
 
   const loadLogo = async file => {
     if (!file) return
-    const dataUrl = await fileToDataUrl(file)
-    onUpdateSponsor(slot.id, index, { logo: dataUrl })
+
+    try {
+      const { dataUrl } = await prepareProjectImage(file, { maxDimension: 1024 })
+      setUploadError('')
+      onUpdateSponsor(slot.id, index, { logo: dataUrl })
+    } catch (error) {
+      setUploadError(getBilingualProjectImageUploadErrorMessage(error))
+    }
   }
 
   return (
@@ -246,6 +274,14 @@ function SponsorLogoPathCell({ slot, index, text, onUpdateSponsor }) {
           event.target.value = ''
         }}
       />
+      {uploadError && (
+        <span
+          role="alert"
+          style={{ color: '#ff9c9c', fontSize: '10px', lineHeight: 1.4, whiteSpace: 'pre-line' }}
+        >
+          {uploadError}
+        </span>
+      )}
     </div>
   )
 }

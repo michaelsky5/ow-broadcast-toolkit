@@ -1,34 +1,36 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { loadStoredProgramProject, readStoredProgramProjectRaw } from '../project/projectStorage'
-import { safeParseProject } from '../project/projectUtils'
+import { useEffect, useState } from 'react'
+import { loadStoredProgramProject } from '../project/projectStorage'
+import {
+  getSessionIdFromLocation,
+  subscribeSessionProgramState
+} from '../project/projectSession'
 import { subscribeProgramState } from '../project/projectSync'
+import { normalizeProject } from '../project/projectUtils'
 import { applyThemeTokens } from '../theme/themeTokens'
-import { loadSceneTransitionSettings } from '../app/consolePreferences'
+import {
+  loadSceneTransitionSettings,
+  normalizeSceneTransitionSettings
+} from '../app/consolePreferences'
 import ProgramPreview from './ProgramPreview'
 import styles from './OverlayPage.module.css'
 
 export default function OverlayPage() {
+  const [sessionId] = useState(getSessionIdFromLocation)
   const [project, setProject] = useState(() => loadStoredProgramProject())
   const [transitionSettings, setTransitionSettings] = useState(loadSceneTransitionSettings)
-  const lastRawRef = useRef(readStoredProgramProjectRaw())
-
-  const applyRawProject = useCallback(raw => {
-    if (!raw || raw === lastRawRef.current) return
-
-    const nextProject = safeParseProject(raw)
-
-    if (!nextProject) return
-
-    lastRawRef.current = raw
-    setProject(nextProject)
-  }, [])
+  const [sessionPending, setSessionPending] = useState(Boolean(sessionId))
+  const [sessionState, setSessionState] = useState(sessionId ? 'connecting' : 'local')
 
   useEffect(() => {
     applyThemeTokens(project.theme)
   }, [project.theme])
 
   useEffect(() => {
-    const syncTransitionSettings = () => setTransitionSettings(loadSceneTransitionSettings())
+    if (sessionId) return undefined
+
+    const syncTransitionSettings = () => {
+      setTransitionSettings(loadSceneTransitionSettings())
+    }
 
     window.addEventListener('storage', syncTransitionSettings)
     const timer = window.setInterval(syncTransitionSettings, 500)
@@ -37,36 +39,44 @@ export default function OverlayPage() {
       window.removeEventListener('storage', syncTransitionSettings)
       window.clearInterval(timer)
     }
-  }, [])
+  }, [sessionId])
 
   useEffect(() => {
-    const unsubscribe = subscribeProgramState(nextProject => {
-      lastRawRef.current = readStoredProgramProjectRaw()
-      setProject(nextProject)
-    }, {
+    if (sessionId) return undefined
+
+    return subscribeProgramState(setProject, {
       ignoreSource: 'overlay',
       pollInterval: 300
     })
+  }, [sessionId])
 
-    const timer = window.setInterval(() => {
-      applyRawProject(readStoredProgramProjectRaw())
-    }, 300)
+  useEffect(() => {
+    if (!sessionId) return undefined
 
-    return () => {
-      unsubscribe?.()
-      window.clearInterval(timer)
-    }
-  }, [applyRawProject])
+    return subscribeSessionProgramState(sessionId, (nextProject, payload) => {
+      setSessionPending(false)
+      setSessionState('online')
+      setProject(normalizeProject(nextProject))
+      setTransitionSettings(normalizeSceneTransitionSettings(payload.transitionSettings))
+    }, {
+      pollInterval: 1000,
+      onStatus: status => {
+        setSessionState(status.state)
+      }
+    })
+  }, [sessionId])
 
   return (
-    <main className={styles.overlay}>
-      <ProgramPreview
-        project={project}
-        bare
-        transitionMode={transitionSettings.sceneTransitionMode}
-        transitionSpeed={transitionSettings.sceneTransitionSpeed}
-        transitionLogo={transitionSettings.sceneTransitionLogo}
-      />
+    <main className={styles.overlay} data-session-state={sessionState}>
+      {!sessionPending && (
+        <ProgramPreview
+          project={project}
+          bare
+          transitionMode={transitionSettings.sceneTransitionMode}
+          transitionSpeed={transitionSettings.sceneTransitionSpeed}
+          transitionLogo={transitionSettings.sceneTransitionLogo}
+        />
+      )}
     </main>
   )
 }

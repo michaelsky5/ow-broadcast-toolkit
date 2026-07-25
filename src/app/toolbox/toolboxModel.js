@@ -390,13 +390,6 @@ export const getPreviewFrameStyle = (exportSize, exportRender = false) => {
   }
 }
 
-export const fileToDataUrl = file => new Promise((resolve, reject) => {
-  const reader = new FileReader()
-  reader.onload = () => resolve(reader.result)
-  reader.onerror = reject
-  reader.readAsDataURL(file)
-})
-
 export const isVideoSource = (source, sourceType = '') => (
   sourceType.startsWith('video/') || /\.(mp4|webm|ogg)(\?.*)?$/i.test(clean(source))
 )

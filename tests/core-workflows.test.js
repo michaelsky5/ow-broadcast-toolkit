@@ -176,7 +176,7 @@ describe('match package workflow', () => {
     assert.equal(draft.currentMatch.hud.showBanPhase, false)
   })
 
-  test('allows larger library backups without raising the regular project import limit', () => {
+  test('allows bounded library backups without raising the regular project import limit', () => {
     const backupHeader = JSON.stringify({
       schemaVersion: 'owbt-team-library-v1',
       exportedAt: '2026-07-21T00:00:00.000Z',
@@ -193,7 +193,7 @@ describe('match package workflow', () => {
       teamProjectImport.MAX_OWBT_TEAM_SOURCE_BYTES
     )
     assert.equal(teamProjectImport.MAX_OWBT_TEAM_SOURCE_BYTES, 24 * 1024 * 1024)
-    assert.equal(teamProjectImport.MAX_TEAM_LIBRARY_BACKUP_BYTES, 128 * 1024 * 1024)
+    assert.equal(teamProjectImport.MAX_TEAM_LIBRARY_BACKUP_BYTES, 32 * 1024 * 1024)
   })
 
   test('rejects unsupported team-library backup schema versions', () => {
