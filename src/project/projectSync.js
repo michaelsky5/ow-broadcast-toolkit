@@ -16,13 +16,7 @@ let sharedChannel = null
 let publishSeq = 0
 
 const canUseWindow = () => typeof window !== 'undefined'
-const canUseStorage = () => {
-  try {
-    return canUseWindow() && !!window.localStorage
-  } catch {
-    return false
-  }
-}
+const canUseStorage = () => canUseWindow() && !!window.localStorage
 const canUseBroadcastChannel = () => canUseWindow() && 'BroadcastChannel' in window
 
 const getSharedChannel = () => {
@@ -79,8 +73,7 @@ const publishState = ({
 
   const payload = createProjectPayload(project, source, eventType)
 
-  const didSave = saveProject(payload.project)
-  if (!didSave) return false
+  saveProject(payload.project)
 
   try {
     window.localStorage?.setItem(pulseKey, JSON.stringify({

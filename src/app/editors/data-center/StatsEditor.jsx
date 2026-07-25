@@ -1,6 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react'
 import { downloadTextFile, getCurrentTeams } from '../../../project/projectUtils'
-import { getProjectImageUploadErrorMessage, prepareProjectImage } from '../../imageUpload'
 import {
   CORE_STATS,
   buildCoreMetricsFromRows,
@@ -24,7 +23,8 @@ import {
   DISPLAY_MODE_OPTIONS,
   buildStatsCsv,
   buildStatsExport,
-  createStatsFileName
+  createStatsFileName,
+  fileToDataUrl
 } from './statsEditorUtils'
 
 const ACTIVE_CATEGORY = 'overall'
@@ -95,37 +95,22 @@ function StatsEditor({ project, language = 'en', onUpdateProject }) {
   }
 
   const applyStatsImageFile = async file => {
-    if (!file) return
+    if (!file?.type?.startsWith('image/')) return
+    const imageDataUrl = await fileToDataUrl(file)
 
-    try {
-      const { dataUrl: imageDataUrl } = await prepareProjectImage(file, {
-        maxDimension: 1920,
-        minDimension: 1280,
-        maxOutputBytes: 512 * 1024
-      })
-
-      onUpdateProject(draft => {
-        const nextSettings = ensureSceneSettings(draft, 'stats')
-        nextSettings.capture = {
-          ...(nextSettings.capture || {}),
-          dataMinutes: Number(nextSettings.dataMinutes ?? nextSettings.capture?.dataMinutes ?? 10) || 0,
-          imageDataUrl
-        }
-        nextSettings.imageCrop = {
-          ...DEFAULT_IMAGE_CROP,
-          ...(nextSettings.imageCrop || {})
-        }
-        nextSettings.statsDisplayMode = 'image'
-      })
-    } catch (error) {
-      setStatsDialog({
-        kicker: pageText.imageInput,
-        title: pageText.imageInput,
-        message: getProjectImageUploadErrorMessage(error, language),
-        confirmLabel: pageText.close,
-        onConfirm: () => setStatsDialog(null)
-      })
-    }
+    onUpdateProject(draft => {
+      const nextSettings = ensureSceneSettings(draft, 'stats')
+      nextSettings.capture = {
+        ...(nextSettings.capture || {}),
+        dataMinutes: Number(nextSettings.dataMinutes ?? nextSettings.capture?.dataMinutes ?? 10) || 0,
+        imageDataUrl
+      }
+      nextSettings.imageCrop = {
+        ...DEFAULT_IMAGE_CROP,
+        ...(nextSettings.imageCrop || {})
+      }
+      nextSettings.statsDisplayMode = 'image'
+    })
   }
 
   const updateImageCrop = patch => {
@@ -314,7 +299,6 @@ function StatsEditor({ project, language = 'en', onUpdateProject }) {
           onClose={() => setShowCaptureModal(false)}
           onUpdateCapture={updateCapture}
           text={pageText}
-          language={language}
         />
       )}
       {statsDialog && <EditorDialog {...statsDialog} />}

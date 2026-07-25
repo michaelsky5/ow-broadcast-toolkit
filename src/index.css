@@ -1,14 +1,30 @@
 @font-face {
   font-family: "HarmonyOS Sans SC";
-  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Regular.app-01b30a67.woff2") format("woff2");
-  font-weight: 100 450;
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Thin.ttf") format("truetype");
+  font-weight: 100 250;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "HarmonyOS Sans SC";
-  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Medium.app-ad717738.woff2") format("woff2");
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Light.ttf") format("truetype");
+  font-weight: 251 350;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Regular.ttf") format("truetype");
+  font-weight: 351 450;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Medium.ttf") format("truetype");
   font-weight: 451 650;
   font-style: normal;
   font-display: swap;
@@ -16,7 +32,7 @@
 
 @font-face {
   font-family: "HarmonyOS Sans SC";
-  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Bold.app-6db2bf03.woff2") format("woff2");
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Bold.ttf") format("truetype");
   font-weight: 651 849;
   font-style: normal;
   font-display: swap;
@@ -24,7 +40,7 @@
 
 @font-face {
   font-family: "HarmonyOS Sans SC";
-  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Black.app-fb097ebb.woff2") format("woff2");
+  src: url("/fonts/harmonyos-sans-sc/HarmonyOS_Sans_SC_Black.ttf") format("truetype");
   font-weight: 850 1000;
   font-style: normal;
   font-display: swap;

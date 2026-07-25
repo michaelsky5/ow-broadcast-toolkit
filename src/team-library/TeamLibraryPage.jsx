@@ -43,12 +43,6 @@ import {
   saveLibraryTeam,
   saveLibraryTeams
 } from './teamLibraryStorage'
-import {
-  TEAM_LIBRARY_STORAGE_ERROR_CODES,
-  assertTeamLibraryWriteSafe,
-  inspectTeamLibraryAssetSource,
-  inspectTeamLibraryPastedImportText
-} from './teamLibraryStorageSafety'
 import { getTeamLibraryCopy } from './teamLibraryCopy'
 import { optimizeLibraryImage } from './imageAssets'
 import {
@@ -74,9 +68,6 @@ const MAX_LIBRARY_IMAGE_BYTES = 3 * 1024 * 1024
 const TEAM_LIST_BATCH_SIZE = 24
 const TEAM_LIBRARY_GUIDE_STORAGE_KEY = 'owbt-team-library-guide-v1'
 const PLAYER_AVATAR_TARGET_BYTES = 96 * 1024
-const TEAM_LIBRARY_STORAGE_ERROR_CODE_SET = new Set(
-  Object.values(TEAM_LIBRARY_STORAGE_ERROR_CODES)
-)
 
 const shouldShowTeamLibraryGuide = () => {
   try {
@@ -160,31 +151,6 @@ const formatBytes = bytes => {
   if (value < 1024 ** 2) return `${(value / 1024).toFixed(1)} KB`
   if (value < 1024 ** 3) return `${(value / 1024 ** 2).toFixed(1)} MB`
   return `${(value / 1024 ** 3).toFixed(1)} GB`
-}
-
-const getTeamLibraryFailureText = (copy, failure, fallback = copy.saveFailed) => {
-  const code = failure?.code || ''
-  const details = failure?.details || {}
-
-  switch (code) {
-    case TEAM_LIBRARY_STORAGE_ERROR_CODES.ASSET_SOURCE_UNSUPPORTED:
-      return copy.unsafeAssetSource
-    case TEAM_LIBRARY_STORAGE_ERROR_CODES.ASSET_TOO_LARGE:
-      return copy.assetTooLarge(formatBytes(details.maxBytes))
-    case TEAM_LIBRARY_STORAGE_ERROR_CODES.TEAM_TOO_LARGE:
-      return copy.teamTooLarge(
-        details.teamName || details.teamId || '-',
-        formatBytes(details.maxBytes)
-      )
-    case TEAM_LIBRARY_STORAGE_ERROR_CODES.LIBRARY_TOO_LARGE:
-      return copy.libraryTooLarge(formatBytes(details.maxBytes))
-    case TEAM_LIBRARY_STORAGE_ERROR_CODES.TOO_MANY_TEAMS:
-      return copy.tooManyTeams(details.maxTeams)
-    case TEAM_LIBRARY_STORAGE_ERROR_CODES.PASTED_IMPORT_TOO_LARGE:
-      return copy.pastedImportTooLarge(formatBytes(details.maxBytes))
-    default:
-      return fallback
-  }
 }
 
 const formatDate = (value, language) => {
@@ -503,48 +469,6 @@ export default function TeamLibraryPage({
     } : previous)
   }
 
-  const showTeamLibraryFailure = (failure, fallback = copy.saveFailed) => {
-    setStatus('')
-    setError(getTeamLibraryFailureText(copy, failure, fallback))
-  }
-
-  const handleAssetSourcePaste = (event, kind) => {
-    const pastedText = event.clipboardData?.getData('text') || ''
-    if (!pastedText) return
-
-    try {
-      inspectTeamLibraryAssetSource(pastedText, { allowDataUrl: false, kind })
-    } catch (pasteError) {
-      event.preventDefault()
-      showTeamLibraryFailure(pasteError, copy.unsafeAssetSource)
-    }
-  }
-
-  const updateProjectImportText = value => {
-    try {
-      inspectTeamLibraryPastedImportText(value)
-      setProjectImportText(value)
-    } catch (pasteError) {
-      showTeamLibraryFailure(pasteError, copy.invalidImportSource)
-    }
-  }
-
-  const handleProjectImportPaste = event => {
-    const pastedText = event.clipboardData?.getData('text') || ''
-    if (!pastedText) return
-    const target = event.currentTarget
-    const selectionStart = Number(target.selectionStart) || 0
-    const selectionEnd = Number(target.selectionEnd) || selectionStart
-    const nextValue = `${projectImportText.slice(0, selectionStart)}${pastedText}${projectImportText.slice(selectionEnd)}`
-
-    try {
-      inspectTeamLibraryPastedImportText(nextValue)
-    } catch (pasteError) {
-      event.preventDefault()
-      showTeamLibraryFailure(pasteError, copy.invalidImportSource)
-    }
-  }
-
   const addPlayer = () => {
     if (!draftTeam || draftTeam.players.length >= MAX_ROSTER_PLAYERS) return
     setDraftTeam(previous => ({
@@ -574,7 +498,7 @@ export default function TeamLibraryPage({
       refreshStorageEstimate(nextTeams)
     } catch (saveError) {
       console.error('[OWBT] Failed to save library team:', saveError)
-      showTeamLibraryFailure(saveError)
+      setError(copy.saveFailed)
     }
   }
 
@@ -616,7 +540,7 @@ export default function TeamLibraryPage({
       refreshStorageEstimate(nextTeams)
     } catch (saveError) {
       console.error('[OWBT] Failed to create library team:', saveError)
-      showTeamLibraryFailure(saveError)
+      setError(copy.saveFailed)
     }
   }
 
@@ -748,7 +672,7 @@ export default function TeamLibraryPage({
       refreshStorageEstimate(nextTeams)
     } catch (saveError) {
       console.error('[OWBT] Failed to save project teams to library:', saveError)
-      showTeamLibraryFailure(saveError)
+      setError(copy.saveFailed)
     }
   }
 
@@ -869,7 +793,7 @@ export default function TeamLibraryPage({
       refreshStorageEstimate(nextTeams)
     } catch (deleteError) {
       console.error('[OWBT] Failed to delete library team:', deleteError)
-      showTeamLibraryFailure(deleteError)
+      setError(copy.saveFailed)
     }
   }
 
@@ -994,19 +918,17 @@ export default function TeamLibraryPage({
       refreshStorageEstimate(nextTeams)
     } catch (brandingError) {
       console.error('[OWBT] Failed to save branding review:', brandingError)
-      showTeamLibraryFailure(brandingError)
+      setError(copy.saveFailed)
     }
   }
 
   const prepareProjectTeamImport = (input, sourceLabel) => {
     const parsed = parseOwbtTeamSource(input, teams)
-    const mergePlan = createLibraryMergePlan(parsed.records, teams, {
-      preserveMissingFields: parsed.sourceKind !== 'library-backup'
-    })
-    assertTeamLibraryWriteSafe(teams, mergePlan.records)
     const plan = {
       ...parsed,
-      ...mergePlan,
+      ...createLibraryMergePlan(parsed.records, teams, {
+        preserveMissingFields: parsed.sourceKind !== 'library-backup'
+      }),
       sourceLabel
     }
     if (parsed.sourceKind === 'library-backup') {
@@ -1020,14 +942,12 @@ export default function TeamLibraryPage({
 
   const prepareCsvImport = (input, sourceLabel) => {
     const parsed = parseTeamLibraryCsvAuto(input, teams, sourceLabel)
-    const mergePlan = createLibraryMergePlan(parsed.records, teams, {
-      generatedShortNameIds: parsed.generatedShortNameIds,
-      preserveMissingFields: true
-    })
-    assertTeamLibraryWriteSafe(teams, mergePlan.records)
     setPendingCsvImport({
       ...parsed,
-      ...mergePlan,
+      ...createLibraryMergePlan(parsed.records, teams, {
+        generatedShortNameIds: parsed.generatedShortNameIds,
+        preserveMissingFields: true
+      }),
       fileName: sourceLabel
     })
     closeImportCenter()
@@ -1080,13 +1000,6 @@ export default function TeamLibraryPage({
       code: failure.error?.importCode || '',
       message: failure.error?.message || ''
     })))
-    const storageFailure = failures.find(failure => (
-      TEAM_LIBRARY_STORAGE_ERROR_CODE_SET.has(failure.error?.code)
-    ))
-    if (storageFailure) {
-      showTeamLibraryFailure(storageFailure.error, copy.invalidImportSource)
-      return
-    }
     setError(getAutomaticImportError(copy, failures, looksLikeJson ? 'project' : preferCsv ? 'csv' : 'csv'))
   }
 
@@ -1128,24 +1041,18 @@ export default function TeamLibraryPage({
     try {
       const parsed = parseOwbtTeamSource(await readTextFileAutoEncoding(file), teams)
       if (parsed.sourceKind !== 'library-backup') throw new Error('Not an OWBT team library backup.')
-      const mergePlan = createLibraryMergePlan(parsed.records, teams)
-      assertTeamLibraryWriteSafe(teams, mergePlan.records)
       setPendingBackupImport({
         ...parsed,
-        ...mergePlan,
+        ...createLibraryMergePlan(parsed.records, teams),
         sourceLabel: file.name
       })
       setStatus('')
       setError('')
     } catch (backupError) {
       console.error('[OWBT] Failed to read team library backup:', backupError)
-      if (TEAM_LIBRARY_STORAGE_ERROR_CODE_SET.has(backupError?.code)) {
-        showTeamLibraryFailure(backupError, copy.invalidBackup)
-      } else {
-        setError(backupError?.importCode === 'library-unsupported-version'
-          ? copy.unsupportedBackupVersion
-          : copy.invalidBackup)
-      }
+      setError(backupError?.importCode === 'library-unsupported-version'
+        ? copy.unsupportedBackupVersion
+        : copy.invalidBackup)
     }
   }
 
@@ -1194,7 +1101,7 @@ export default function TeamLibraryPage({
       refreshStorageEstimate(nextTeams)
     } catch (csvError) {
       console.error('[OWBT] Failed to save CSV teams:', csvError)
-      showTeamLibraryFailure(csvError)
+      setError(copy.saveFailed)
     }
   }
 
@@ -1300,7 +1207,7 @@ export default function TeamLibraryPage({
       refreshStorageEstimate(nextTeams)
     } catch (logoFolderError) {
       console.error('[OWBT] Failed to import team logo folder:', logoFolderError)
-      showTeamLibraryFailure(logoFolderError)
+      setError(copy.saveFailed)
     } finally {
       setLogoFolderSaving(false)
     }
@@ -1318,8 +1225,9 @@ export default function TeamLibraryPage({
         ? copy.imageOptimized(formatBytes(result.originalBytes), formatBytes(result.outputBytes))
         : copy.imageReady(formatBytes(result.outputBytes)))
       setError('')
-    } catch (imageError) {
-      showTeamLibraryFailure(imageError, copy.invalidImage)
+    } catch {
+      setStatus('')
+      setError(copy.invalidImage)
     }
   }
 
@@ -1338,7 +1246,6 @@ export default function TeamLibraryPage({
 
     try {
       const result = await optimizeLibraryImage(file, {
-        kind: 'avatar',
         maxDimension: 512,
         targetBytes: PLAYER_AVATAR_TARGET_BYTES
       })
@@ -1347,8 +1254,9 @@ export default function TeamLibraryPage({
         ? copy.avatarOptimized(player.name, formatBytes(result.originalBytes), formatBytes(result.outputBytes))
         : copy.avatarReady(player.name, formatBytes(result.outputBytes)))
       setError('')
-    } catch (imageError) {
-      showTeamLibraryFailure(imageError, copy.invalidImage)
+    } catch {
+      setStatus('')
+      setError(copy.invalidImage)
     }
   }
 
@@ -1482,7 +1390,7 @@ export default function TeamLibraryPage({
       refreshStorageEstimate(nextTeams)
     } catch (mergeError) {
       console.error('[OWBT] Failed to merge duplicate library teams:', mergeError)
-      showTeamLibraryFailure(mergeError)
+      setError(copy.saveFailed)
     }
   }
 
@@ -1843,7 +1751,6 @@ export default function TeamLibraryPage({
                     <input
                       value={draftTeam.logo?.startsWith('data:') ? '' : draftTeam.logo}
                       onChange={event => updateDraftField('logo', event.target.value)}
-                      onPaste={event => handleAssetSourcePaste(event, 'logo')}
                       placeholder={draftLogoBytes ? copy.localImageLoaded : copy.logoUrlPlaceholder}
                     />
                   </label>
@@ -1905,7 +1812,6 @@ export default function TeamLibraryPage({
                             <input
                               value={player.avatar?.startsWith('data:') ? '' : player.avatar || ''}
                               onChange={event => updateDraftPlayer(player.id, { avatar: event.target.value })}
-                              onPaste={event => handleAssetSourcePaste(event, 'avatar')}
                               placeholder={player.avatar?.startsWith('data:') ? copy.localImageLoaded : copy.playerAvatarPlaceholder}
                             />
                             <button type="button" onClick={() => selectPlayerAvatar(player.id)}>{copy.upload}</button>
@@ -2246,8 +2152,7 @@ export default function TeamLibraryPage({
           <textarea
             className={styles.projectImportTextarea}
             value={projectImportText}
-            onChange={event => updateProjectImportText(event.target.value)}
-            onPaste={handleProjectImportPaste}
+            onChange={event => setProjectImportText(event.target.value)}
             placeholder={copy.importCenterPlaceholder}
             spellCheck={false}
           />

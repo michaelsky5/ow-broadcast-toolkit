@@ -297,6 +297,13 @@ export const parseStatsBlock = text => {
   return Array.from({ length: 5 }, (_, index) => parseStatsLine(lines[index] || ''))
 }
 
+export const fileToDataUrl = file => new Promise((resolve, reject) => {
+  const reader = new FileReader()
+  reader.onload = () => resolve(reader.result)
+  reader.onerror = reject
+  reader.readAsDataURL(file)
+})
+
 export const buildCropAssets = (imageDataUrl, capture) => new Promise((resolve, reject) => {
   const img = new Image()
 

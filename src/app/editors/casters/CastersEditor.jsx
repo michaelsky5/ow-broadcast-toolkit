@@ -1,11 +1,10 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import styles from '../shared/SceneEditor.styles.js'
 import { getCasterEditorCopy } from '../shared/editorCopy'
-import { EditorDialog, Field, Panel, SegmentedControl } from '../shared/editorControls'
+import { Field, Panel, SegmentedControl } from '../shared/editorControls'
 import { ensureSceneSettings, getSceneSettings, normalizeBanList } from '../shared/editorHelpers'
 import { OW_MAP_BY_ID } from '../../../data/overwatch'
 import { getCurrentTeams, getStartingPlayers } from '../../../project/projectUtils'
-import { getProjectImageUploadErrorMessage, prepareProjectImage } from '../../imageUpload'
 
 const CASTER_SLOT_COUNT = 4
 const STAFF_SLOT_COUNT = 8
@@ -28,6 +27,13 @@ const DEFAULT_DESK_NOTE_SETTINGS = {
   visible: false,
   note: 'MATCH DESK STANDBY'
 }
+
+const fileToDataUrl = file => new Promise((resolve, reject) => {
+  const reader = new FileReader()
+  reader.onload = () => resolve(reader.result)
+  reader.onerror = reject
+  reader.readAsDataURL(file)
+})
 
 const clean = value => String(value || '').trim()
 
@@ -143,7 +149,6 @@ function CastersEditor({ project, text, language, activeSection = 'casters', onU
   const selectedInterviewPlayer = Number.isFinite(selectedPlayerSlot) ? interviewPlayers[selectedPlayerSlot] : null
   const avatarInputRef = useRef(null)
   const pendingAvatarSlotRef = useRef(null)
-  const [imageDialog, setImageDialog] = useState(null)
 
   const updateCasterSettings = patch => {
     onUpdateProject(draft => {
@@ -283,18 +288,9 @@ function CastersEditor({ project, text, language, activeSection = 'casters', onU
     if (!file || slotIndex === null) return
 
     try {
-      const { dataUrl } = await prepareProjectImage(file, {
-        maxDimension: 512,
-        minDimension: 384
-      })
-      updatePersonSlot(slotIndex, { avatar: dataUrl })
-    } catch (error) {
-      setImageDialog({
-        title: personCopy.image,
-        message: getProjectImageUploadErrorMessage(error, language),
-        confirmLabel: casterText.close,
-        onConfirm: () => setImageDialog(null)
-      })
+      if (!file.type.startsWith('image/')) return
+      const avatar = await fileToDataUrl(file)
+      updatePersonSlot(slotIndex, { avatar })
     } finally {
       pendingAvatarSlotRef.current = null
       event.target.value = ''
@@ -642,7 +638,6 @@ function CastersEditor({ project, text, language, activeSection = 'casters', onU
         hidden
         onChange={handleCasterAvatarFile}
       />
-      {imageDialog && <EditorDialog {...imageDialog} />}
     </div>
   )
 }

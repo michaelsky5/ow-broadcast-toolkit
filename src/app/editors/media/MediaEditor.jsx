@@ -3,11 +3,6 @@ import styles from '../shared/SceneEditor.styles.js'
 import { Field, Panel, SegmentedControl, ToggleField } from '../shared/editorControls'
 import { getPageEditorCopy } from '../shared/editorCopy'
 import { ensureSceneSettings, getSceneSettings } from '../shared/editorHelpers'
-import {
-  hasEmbeddedVideoReferences,
-  isEmbeddedVideoSource,
-  removeEmbeddedVideoReferences
-} from '../../../project/projectMediaSafety'
 
 const VIDEO_RENDER_OPTIONS = [
   { value: 'WEB', labelKey: 'toolkitPlayback' },
@@ -16,11 +11,8 @@ const VIDEO_RENDER_OPTIONS = [
 
 const clean = value => String(value || '').trim()
 const normalizeMode = value => String(value || '').toUpperCase() === 'VIDEO' ? 'VIDEO' : 'HIGHLIGHT'
-const getVideoLibrary = settings => (Array.isArray(settings.videoLibrary) ? settings.videoLibrary : [])
-  .filter(item => item && typeof item === 'object')
-const getVideoPlaylist = settings => (Array.isArray(settings.videoPlaylist) ? settings.videoPlaylist : [])
-  .map(clean)
-  .filter(Boolean)
+const getVideoLibrary = settings => Array.isArray(settings.videoLibrary) ? settings.videoLibrary : []
+const getVideoPlaylist = settings => Array.isArray(settings.videoPlaylist) ? settings.videoPlaylist : []
 const getDisplayNameFromPath = (path, fallback = 'Video Source') => {
   const cleanPath = clean(path)
   if (!cleanPath) return fallback
@@ -30,47 +22,20 @@ const getDisplayNameFromPath = (path, fallback = 'Video Source') => {
   return fileName || fallback
 }
 
-const MEDIA_SOURCE_SAFETY_COPY = {
-  zh: {
-    legacyEmbeddedTitle: '检测到旧版内嵌视频',
-    legacyEmbeddedMessage: '此项目包含旧版 Data/Blob 视频。为避免丢失，OWBT 会继续原样保留；替换为 HTTPS 地址后，可从编辑与播出状态中主动移除这些内嵌项。',
-    removeEmbedded: '从编辑与播出中移除',
-    embeddedPathLabel: '旧版内嵌视频（内容已隐藏）',
-    remoteOnlyTitle: '使用 HTTPS 视频地址',
-    remoteOnlyHint: '本地文件不会被读取或写入项目',
-    localFileDisabled: '本地上传已禁用',
-    localFileTitle: '本地视频已阻止',
-    localFileMessage: '为避免浏览器存储溢出，OWBT 不会读取或保存本地视频文件。请先将视频上传到可访问的 HTTPS 地址，再粘贴 URL。',
-    embeddedSourceTitle: '已阻止内嵌视频',
-    embeddedSourceMessage: '新的 Data/Blob 视频会造成浏览器存储膨胀，因此不能添加。请改用可访问的 HTTPS 地址。',
-    dismiss: '知道了'
-  },
-  en: {
-    legacyEmbeddedTitle: 'Legacy embedded video detected',
-    legacyEmbeddedMessage: 'This project contains legacy Data/Blob video. OWBT will preserve it to prevent data loss. Replace it with an HTTPS URL, then explicitly remove the embedded entries from both Edit and Program.',
-    removeEmbedded: 'Remove from Edit and Program',
-    embeddedPathLabel: 'Legacy embedded video (content hidden)',
-    remoteOnlyTitle: 'Use an HTTPS video URL',
-    remoteOnlyHint: 'Local files are never read or stored in the project',
-    localFileDisabled: 'Local upload disabled',
-    localFileTitle: 'Local video blocked',
-    localFileMessage: 'To prevent browser storage overflow, OWBT does not read or save local video files. Upload the video to an accessible HTTPS URL, then paste that URL.',
-    embeddedSourceTitle: 'Embedded video blocked',
-    embeddedSourceMessage: 'New Data and Blob video URLs are not accepted because they can overflow browser storage. Use an accessible HTTPS URL instead.',
-    dismiss: 'Dismiss'
-  }
-}
+const fileToDataUrl = file => new Promise((resolve, reject) => {
+  const reader = new FileReader()
+  reader.onload = () => resolve(reader.result)
+  reader.onerror = reject
+  reader.readAsDataURL(file)
+})
 
 function MediaEditor({ project, language = 'en', onUpdateProject }) {
   const pageText = getPageEditorCopy(language)
-  const safetyCopy = MEDIA_SOURCE_SAFETY_COPY[String(language).toLowerCase().startsWith('zh') ? 'zh' : 'en']
   const settings = getSceneSettings(project, 'media')
-  const hasUnsafeStoredReferences = hasEmbeddedVideoReferences(settings)
-  const activeVideoInputRef = useRef(null)
+  const fileInputRef = useRef(null)
   const [isDragging, setIsDragging] = useState(false)
   const [newVideoName, setNewVideoName] = useState('')
   const [newVideoPath, setNewVideoPath] = useState('')
-  const [sourceNotice, setSourceNotice] = useState('')
   const mode = normalizeMode(settings.mode)
   const isVideoMode = mode === 'VIDEO'
   const sourceUrl = clean(settings.sourceUrl)
@@ -80,7 +45,6 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
   const videoPlaylist = getVideoPlaylist(settings)
   const renderMode = settings.videoRenderMode || 'WEB'
   const sourceDisplay = activeVideoPath
-  const visibleSourceNotice = sourceNotice || (hasUnsafeStoredReferences ? 'legacyEmbedded' : '')
   const videoRenderOptions = VIDEO_RENDER_OPTIONS.map(option => ({
     value: option.value,
     label: pageText[option.labelKey]
@@ -88,8 +52,7 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
 
   const updateMediaSettings = patch => {
     onUpdateProject(draft => {
-      const mediaSettings = ensureSceneSettings(draft, 'media')
-      Object.assign(mediaSettings, patch)
+      Object.assign(ensureSceneSettings(draft, 'media'), patch)
     })
   }
 
@@ -106,10 +69,19 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
     ]
   }
 
-  const rejectLocalMediaFile = file => {
-    if (!isVideoMode || !file) return
-    setSourceNotice('local')
-    activeVideoInputRef.current?.focus()
+  const applyMediaFile = async file => {
+    if (!isVideoMode || !file || !file.type.startsWith('video/')) return
+    const dataUrl = await fileToDataUrl(file)
+    const patch = {
+      mode: 'VIDEO',
+      sourceUrl: dataUrl,
+      sourceName: file.name,
+      sourceType: file.type,
+      activeVideoPath: dataUrl,
+      videoLibrary: addVideoToLibrary(dataUrl, file.name)
+    }
+
+    updateMediaSettings(patch)
   }
 
   const clearSource = () => {
@@ -122,15 +94,9 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
   }
 
   const updateActiveVideoPath = value => {
-    if (isEmbeddedVideoSource(value)) {
-      setSourceNotice('blockedEmbedded')
-      return
-    }
-
-    setSourceNotice('')
     updateMediaSettings({
       activeVideoPath: value,
-      sourceUrl: '',
+      sourceUrl: value,
       sourceName: '',
       sourceType: value ? 'video/manual' : ''
     })
@@ -139,10 +105,6 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
   const registerVideo = () => {
     const path = clean(newVideoPath)
     if (!path) return
-    if (isEmbeddedVideoSource(path)) {
-      setSourceNotice('blockedEmbedded')
-      return
-    }
 
     const name = clean(newVideoName) || getDisplayNameFromPath(path, pageText.defaultVideoSource)
     updateMediaSettings({
@@ -187,8 +149,8 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
   const playNow = path => {
     updateMediaSettings({
       activeVideoPath: path,
-      sourceUrl: '',
-      sourceName: getVideoName(path),
+      sourceUrl: path,
+      sourceName: getDisplayNameFromPath(path, pageText.defaultVideoSource),
       sourceType: 'video/manual',
       mode: 'VIDEO'
     })
@@ -201,47 +163,17 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
 
   const useLegacySource = () => {
     if (!sourceUrl) return
-    const legacySourceName = settings.sourceName || (
-      isEmbeddedVideoSource(sourceUrl)
-        ? safetyCopy.embeddedPathLabel
-        : getDisplayNameFromPath(sourceUrl, pageText.defaultVideoSource)
-    )
 
     updateMediaSettings({
       activeVideoPath: sourceUrl,
-      sourceUrl: '',
-      sourceName: legacySourceName,
+      sourceName: settings.sourceName || getDisplayNameFromPath(sourceUrl, pageText.defaultVideoSource),
       sourceType: settings.sourceType || 'video/manual',
       mode: 'VIDEO',
-      ...(
-        isEmbeddedVideoSource(sourceUrl)
-          ? {}
-          : { videoLibrary: addVideoToLibrary(sourceUrl, legacySourceName) }
-      )
+      videoLibrary: addVideoToLibrary(sourceUrl, settings.sourceName || getDisplayNameFromPath(sourceUrl, pageText.defaultVideoSource))
     })
   }
 
-  const removeLegacyEmbeddedMedia = () => {
-    onUpdateProject(draft => {
-      const mediaSettings = ensureSceneSettings(draft, 'media')
-      Object.assign(mediaSettings, removeEmbeddedVideoReferences(mediaSettings))
-    }, {
-      undoReason: 'REMOVE EMBEDDED MEDIA',
-      live: true
-    })
-    setSourceNotice('')
-  }
-
-  const getVideoName = path => {
-    const registeredName = videoLibrary.find(item => item.path === path)?.name
-    if (registeredName) return registeredName
-    if (isEmbeddedVideoSource(path)) return settings.sourceName || safetyCopy.embeddedPathLabel
-    return getDisplayNameFromPath(path, pageText.defaultVideoSource)
-  }
-
-  const getVideoPathLabel = path => (
-    isEmbeddedVideoSource(path) ? safetyCopy.embeddedPathLabel : path
-  )
+  const getVideoName = path => videoLibrary.find(item => item.path === path)?.name || getDisplayNameFromPath(path, pageText.defaultVideoSource)
 
   useEffect(() => {
     const handlePaste = event => {
@@ -256,9 +188,7 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
       const items = event.clipboardData?.items || []
       for (const item of items) {
         if (item.kind === 'file' && item.type.startsWith('video/')) {
-          event.preventDefault()
-          setSourceNotice('local')
-          activeVideoInputRef.current?.focus()
+          applyMediaFile(item.getAsFile())
           break
         }
       }
@@ -266,7 +196,7 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
 
     document.addEventListener('paste', handlePaste)
     return () => document.removeEventListener('paste', handlePaste)
-  }, [isVideoMode])
+  })
 
   if (!isVideoMode) {
     return (
@@ -283,19 +213,6 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
               <input value={settings.highlightLabel || ''} onChange={event => updateMediaSettings({ highlightLabel: event.target.value })} placeholder="HIGHLIGHT" />
             </Field>
           </div>
-          {hasUnsafeStoredReferences && (
-            <div className={styles.mediaLegacySource} role="alert" aria-live="assertive">
-              <div>
-                <strong>{safetyCopy.legacyEmbeddedTitle}</strong>
-                <span style={{ overflow: 'visible', textOverflow: 'clip', whiteSpace: 'normal' }}>
-                  {safetyCopy.legacyEmbeddedMessage}
-                </span>
-              </div>
-              <button type="button" className={styles.secondaryButton} onClick={removeLegacyEmbeddedMedia}>
-                {safetyCopy.removeEmbedded}
-              </button>
-            </div>
-          )}
         </Panel>
       </div>
     )
@@ -307,10 +224,7 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
         <button
           type="button"
           className={`${styles.mediaDropzone} ${isDragging ? styles.mediaDropzoneActive : ''}`}
-          onClick={() => {
-            setSourceNotice('local')
-            activeVideoInputRef.current?.focus()
-          }}
+          onClick={() => fileInputRef.current?.click()}
           onDragOver={event => {
             event.preventDefault()
             setIsDragging(true)
@@ -319,7 +233,7 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
           onDrop={event => {
             event.preventDefault()
             setIsDragging(false)
-            rejectLocalMediaFile(event.dataTransfer.files?.[0])
+            applyMediaFile(event.dataTransfer.files?.[0])
           }}
         >
           {sourceDisplay ? (
@@ -329,62 +243,35 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
             </span>
           ) : (
             <span>
-              <strong>{safetyCopy.remoteOnlyTitle}</strong>
-              <em>{safetyCopy.remoteOnlyHint}</em>
+              <strong>{pageText.uploadDropPasteVideo}</strong>
+              <em>{pageText.videoSource}</em>
             </span>
           )}
         </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="video/*"
+          hidden
+          onChange={event => {
+            applyMediaFile(event.target.files?.[0])
+            event.target.value = ''
+          }}
+        />
 
         <Field label={pageText.activeVideoPath}>
           <input
-            ref={activeVideoInputRef}
-            value={isEmbeddedVideoSource(activeVideoPath) ? '' : activeVideoPath}
+            value={activeVideoPath}
             onChange={event => updateActiveVideoPath(event.target.value)}
-            placeholder={isEmbeddedVideoSource(activeVideoPath)
-              ? safetyCopy.embeddedPathLabel
-              : renderMode === 'WEB'
-                ? 'https://cdn.example.com/highlight.mp4'
-                : 'C:\\media\\highlight.mp4'}
+            placeholder="/media/highlight.mp4"
           />
         </Field>
-
-        {visibleSourceNotice && (
-          <div className={styles.mediaLegacySource} role="alert" aria-live="assertive">
-            <div>
-              <strong>{
-                visibleSourceNotice === 'legacyEmbedded'
-                  ? safetyCopy.legacyEmbeddedTitle
-                  : visibleSourceNotice === 'blockedEmbedded'
-                    ? safetyCopy.embeddedSourceTitle
-                    : safetyCopy.localFileTitle
-              }</strong>
-              <span style={{ overflow: 'visible', textOverflow: 'clip', whiteSpace: 'normal' }}>
-                {
-                  visibleSourceNotice === 'legacyEmbedded'
-                    ? safetyCopy.legacyEmbeddedMessage
-                    : visibleSourceNotice === 'blockedEmbedded'
-                      ? safetyCopy.embeddedSourceMessage
-                      : safetyCopy.localFileMessage
-                }
-              </span>
-            </div>
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              onClick={visibleSourceNotice === 'legacyEmbedded'
-                ? removeLegacyEmbeddedMedia
-                : () => setSourceNotice('')}
-            >
-              {visibleSourceNotice === 'legacyEmbedded' ? safetyCopy.removeEmbedded : safetyCopy.dismiss}
-            </button>
-          </div>
-        )}
 
         {hasLegacySource && (
           <div className={styles.mediaLegacySource}>
             <div>
               <strong>{pageText.legacySource}</strong>
-              <span>{getVideoPathLabel(sourceUrl)}</span>
+              <span>{sourceUrl}</span>
             </div>
             <button type="button" className={styles.secondaryButton} onClick={useLegacySource}>
               {pageText.useSource}
@@ -393,15 +280,8 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
         )}
 
         <div className={styles.mediaSourceActions}>
-          <button
-            type="button"
-            className={styles.secondaryButton}
-            onClick={() => {
-              setSourceNotice('local')
-              activeVideoInputRef.current?.focus()
-            }}
-          >
-            {safetyCopy.localFileDisabled}
+          <button type="button" className={styles.secondaryButton} onClick={() => fileInputRef.current?.click()}>
+            {pageText.selectFile}
           </button>
           <button type="button" className={styles.secondaryButton} disabled={!sourceDisplay} onClick={clearSource}>
             {pageText.clear}
@@ -495,7 +375,7 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
                       <b>{index + 1}</b>
                       <div>
                         <strong>{getVideoName(path)}</strong>
-                        <span>{getVideoPathLabel(path)}</span>
+                        <span>{path}</span>
                       </div>
                     </div>
                     <div className={styles.mediaItemActions}>
@@ -541,8 +421,8 @@ function MediaEditor({ project, language = 'en', onUpdateProject }) {
                     <div className={styles.mediaItemHeader}>
                       <b>{isActive ? pageText.on : index + 1}</b>
                       <div>
-                        <strong>{getVideoName(item.path)}</strong>
-                        <span>{getVideoPathLabel(item.path)}</span>
+                        <strong>{item.name || getDisplayNameFromPath(item.path, pageText.defaultVideoSource)}</strong>
+                        <span>{item.path}</span>
                       </div>
                     </div>
                     <div className={styles.mediaItemActions}>

@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import { OW_ROLE_OPTIONS } from '../../../data/overwatch'
 import { getTeamPlayers } from '../../../project/projectUtils'
-import { getProjectImageUploadErrorMessage, prepareProjectImage } from '../../imageUpload'
 import styles from '../shared/SceneEditor.styles.js'
 import { getRosterEditorCopy } from '../shared/editorCopy'
 import { EditorDialog, Field, Panel, SegmentedControl, ToggleField } from '../shared/editorControls'
@@ -13,6 +12,7 @@ import {
   MIN_ACTIVE_ROSTER_PLAYERS,
   ROLE_SORT_ORDER,
   createEntityId,
+  fileToDataUrl,
   getDefaultHeroForRole,
   getRoleCounts,
   getRosterOutputIds,
@@ -117,17 +117,7 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
       return
     }
 
-    try {
-      const { dataUrl } = await prepareProjectImage(file, { maxDimension: 1024 })
-      updateCurrentTeamLogo(dataUrl)
-    } catch (error) {
-      setDialog({
-        title: text.teamLogo,
-        message: getProjectImageUploadErrorMessage(error, language),
-        confirmLabel: text.close,
-        onConfirm: () => setDialog(null)
-      })
-    }
+    updateCurrentTeamLogo(await fileToDataUrl(file))
   }
 
   const updateRosterSlot = (slotIndex, playerId, patch) => {
@@ -170,19 +160,9 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
     const pendingSlot = pendingAvatarSlotRef.current
 
     try {
-      if (!file || !pendingSlot) return
-      const { dataUrl } = await prepareProjectImage(file, {
-        maxDimension: 512,
-        minDimension: 384
-      })
-      updateRosterSlot(pendingSlot.slotIndex, pendingSlot.playerId, { avatar: dataUrl })
-    } catch (error) {
-      setDialog({
-        title: text.avatarUrl,
-        message: getProjectImageUploadErrorMessage(error, language),
-        confirmLabel: text.close,
-        onConfirm: () => setDialog(null)
-      })
+      if (!file || !pendingSlot || !file.type.startsWith('image/')) return
+      const avatar = await fileToDataUrl(file)
+      updateRosterSlot(pendingSlot.slotIndex, pendingSlot.playerId, { avatar })
     } finally {
       pendingAvatarSlotRef.current = null
       event.target.value = ''

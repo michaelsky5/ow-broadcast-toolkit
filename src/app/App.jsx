@@ -8,23 +8,12 @@ import {
   stringifyProject
 } from '../project/projectUtils'
 import {
-  OWBT_STORAGE_ERROR_EVENT,
-  OWBT_STORAGE_SUCCESS_EVENT,
-  inspectStoredProjectResult,
-  isRecoverableStoredProjectInspection,
   loadStoredProgramProject,
   loadStoredProject,
-  replaceStoredProjectResult,
-  resetStoredProjectResult
+  replaceStoredProject,
+  resetStoredProject
 } from '../project/projectStorage'
 import { publishProgramState, publishProjectState } from '../project/projectSync'
-import {
-  clearSessionCredentials,
-  createSessionCredentials,
-  loadSessionCredentials,
-  publishSessionProgramState,
-  saveSessionCredentials
-} from '../project/projectSession'
 import { applyThemeTokens } from '../theme/themeTokens'
 import { OW_MAP_OPTIONS } from '../data/overwatch'
 import { CONSOLE_SELECTOR_ITEMS, SCENE_REGISTRY, getConsoleSceneById, getSceneById } from '../scenes/registry'
@@ -33,19 +22,9 @@ import OverlayPage from '../overlay/OverlayPage'
 import ProgramPreview from '../overlay/ProgramPreview'
 import { getAppCopy, getAppLanguage } from './appCopy'
 import { APP_ROUTES, getAppRoute, getAppRouteHash, getAppRouteUrl } from './appRoute'
-import { getBrowserLocalStorage } from './browserStorage'
-import {
-  getLatestStorageIssue,
-  recordStorageIssue,
-  resolveStorageIssue
-} from './storageIssues'
 import IntroSplash from './IntroSplash'
 import { isUsageNoticeAccepted } from './usageNotice'
 import ConsoleEntry from './ConsoleEntry'
-import {
-  UNDO_MEMORY_BUDGET_BYTES,
-  createUndoSnapshotResult
-} from './projectUndo'
 import {
   CONSOLE_SETTINGS_STORAGE_KEY,
   DEFAULT_SCENE_TRANSITION_SETTINGS,
@@ -181,26 +160,6 @@ const updateNested = (project, updater) => {
 }
 
 const PROJECT_SYNC_DEBOUNCE_MS = 180
-const REMOTE_SESSION_SYNC_DEBOUNCE_MS = 350
-const UNDO_COALESCE_MS = 1000
-
-const formatStorageSize = bytes => {
-  const value = Number(bytes || 0)
-  if (!value) return ''
-  if (value < 1024 * 1024) return `${Math.ceil(value / 1024)} KB`
-  return `${(value / (1024 * 1024)).toFixed(2)} MB`
-}
-
-const getRemoteSessionState = error => {
-  if (
-    error?.code === 'PAYLOAD_TOO_LARGE'
-    || error?.code === 'EMBEDDED_MEDIA_TOO_LARGE'
-    || error?.code === 'UNSAFE_EMBEDDED_MEDIA'
-  ) return 'oversize'
-  if (error?.code === 'SESSION_STORE_UNAVAILABLE') return 'unavailable'
-  if (error?.code === 'INVALID_WRITER_SECRET') return 'unauthorized'
-  return 'offline'
-}
 const HOTKEY_COMMANDS = [
   { id: 'take', defaultKeys: 'Ctrl Alt T', labelKey: 'hotkeyTake' },
   { id: 'undo', defaultKeys: 'Ctrl Alt Z', labelKey: 'hotkeyUndo' },
@@ -384,50 +343,18 @@ const normalizeConsoleSettings = settings => {
 }
 
 const loadConsoleSettings = () => {
-  const storage = getBrowserLocalStorage()
-  if (!storage) return DEFAULT_CONSOLE_SETTINGS
+  if (typeof window === 'undefined' || !window.localStorage) return DEFAULT_CONSOLE_SETTINGS
 
   try {
-    return normalizeConsoleSettings(JSON.parse(storage.getItem(CONSOLE_SETTINGS_STORAGE_KEY) || '{}'))
+    return normalizeConsoleSettings(JSON.parse(window.localStorage.getItem(CONSOLE_SETTINGS_STORAGE_KEY) || '{}'))
   } catch {
     return DEFAULT_CONSOLE_SETTINGS
   }
 }
 
 const saveConsoleSettings = settings => {
-  const serialized = JSON.stringify(normalizeConsoleSettings(settings))
-  const storage = getBrowserLocalStorage()
-  if (!storage) return false
-
-  try {
-    storage.setItem(CONSOLE_SETTINGS_STORAGE_KEY, serialized)
-    try {
-      window.dispatchEvent(new CustomEvent(OWBT_STORAGE_SUCCESS_EVENT, {
-        detail: {
-          operation: 'saveConsoleSettings',
-          serializedBytes: new Blob([serialized]).size
-        }
-      }))
-    } catch {
-      // Saving succeeded even if the status event cannot be delivered.
-    }
-    return true
-  } catch (error) {
-    try {
-      window.dispatchEvent(new CustomEvent(OWBT_STORAGE_ERROR_EVENT, {
-        detail: {
-          operation: 'saveConsoleSettings',
-          name: String(error?.name || 'StorageError'),
-          message: String(error?.message || error),
-          serializedBytes: new Blob([serialized]).size,
-          quotaExceeded: error?.name === 'QuotaExceededError'
-        }
-      }))
-    } catch {
-      // The settings stay in memory even if the global warning cannot render.
-    }
-    return false
-  }
+  if (typeof window === 'undefined' || !window.localStorage) return
+  window.localStorage.setItem(CONSOLE_SETTINGS_STORAGE_KEY, JSON.stringify(normalizeConsoleSettings(settings)))
 }
 
 const isTypingTarget = target => {
@@ -742,10 +669,6 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   const [undoStack, setUndoStack] = useState([])
   const [appDialog, setAppDialog] = useState(null)
   const [matchPackageNotice, setMatchPackageNotice] = useState(null)
-  const [storageIssues, setStorageIssues] = useState(() => new Map())
-  const [recoveryState, setRecoveryState] = useState(null)
-  const [sessionCredentials, setSessionCredentials] = useState(loadSessionCredentials)
-  const [sessionStatus, setSessionStatus] = useState({ state: 'local' })
   const [workspaceMode, setWorkspaceMode] = useState('production')
   const [entrySection, setEntrySection] = useState('system')
   const [sceneModeHints, setSceneModeHints] = useState({
@@ -759,27 +682,17 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   const matchPackageTextRef = useRef(null)
   const projectRef = useRef(project)
   const programProjectRef = useRef(programProject)
-  const undoStackRef = useRef(undoStack)
-  const recoveryModeRef = useRef(false)
   const hotkeyActionsRef = useRef({})
   const consoleScreenRef = useRef(consoleScreen)
   const libraryReturnScreenRef = useRef(libraryReturnScreen)
   const previousRouteRef = useRef(route)
   const internalLibraryNavigationRef = useRef(false)
-  const onlineSessionActionRef = useRef(false)
   const copy = getAppCopy(project, consoleSettings.interfaceLanguage)
   const language = getAppLanguage(project, consoleSettings.interfaceLanguage)
   const competitionName = getCompetitionName(project, language)
   const overlayUrl = getOverlayUrl(project)
   const statusOptions = getStatusOptions(copy)
   const showRightRailControls = workspaceMode === 'production'
-  const recoveryMode = Boolean(recoveryState)
-  const storageIssue = getLatestStorageIssue(storageIssues)
-  const storageIssueCount = storageIssues.size
-  const recoveryInspection = useMemo(
-    () => recoveryState ? inspectStoredProjectResult(project) : null,
-    [project, recoveryState]
-  )
 
   useEffect(() => {
     consoleScreenRef.current = consoleScreen
@@ -835,77 +748,28 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
 
   const currentMap = OW_MAP_OPTIONS.find(map => map.id === project.currentMatch.currentMapId)
   const currentMapLabel = currentMap ? (language === 'en' ? currentMap.en : currentMap.zh) : project.currentMatch.currentMapId
-  const sessionStatusLabel = {
-    connecting: copy.sessionSyncConnecting,
-    local: copy.sessionSyncLocal,
-    offline: copy.sessionSyncOffline,
-    online: copy.sessionSyncOnline,
-    oversize: copy.sessionSyncOversize,
-    unauthorized: copy.sessionSyncUnauthorized,
-    unavailable: copy.sessionSyncUnavailable
-  }[sessionStatus.state] || copy.sessionSyncOffline
 
   useEffect(() => {
     projectRef.current = project
     applyThemeTokens(project.theme)
-    if (recoveryMode) return undefined
-
     const syncTimer = window.setTimeout(() => {
       publishProjectState(projectRef.current, 'console')
     }, PROJECT_SYNC_DEBOUNCE_MS)
 
     return () => window.clearTimeout(syncTimer)
-  }, [project, recoveryMode])
+  }, [project])
 
   useEffect(() => {
     programProjectRef.current = programProject
-    if (recoveryMode) return undefined
-
     const syncTimer = window.setTimeout(() => {
       publishProgramState(programProjectRef.current, 'console-program')
     }, PROJECT_SYNC_DEBOUNCE_MS)
 
     return () => window.clearTimeout(syncTimer)
-  }, [programProject, recoveryMode])
-
-  useEffect(() => {
-    if (!sessionCredentials || recoveryMode) return undefined
-
-    const syncTimer = window.setTimeout(() => {
-      setSessionStatus(previous => (
-        previous.state === 'online' ? previous : { state: 'connecting' }
-      ))
-
-      void publishSessionProgramState(
-        sessionCredentials,
-        programProjectRef.current,
-        {
-          source: 'console-program',
-          transitionSettings: normalizeSceneTransitionSettings(consoleSettings)
-        }
-      ).then(response => {
-        setSessionStatus({
-          state: 'online',
-          updatedAt: response.updatedAt || ''
-        })
-      }).catch(error => {
-        if (error?.code === 'INVALID_WRITER_SECRET') {
-          clearSessionCredentials()
-          setSessionCredentials(null)
-        }
-        setSessionStatus({
-          state: getRemoteSessionState(error),
-          code: error.code || ''
-        })
-      })
-    }, REMOTE_SESSION_SYNC_DEBOUNCE_MS)
-
-    return () => window.clearTimeout(syncTimer)
-  }, [consoleSettings, programProject, recoveryMode, sessionCredentials])
+  }, [programProject])
 
   useEffect(() => {
     const flushProjectState = () => {
-      if (recoveryModeRef.current) return
       publishProjectState(projectRef.current, 'console')
       publishProgramState(programProjectRef.current, 'console-program')
     }
@@ -922,108 +786,38 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     }
   }, [])
 
-  useEffect(() => {
-    const handleStorageError = event => {
-      setStorageIssues(issues => recordStorageIssue(issues, event.detail))
-    }
-    const handleStorageSuccess = event => {
-      const operation = event.detail?.operation || ''
-      if (!operation) return
-      setStorageIssues(issues => resolveStorageIssue(issues, operation))
-    }
-
-    window.addEventListener(OWBT_STORAGE_ERROR_EVENT, handleStorageError)
-    window.addEventListener(OWBT_STORAGE_SUCCESS_EVENT, handleStorageSuccess)
-    return () => {
-      window.removeEventListener(OWBT_STORAGE_ERROR_EVENT, handleStorageError)
-      window.removeEventListener(OWBT_STORAGE_SUCCESS_EVENT, handleStorageSuccess)
-    }
-  }, [])
-
-  const pushUndoSnapshot = (reason, options = {}) => {
-    const normalizedReason = reason || 'EDIT'
-    const source = options.source || {}
-    const result = createUndoSnapshotResult({
-      editorSceneId: source.editorSceneId ?? editorSceneId,
-      maxBytes: UNDO_MEMORY_BUDGET_BYTES,
-      previewSceneId: source.previewSceneId ?? previewSceneId,
-      programProject: source.programProject ?? programProjectRef.current,
-      project: source.project ?? projectRef.current,
-      reason: normalizedReason,
-      workspaceMode: source.workspaceMode ?? workspaceMode
-    })
-    if (!result.ok) return result
-
-    const latest = undoStackRef.current[0]
-    if (
-      options.coalesce !== false
-      && latest?.reason === normalizedReason
-      && result.snapshot.createdAt - Number(latest.createdAt || 0) < UNDO_COALESCE_MS
-    ) {
-      return {
-        ok: true,
-        inserted: false,
-        reused: true,
-        snapshotId: latest.id
-      }
-    }
-
-    let retainedBytes = result.snapshot.approxBytes
-    const retainedSnapshots = []
-    for (const snapshot of undoStackRef.current) {
-      if (retainedSnapshots.length >= 11) break
-      const snapshotBytes = Number(snapshot.approxBytes || 0)
-      if (!snapshotBytes || retainedBytes + snapshotBytes > UNDO_MEMORY_BUDGET_BYTES) continue
-      retainedSnapshots.push(snapshot)
-      retainedBytes += snapshotBytes
-    }
-
-    const nextStack = [result.snapshot, ...retainedSnapshots]
-    undoStackRef.current = nextStack
-    setUndoStack(nextStack)
-    return {
-      ...result,
-      inserted: true,
-      reused: false,
-      snapshotId: result.snapshot.id
-    }
-  }
-
-  const removeUndoSnapshot = result => {
-    if (!result?.inserted || !result.snapshotId) return
-    const nextStack = undoStackRef.current.filter(snapshot => snapshot.id !== result.snapshotId)
-    undoStackRef.current = nextStack
-    setUndoStack(nextStack)
+  const pushUndoSnapshot = reason => {
+    setUndoStack(prev => [{
+      id: `${Date.now()}-${reason || 'edit'}`,
+      reason,
+      project: structuredClone(projectRef.current),
+      programProject: structuredClone(programProjectRef.current),
+      previewSceneId,
+      editorSceneId,
+      workspaceMode
+    }, ...prev].slice(0, 12))
   }
 
   const updateProject = (updater, options = {}) => {
-    if (recoveryModeRef.current && options.persistImmediately === true) return false
-    if (!options.skipUndo && !recoveryModeRef.current) {
-      pushUndoSnapshot(options.undoReason || 'EDIT')
-    }
+    if (!options.skipUndo) pushUndoSnapshot(options.undoReason || 'EDIT')
 
     const nextProject = updateNested(projectRef.current, updater)
-    const nextProgramProject = options.live === true && !recoveryModeRef.current
-      ? updateNested(programProjectRef.current, options.programUpdater || updater)
-      : null
-
-    if (options.persistImmediately === true) {
-      const currentSaved = publishProjectState(nextProject, 'console')
-      const programSaved = nextProgramProject
-        ? publishProgramState(nextProgramProject, 'console-program')
-        : true
-      if (!currentSaved || !programSaved) return false
-    }
-
     projectRef.current = nextProject
     setProject(nextProject)
 
-    if (nextProgramProject) {
-      programProjectRef.current = nextProgramProject
-      setProgramProject(nextProgramProject)
+    if (options.persistImmediately === true) {
+      publishProjectState(nextProject, 'console')
     }
 
-    return true
+    if (options.live === true) {
+      const nextProgramProject = updateNested(programProjectRef.current, options.programUpdater || updater)
+      programProjectRef.current = nextProgramProject
+      setProgramProject(nextProgramProject)
+
+      if (options.persistImmediately === true) {
+        publishProgramState(nextProgramProject, 'console-program')
+      }
+    }
   }
 
   const pushLog = message => {
@@ -1103,7 +897,6 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   }
 
   const autoTakeProgramScene = (scene, options = {}) => {
-    if (recoveryModeRef.current) return
     const previousProgramProject = programProjectRef.current
     const nextProject = {
       ...previousProgramProject,
@@ -1124,7 +917,6 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   }
 
   const takePreviewToProgram = () => {
-    if (recoveryModeRef.current) return
     pushUndoSnapshot('TAKE')
     const nextProgramProject = markTakeTransition(structuredClone(previewProject))
     programProjectRef.current = nextProgramProject
@@ -1148,17 +940,14 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   }
 
   const undoLastAction = () => {
-    if (recoveryModeRef.current) return
-    const snapshot = undoStackRef.current[0]
+    const snapshot = undoStack[0]
 
     if (!snapshot) {
       pushLog(copy.undoEmpty)
       return
     }
 
-    const nextStack = undoStackRef.current.slice(1)
-    undoStackRef.current = nextStack
-    setUndoStack(nextStack)
+    setUndoStack(prev => prev.slice(1))
     projectRef.current = snapshot.project
     programProjectRef.current = snapshot.programProject
     setProject(snapshot.project)
@@ -1170,143 +959,25 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     pushLog(copy.logUndo(getUndoReasonLabel(snapshot.reason, copy)))
   }
 
-  const copyUrl = async (url, logMessage) => {
+  const copyOverlayUrl = async () => {
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable')
-      await navigator.clipboard.writeText(url)
-      pushLog(logMessage)
+      await navigator.clipboard.writeText(overlayUrl)
+      pushLog(copy.logCopyOverlay)
     } catch {
       setAppDialog({
         kicker: 'Overlay',
         title: copy.copyUrl,
-        message: `${copy.overlayUrl}: ${url}`,
+        message: `${copy.overlayUrl}: ${overlayUrl}`,
         confirmLabel: copy.ok,
         onConfirm: () => setAppDialog(null)
       })
     }
-  }
-
-  const copyOverlayUrl = () => copyUrl(overlayUrl, copy.logCopyOverlay)
-
-  const copyOnlineOverlayUrl = async () => {
-    if (onlineSessionActionRef.current) return
-    onlineSessionActionRef.current = true
-    const isNewSession = !sessionCredentials
-    let credentials = sessionCredentials
-    setSessionStatus({ state: 'connecting' })
-
-    try {
-      credentials = credentials || await createSessionCredentials()
-      if (isNewSession && !saveSessionCredentials(credentials)) {
-        setStorageIssues(issues => recordStorageIssue(issues, {
-          operation: 'saveSessionCredentials',
-          name: 'SessionCredentialsNotSavedError',
-          serializedBytes: 0
-        }))
-        const error = new Error('Session credentials could not be saved.')
-        error.code = 'SESSION_CREDENTIALS_NOT_SAVED'
-        throw error
-      }
-      if (isNewSession) {
-        setStorageIssues(issues => resolveStorageIssue(issues, 'saveSessionCredentials'))
-      }
-
-      const response = await publishSessionProgramState(
-        credentials,
-        programProjectRef.current,
-        {
-          source: 'console-program',
-          transitionSettings: normalizeSceneTransitionSettings(consoleSettings)
-        }
-      )
-
-      setSessionCredentials(credentials)
-      setSessionStatus({
-        state: 'online',
-        updatedAt: response.updatedAt || ''
-      })
-
-      await copyUrl(
-        getOverlayUrl(projectRef.current, { sessionId: credentials.sessionId }),
-        copy.logCopyOnlineOverlay
-      )
-    } catch (error) {
-      if (isNewSession) clearSessionCredentials()
-      if (error?.code === 'INVALID_WRITER_SECRET') {
-        clearSessionCredentials()
-        setSessionCredentials(null)
-      }
-      const state = getRemoteSessionState(error)
-      setSessionStatus({ state, code: error.code || '' })
-      setAppDialog({
-        kicker: 'OBS ONLINE SYNC',
-        title: copy.sessionSyncFailedTitle,
-        message: state === 'oversize'
-          ? copy.sessionSyncFailedOversize
-          : state === 'unavailable'
-            ? copy.sessionSyncFailedUnavailable
-            : error?.code === 'SESSION_CREDENTIALS_NOT_SAVED'
-              ? copy.sessionSyncFailedCredentials
-              : state === 'unauthorized'
-                ? copy.sessionSyncFailedUnauthorized
-                : copy.sessionSyncFailedBody,
-        confirmLabel: copy.ok,
-        onConfirm: () => setAppDialog(null)
-      })
-    } finally {
-      onlineSessionActionRef.current = false
-    }
-  }
-
-  const showUndoSnapshotUnavailable = (projectToExport = projectRef.current) => {
-    setAppDialog({
-      kicker: copy.project,
-      title: copy.undoSnapshotUnavailableTitle,
-      message: copy.undoSnapshotUnavailableBody,
-      actions: [
-        {
-          label: copy.exportProject,
-          onClick: () => exportProjectAsJson(projectToExport)
-        },
-        {
-          label: copy.ok,
-          tone: 'primary',
-          onClick: () => setAppDialog(null)
-        }
-      ]
-    })
-  }
-
-  const showRecoveryActionBlocked = () => {
-    setAppDialog({
-      kicker: copy.recoveryModeLabel,
-      title: copy.recoveryActionBlockedTitle,
-      message: copy.recoveryActionBlockedBody,
-      confirmLabel: copy.ok,
-      onConfirm: () => setAppDialog(null)
-    })
   }
 
   const performResetProject = () => {
-    if (recoveryModeRef.current) {
-      showRecoveryActionBlocked()
-      return
-    }
-
-    const undoResult = pushUndoSnapshot('RESET PROJECT', { coalesce: false })
-    if (!undoResult.ok) {
-      showUndoSnapshotUnavailable()
-      return
-    }
-
-    const result = resetStoredProjectResult()
-    if (!result.ok) {
-      removeUndoSnapshot(undoResult)
-      pushLog(copy.logStorageSaveFailed)
-      return
-    }
-
-    const next = result.project
+    pushUndoSnapshot('RESET PROJECT')
+    const next = resetStoredProject()
     projectRef.current = next
     programProjectRef.current = next
     setProject(next)
@@ -1349,110 +1020,9 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     })
   }
 
-  const enterProjectRecovery = importedProject => {
-    const previousState = {
-      previousConsoleScreen: consoleScreen,
-      previousEditorSceneId: editorSceneId,
-      previousPreviewSceneId: previewSceneId,
-      previousProgramProject: programProjectRef.current,
-      previousProject: projectRef.current,
-      previousWorkspaceMode: workspaceMode
-    }
-
-    recoveryModeRef.current = true
-    setRecoveryState(previousState)
-    projectRef.current = importedProject
-    setProject(importedProject)
-    setMatchPackageNotice(null)
-    setConsoleScreen('workspace')
-    setWorkspaceMode('production')
-    setPreviewSceneId('media')
-    setEditorSceneId('media')
-    pushLog(copy.logRecoveryProject)
-  }
-
-  const leaveProjectRecovery = () => {
-    if (!recoveryState) return
-    const previousState = recoveryState
-
-    recoveryModeRef.current = false
-    setRecoveryState(null)
-    projectRef.current = previousState.previousProject
-    programProjectRef.current = previousState.previousProgramProject
-    setProject(previousState.previousProject)
-    setProgramProject(previousState.previousProgramProject)
-    setConsoleScreen(previousState.previousConsoleScreen)
-    setWorkspaceMode(previousState.previousWorkspaceMode)
-    setPreviewSceneId(previousState.previousPreviewSceneId)
-    setEditorSceneId(previousState.previousEditorSceneId)
-    setMatchPackageNotice(null)
-    pushLog(copy.logDiscardRecovery)
-  }
-
-  const saveRecoveredProject = () => {
-    if (!recoveryState || !recoveryInspection?.ok) return
-
-    const undoResult = pushUndoSnapshot('IMPORT PROJECT', {
-      coalesce: false,
-      source: {
-        editorSceneId: recoveryState.previousEditorSceneId,
-        previewSceneId: recoveryState.previousPreviewSceneId,
-        programProject: recoveryState.previousProgramProject,
-        project: recoveryState.previousProject,
-        workspaceMode: recoveryState.previousWorkspaceMode
-      }
-    })
-    if (!undoResult.ok) {
-      showUndoSnapshotUnavailable(recoveryState.previousProject)
-      return
-    }
-
-    const result = replaceStoredProjectResult(projectRef.current)
-    if (!result.ok) {
-      removeUndoSnapshot(undoResult)
-      pushLog(copy.logStorageSaveFailed)
-      return
-    }
-
-    const next = result.project
-    recoveryModeRef.current = false
-    setRecoveryState(null)
-    projectRef.current = next
-    programProjectRef.current = next
-    setProject(next)
-    setProgramProject(next)
-    setMatchPackageNotice(null)
-    setPreviewSceneId(getConsoleSceneById(next.scenes.activeSceneId).id)
-    setEditorSceneId(getConsoleSceneById(next.scenes.activeSceneId).id)
-    pushLog(copy.logSaveRecovery)
-  }
-
   const applyImportedProject = importedProject => {
-    if (recoveryModeRef.current) {
-      showRecoveryActionBlocked()
-      return
-    }
-
-    const inspection = inspectStoredProjectResult(importedProject)
-    if (isRecoverableStoredProjectInspection(inspection)) {
-      enterProjectRecovery(importedProject)
-      return
-    }
-
-    const undoResult = pushUndoSnapshot('IMPORT PROJECT', { coalesce: false })
-    if (!undoResult.ok) {
-      showUndoSnapshotUnavailable()
-      return
-    }
-
-    const result = replaceStoredProjectResult(importedProject)
-    if (!result.ok) {
-      removeUndoSnapshot(undoResult)
-      pushLog(copy.logStorageSaveFailed)
-      return
-    }
-
-    const next = result.project
+    pushUndoSnapshot('IMPORT PROJECT')
+    const next = replaceStoredProject(importedProject)
     projectRef.current = next
     programProjectRef.current = next
     setProject(next)
@@ -1595,7 +1165,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   }
 
   const applyPastedMatchPackage = (matchPackage, importMode) => {
-    const didApply = updateProject(draft => {
+    updateProject(draft => {
       if (importMode === MATCH_PACKAGE_IMPORT_MODES.SWAP) {
         swapProjectMatchSides(draft)
       } else if (importMode === MATCH_PACKAGE_IMPORT_MODES.REPLACE) {
@@ -1609,13 +1179,6 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
       persistImmediately: true,
       undoReason: 'IMPORT MATCH PACKAGE'
     })
-    if (!didApply) {
-      setAppDialog(null)
-      setMatchPackageNotice(null)
-      pushLog(copy.logStorageSaveFailed)
-      return
-    }
-
     setAppDialog(null)
     setMatchPackageNotice({
       title: copy.matchPackageImported(matchPackage.teams.teamA.name, matchPackage.teams.teamB.name),
@@ -1862,129 +1425,55 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     consoleSettings.hotkeysEnabled
   ])
 
-  const renderStorageWarning = (floating = false) => storageIssue && (
-    <section
-      className={`${styles.storageWarning} ${floating ? styles.storageWarningFloating : ''}`}
-      role="alert"
-    >
-      <div>
-        <span>{copy.storageSaveFailedLabel}</span>
-        <strong>{copy.storageSaveFailedTitle}</strong>
-        <em>
-          {copy.storageSaveFailedBody(formatStorageSize(storageIssue.serializedBytes))}
-          {storageIssueCount > 1 && ` ${copy.storageSaveFailedMore(storageIssueCount - 1)}`}
-        </em>
-      </div>
-      <div>
-        <button type="button" onClick={() => exportProjectAsJson(project)}>
-          {copy.exportProject}
-        </button>
-      </div>
-    </section>
-  )
-
-  const renderRecoveryWarning = (floating = false) => recoveryState && (
-    <section
-      className={`${styles.storageWarning} ${styles.recoveryWarning} ${floating ? styles.storageWarningFloating : ''}`}
-      role="alert"
-      style={floating && storageIssue ? { top: '142px' } : undefined}
-    >
-      <div>
-        <span>{copy.recoveryModeLabel}</span>
-        <strong>{copy.recoveryModeTitle}</strong>
-        <em>{
-          recoveryInspection?.ok
-            ? copy.recoveryModeReadyBody
-            : recoveryInspection?.name === 'UnsafeEmbeddedMediaError'
-              ? copy.recoveryModeBody
-              : recoveryInspection?.name === 'EmbeddedMediaTooLargeError'
-                ? copy.recoveryModeOversizedAssetBody(
-                  formatStorageSize(recoveryInspection?.serializedBytes)
-                )
-                : copy.recoveryModeNeedsCleanupBody(
-                  formatStorageSize(recoveryInspection?.serializedBytes)
-                )
-        }</em>
-      </div>
-      <div>
-        <button
-          type="button"
-          disabled={!recoveryInspection?.ok}
-          onClick={saveRecoveredProject}
-        >
-          {copy.saveRecoveredProject}
-        </button>
-        <button type="button" onClick={() => exportProjectAsJson(project)}>
-          {copy.exportProject}
-        </button>
-        <button type="button" onClick={leaveProjectRecovery}>
-          {copy.discardRecovery}
-        </button>
-      </div>
-    </section>
-  )
-
   if (consoleScreen === 'intro') {
     return (
-      <>
-        <IntroSplash
-          project={project}
-          languageOverride={consoleSettings.interfaceLanguage}
-          duration={project.event?.startupMotion === 'reduced' ? 650 : 1450}
-          onFinish={() => setConsoleScreen(route === APP_ROUTES.LIBRARY ? 'library' : 'entry')}
-        />
-        {renderStorageWarning(true)}
-        {renderRecoveryWarning(true)}
-      </>
+      <IntroSplash
+        project={project}
+        languageOverride={consoleSettings.interfaceLanguage}
+        duration={project.event?.startupMotion === 'reduced' ? 650 : 1450}
+        onFinish={() => setConsoleScreen(route === APP_ROUTES.LIBRARY ? 'library' : 'entry')}
+      />
     )
   }
 
   if (consoleScreen === 'entry') {
     return (
-      <>
-        <ConsoleEntry
-          project={project}
-          activeSection={entrySection}
-          consoleLanguage={language}
-          consoleSettingsPanel={(
-            <ConsoleSettingsWorkspace
-              copy={copy}
-              language={language}
-              settings={consoleSettings}
-              onLanguageChange={updateConsoleLanguage}
-              onReset={resetConsoleSettings}
-              onUpdate={updateConsoleSettings}
-            />
-          )}
-          onSectionChange={setEntrySection}
-          onUpdateConsoleLanguage={updateConsoleLanguage}
-          onUpdateProject={updateProject}
-          onOpenTeamLibrary={() => openTeamLibrary('entry')}
-          onEnterConsole={enterWorkspace}
-        />
-        {renderStorageWarning(true)}
-        {renderRecoveryWarning(true)}
-      </>
+      <ConsoleEntry
+        project={project}
+        activeSection={entrySection}
+        consoleLanguage={language}
+        consoleSettingsPanel={(
+          <ConsoleSettingsWorkspace
+            copy={copy}
+            language={language}
+            settings={consoleSettings}
+            onLanguageChange={updateConsoleLanguage}
+            onReset={resetConsoleSettings}
+            onUpdate={updateConsoleSettings}
+          />
+        )}
+        onSectionChange={setEntrySection}
+        onUpdateConsoleLanguage={updateConsoleLanguage}
+        onUpdateProject={updateProject}
+        onOpenTeamLibrary={() => openTeamLibrary('entry')}
+        onEnterConsole={enterWorkspace}
+      />
     )
   }
 
   if (consoleScreen === 'library') {
     return (
-      <>
-        <LibraryLoadBoundary language={language} onBack={closeTeamLibrary}>
-          <Suspense fallback={<LibraryLoadState language={language} />}>
-            <TeamLibraryPage
-              project={project}
-              language={language}
-              onBack={closeTeamLibrary}
-              onRouteBlockerChange={onRouteBlockerChange}
-              onUpdateProject={updateProject}
-            />
-          </Suspense>
-        </LibraryLoadBoundary>
-        {renderStorageWarning(true)}
-        {renderRecoveryWarning(true)}
-      </>
+      <LibraryLoadBoundary language={language} onBack={closeTeamLibrary}>
+        <Suspense fallback={<LibraryLoadState language={language} />}>
+          <TeamLibraryPage
+            project={project}
+            language={language}
+            onBack={closeTeamLibrary}
+            onRouteBlockerChange={onRouteBlockerChange}
+            onUpdateProject={updateProject}
+          />
+        </Suspense>
+      </LibraryLoadBoundary>
     )
   }
 
@@ -2093,12 +1582,11 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
           </div>
 
           <div className={styles.actions}>
-            <button className={styles.primaryAction} disabled={recoveryMode} onClick={handlePasteMatchPackage}>{copy.pasteMatchPackage}</button>
-            <button className={styles.primaryAction} disabled={recoveryMode} onClick={copyOnlineOverlayUrl}>{copy.copyOnlineOverlayUrl}</button>
+            <button className={styles.primaryAction} onClick={handlePasteMatchPackage}>{copy.pasteMatchPackage}</button>
             <button className={styles.primaryAction} onClick={copyOverlayUrl}>{copy.copyOverlayUrl}</button>
             <button className={styles.projectFileAction} onClick={handleExportProject}>{copy.exportProject}</button>
-            <button className={styles.projectFileAction} disabled={recoveryMode} onClick={handleImportProjectChoice}>{copy.importProject}</button>
-            <button className={`${styles.dangerAction} ${styles.projectFileAction}`} disabled={recoveryMode} onClick={handleResetProject}>{copy.resetProject}</button>
+            <button className={styles.projectFileAction} onClick={handleImportProjectChoice}>{copy.importProject}</button>
+            <button className={`${styles.dangerAction} ${styles.projectFileAction}`} onClick={handleResetProject}>{copy.resetProject}</button>
             <input
               ref={importInputRef}
               type="file"
@@ -2119,9 +1607,6 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
             <button type="button" aria-label={copy.dismissNotice} onClick={() => setMatchPackageNotice(null)}>×</button>
           </section>
         )}
-
-        {renderStorageWarning()}
-        {renderRecoveryWarning()}
 
         <section className={styles.statusGrid}>
           <div className={styles.statBox}>
@@ -2147,10 +1632,6 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
           <div className={styles.statBox}>
             <span>{copy.score}</span>
             <strong>{project.currentMatch.score.teamA} : {project.currentMatch.score.teamB}</strong>
-          </div>
-          <div className={styles.statBox} data-session-state={sessionStatus.state}>
-            <span>{copy.sessionSyncStatus}</span>
-            <strong>{sessionStatusLabel}</strong>
           </div>
           {showRightRailControls && (
             <button
@@ -2234,7 +1715,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
                 <RailPanel title={copy.quickActions}>
                   <div className={styles.quickActionGrid}>
                     <button onClick={swapMatchSides}>{copy.swapSides}</button>
-                    <button disabled={recoveryMode || !undoStack.length} onClick={undoLastAction}>{copy.undoAction}</button>
+                    <button disabled={!undoStack.length} onClick={undoLastAction}>{copy.undoAction}</button>
                     <button onClick={resetScore}>{copy.resetScore}</button>
                   </div>
                 </RailPanel>

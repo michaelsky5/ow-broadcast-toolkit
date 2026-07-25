@@ -30,11 +30,11 @@ export const normalizeSceneTransitionSettings = settings => {
 }
 
 export const loadSceneTransitionSettings = () => {
-  try {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      return DEFAULT_SCENE_TRANSITION_SETTINGS
-    }
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return DEFAULT_SCENE_TRANSITION_SETTINGS
+  }
 
+  try {
     const raw = JSON.parse(window.localStorage.getItem(CONSOLE_SETTINGS_STORAGE_KEY) || '{}')
     return normalizeSceneTransitionSettings(raw)
   } catch {
