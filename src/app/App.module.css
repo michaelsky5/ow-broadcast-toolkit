@@ -520,6 +520,102 @@
   background: var(--theme-primary-soft);
 }
 
+.storageWarning {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 92, 92, 0.55);
+  border-left: 4px solid #ff5c5c;
+  background: linear-gradient(90deg, rgba(255, 55, 55, 0.18), rgba(80, 5, 5, 0.2));
+  box-shadow: 0 0 24px rgba(255, 55, 55, 0.09);
+}
+
+.storageWarningFloating {
+  position: fixed;
+  z-index: 10000;
+  top: 14px;
+  right: 14px;
+  left: 14px;
+  max-width: 1180px;
+  margin: 0 auto;
+  backdrop-filter: blur(16px);
+}
+
+.storageWarning > div:first-child {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.storageWarning span {
+  color: #ff8585;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.storageWarning strong {
+  color: #fff;
+  font-size: 16px;
+}
+
+.storageWarning em {
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.45;
+}
+
+.storageWarning > div:last-child {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.storageWarning button {
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.32);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.storageWarning button:first-child {
+  border-color: rgba(255, 92, 92, 0.8);
+  background: #ff5c5c;
+  color: #130000;
+}
+
+.storageWarning button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.recoveryWarning {
+  border-color: rgba(255, 190, 92, 0.62);
+  border-left-color: #ffbe5c;
+  background: linear-gradient(90deg, rgba(112, 67, 0, 0.32), rgba(48, 30, 0, 0.24));
+  box-shadow: 0 0 24px rgba(255, 190, 92, 0.1);
+}
+
+.recoveryWarning span {
+  color: #ffd18d;
+}
+
+.recoveryWarning button:first-child {
+  border-color: rgba(255, 190, 92, 0.85);
+  background: #ffbe5c;
+  color: #1f1200;
+}
+
 .matchPackagePreview {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -888,6 +984,21 @@
 .sceneBundleButton span {
   font-size: 13px;
   font-weight: 950;
+}
+
+.statBox[data-session-state='online'] strong {
+  color: #63f59a;
+}
+
+.statBox[data-session-state='offline'] strong,
+.statBox[data-session-state='oversize'] strong,
+.statBox[data-session-state='unauthorized'] strong,
+.statBox[data-session-state='unavailable'] strong {
+  color: #ff8585;
+}
+
+.statBox[data-session-state='connecting'] strong {
+  color: #ffd84a;
 }
 
 .sceneBundleButton em {
@@ -1806,6 +1917,15 @@
 }
 
 @media (max-width: 560px) {
+  .storageWarning {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .storageWarning > div:last-child button {
+    flex: 1 1 0;
+  }
+
   .controlApp .statusGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

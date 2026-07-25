@@ -1,6 +1,6 @@
 # OWBT Web Deployment
 
-OWBT builds as a static Vite app. The Console is served at `/`, and the OBS output is served through the hash route `/#overlay`.
+OWBT builds as a Vite app. The Console is served at `/`, and the OBS output is served through the hash route `/#overlay`. Vercel deployments can additionally enable the optional HTTPS Session Function used by cross-browser OBS URLs.
 
 ## Preflight
 
@@ -45,6 +45,24 @@ Recommended settings:
 - Build Command: `npm run build:web`
 - Output Directory: `dist`
 
+### Online OBS Session storage
+
+`复制在线 OBS URL` stays unavailable until both server-only variables are configured:
+
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+
+Use a dedicated Upstash Redis database. Never expose the token through a `VITE_` variable. The Function intentionally returns `503 SESSION_STORE_UNAVAILABLE` when these variables are absent; it has no in-memory or Runtime Cache fallback.
+
+Before enabling the variables in Production, add a Vercel WAF rate-limit rule for `/api/session/*` (for example, 600 requests per minute per IP with a 429 action). The API also limits new Session creation to 60 per network per day, but the edge rule is still required to stop abusive requests before they invoke a Function or Redis.
+
+After deployment, verify the real Vercel route rather than only unit tests:
+
+1. A GET with a random 64-hex ID returns `404` (or `503` before storage is configured), never `index.html`.
+2. A same-origin PUT creates a Session and returns a positive integer `revision`.
+3. A GET using that returned revision in both `?revision=<revision>` and `If-None-Match: "<revision>"` returns `304` without the project payload.
+4. A second PUT advances the revision atomically.
+
 ## Netlify
 
 The repository includes `netlify.toml`.
@@ -66,4 +84,4 @@ https://your-domain.example/#overlay
 
 ## Web Limitations
 
-The web app does not directly read arbitrary local filesystem paths. Use project import/export, browser-local storage, uploaded assets, and URL/data URL assets in the web version. Local asset roots, bulk path management, and OBS scene file paths are reserved for the future Windows desktop app.
+The web app does not directly read arbitrary local filesystem paths. Use project import/export, browser-local storage, compressed image uploads, and HTTPS asset URLs in the web version. Local video files and Data/Blob video URLs are intentionally blocked because they cannot be persisted safely. Local asset roots, bulk path management, and OBS scene file paths are reserved for the future Windows desktop app.

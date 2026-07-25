@@ -20,13 +20,6 @@ export const DEFAULT_IMAGE_CROP = {
   hPct: 29.6
 }
 
-export const fileToDataUrl = file => new Promise((resolve, reject) => {
-  const reader = new FileReader()
-  reader.onload = () => resolve(reader.result)
-  reader.onerror = reject
-  reader.readAsDataURL(file)
-})
-
 const statNumber = value => Number(String(value || '').replace(/[^\d.-]/g, '')) || 0
 
 export const createStatsFileName = (project, extension) => {
