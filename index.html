@@ -17,6 +17,142 @@
     <script>
       document.documentElement.dataset.owbtSurface = window.location.hash.startsWith('#overlay') ? 'overlay' : 'console'
     </script>
+    <script>
+      (() => {
+        const RECOVERY_QUERY_KEY = 'owbt-recover'
+        const RECOVERY_SESSION_KEY = 'owbt.bootRecovery.v1'
+        const RECOVERY_WINDOW_MS = 60_000
+        const BOOT_TIMEOUT_MS = 30_000
+        let booted = false
+        let recoveryInFlight = false
+
+        const readRecovery = () => {
+          try {
+            return JSON.parse(window.sessionStorage.getItem(RECOVERY_SESSION_KEY) || 'null')
+          } catch {
+            return null
+          }
+        }
+
+        const writeRecovery = value => {
+          try {
+            if (value) window.sessionStorage.setItem(RECOVERY_SESSION_KEY, JSON.stringify(value))
+            else window.sessionStorage.removeItem(RECOVERY_SESSION_KEY)
+          } catch {
+            // Recovery must still work when browser storage is unavailable.
+          }
+        }
+
+        const showBootFailure = reason => {
+          document.documentElement.dataset.owbtBoot = 'failed'
+          console.error('[OWBT] Startup recovery failed:', reason)
+
+          if (window.location.hash.startsWith('#overlay')) {
+            const makeTransparent = () => {
+              document.documentElement.style.background = 'transparent'
+              if (document.body) document.body.style.background = 'transparent'
+            }
+
+            makeTransparent()
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', makeTransparent, { once: true })
+            }
+            return
+          }
+
+          const renderMessage = () => {
+            const root = document.getElementById('root')
+            if (!root || root.childElementCount) return
+
+            root.innerHTML = [
+              '<main style="min-height:100vh;display:grid;place-items:center;padding:32px;background:#050505;color:#fff;font-family:system-ui,sans-serif">',
+              '<section style="max-width:680px;border:1px solid rgba(255,255,255,.18);padding:28px;background:#101210">',
+              '<strong style="display:block;font-size:22px">OWBT 启动失败</strong>',
+              '<p style="margin:12px 0 0;line-height:1.7;color:rgba(255,255,255,.72)">页面已尝试自动刷新，但仍无法加载应用资源。请检查网络后重新加载，或刷新 OBS 浏览器源缓存。</p>',
+              '</section>',
+              '</main>'
+            ].join('')
+          }
+
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderMessage, { once: true })
+          } else {
+            renderMessage()
+          }
+        }
+
+        const recover = reason => {
+          if (recoveryInFlight) return
+          recoveryInFlight = true
+
+          const now = Date.now()
+          const previous = readRecovery()
+          const currentUrl = new URL(window.location.href)
+          const alreadyRetried = currentUrl.searchParams.has(RECOVERY_QUERY_KEY) || (
+            previous &&
+            now - Number(previous.timestamp || 0) < RECOVERY_WINDOW_MS
+          )
+
+          if (alreadyRetried) {
+            showBootFailure(reason)
+            return
+          }
+
+          writeRecovery({ reason, timestamp: now })
+          currentUrl.searchParams.set(RECOVERY_QUERY_KEY, now.toString(36))
+          window.location.replace(currentUrl.href)
+        }
+
+        window.__OWBT_MARK_BOOTED__ = () => {
+          const completedRecovery = readRecovery()
+          booted = true
+          recoveryInFlight = false
+          writeRecovery(null)
+          document.documentElement.dataset.owbtBoot = 'ready'
+
+          if (completedRecovery?.reason) {
+            document.documentElement.dataset.owbtRecovered = String(completedRecovery.reason)
+          }
+
+          const currentUrl = new URL(window.location.href)
+          if (!currentUrl.searchParams.has(RECOVERY_QUERY_KEY)) return
+
+          currentUrl.searchParams.delete(RECOVERY_QUERY_KEY)
+          window.history.replaceState(
+            window.history.state,
+            '',
+            `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`
+          )
+        }
+
+        window.addEventListener('error', event => {
+          const target = event.target
+          const tagName = String(target?.tagName || '').toUpperCase()
+          const isCriticalAsset = tagName === 'SCRIPT' || (
+            tagName === 'LINK' &&
+            String(target?.rel || '').toLowerCase() === 'stylesheet'
+          )
+
+          if (isCriticalAsset) recover(`asset:${target?.src || target?.href || 'unknown'}`)
+        }, true)
+
+        window.addEventListener('vite:preloadError', event => {
+          event.preventDefault()
+          recover('vite-preload')
+        })
+
+        window.addEventListener('unhandledrejection', event => {
+          const message = String(event.reason?.message || event.reason || '')
+          if (/chunkloaderror|dynamically imported|module script/i.test(message)) {
+            recover(`module:${message}`)
+          }
+        })
+
+        window.setTimeout(() => {
+          if (!booted) recover('boot-timeout')
+        }, BOOT_TIMEOUT_MS)
+      })()
+    </script>
     <title>OWBT - Overwatch Broadcast Toolkit</title>
   </head>
   <body>
