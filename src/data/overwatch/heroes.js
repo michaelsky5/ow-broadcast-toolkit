@@ -3,6 +3,7 @@ import { OW_ROLE_BY_ID } from './roles'
 
 export const OW_HEROES = [
   // Tank
+  { id: 'dmon', zh: 'D.Mon', en: 'D.Mon', role: 'tank', assetKey: 'd.mon' },
   { id: 'domina', zh: '金驭', en: 'Domina', role: 'tank', assetKey: 'domina' },
   { id: 'doomfist', zh: '末日铁拳', en: 'Doomfist', role: 'tank', assetKey: 'doomfist' },
   { id: 'dva', zh: 'D.Va', en: 'D.Va', role: 'tank', assetKey: 'dva' },
