@@ -1,5 +1,7 @@
 ﻿import React, { useMemo } from 'react';
 
+import { OW_HERO_BY_ID, resolveHeroAssetKey } from '../../data/overwatch';
+
 const COLORS = {
   black: '#050505',
   yellow: 'var(--theme-primary)',
@@ -106,11 +108,12 @@ const getHeroAssetCandidates = (role, hero) => {
   const cleanRole = String(role || '').trim().toLowerCase();
   const cleanHero = String(hero || '').trim().toLowerCase();
   if (!cleanHero) return ['/OW.svg'];
+  const assetKey = resolveHeroAssetKey(cleanHero, OW_HERO_BY_ID);
 
   return dedupe([
-    cleanRole && `/heroes/${cleanRole}/${cleanHero}.png`,
-    cleanRole && `/roster/${cleanRole}/${cleanHero}.png`,
-    `/heroes/${cleanHero}.png`,
+    cleanRole && `/heroes/${cleanRole}/${assetKey}.png`,
+    cleanRole && `/roster/${cleanRole}/${assetKey}.png`,
+    `/heroes/${assetKey}.png`,
     '/OW.svg'
   ]);
 };

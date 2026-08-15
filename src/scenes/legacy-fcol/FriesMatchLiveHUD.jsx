@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps, no-unused-vars */
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
-import { needsAttackDefense } from '../../data/overwatch';
+import { OW_HERO_BY_ID, needsAttackDefense, resolveHeroAssetKey } from '../../data/overwatch';
 import BeginInfoOverlay from './BeginInfoOverlay';
 import BanPhaseScene from './BanPhaseScene';
 
@@ -385,9 +385,9 @@ const getTotalMapsFromFormat = format => {
   return 5;
 };
 
-const BanBox = React.memo(({ heroName, align }) => (
+const BanBox = React.memo(({ role, hero, align }) => (
   <div style={{ ...banBoxContainer, flexDirection: align === 'left' ? 'row-reverse' : 'row' }}>
-    <img src={`/heroes/${heroName}.png`} style={banImgStyle} alt="ban" onError={e => { e.target.src = '/OW.svg'; }} />
+    <img src={`/heroes/${role}/${resolveHeroAssetKey(hero, OW_HERO_BY_ID)}.png`} style={banImgStyle} alt="ban" onError={e => { e.target.src = '/OW.svg'; }} />
     <div style={banLabelStyle}><span>B</span><span>A</span><span>N</span></div>
   </div>
 ));
@@ -1470,7 +1470,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                     <img src={safeLogoA} style={logoImgStyle} alt="logoA" />
                   </div>
                   {matchData.showBans && (
-                    <div style={banAreaStyle}><BanBox heroName={`${roleA}/${heroA}`} align="right" /></div>
+                    <div style={banAreaStyle}><BanBox role={roleA} hero={heroA} align="right" /></div>
                   )}
                   <div style={{ ...teamNameBlockStyle, fontSize: `${teamNameFontSize}px` }}>
                     <div style={teamNameTextStyle}>{matchData.teamA}</div>
@@ -1587,7 +1587,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                     <div style={teamNameTextStyle}>{matchData.teamB}</div>
                   </div>
                   {matchData.showBans && (
-                    <div style={banAreaStyle}><BanBox heroName={`${roleB}/${heroB}`} align="left" /></div>
+                    <div style={banAreaStyle}><BanBox role={roleB} hero={heroB} align="left" /></div>
                   )}
                   <div style={{ ...logoBlockStyle, backgroundColor: matchData.logoBgB }}>
                     <img src={safeLogoB} style={logoImgStyle} alt="logoB" />

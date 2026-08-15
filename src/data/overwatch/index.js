@@ -36,3 +36,5 @@ export {
   getMapImage,
   getModeIcon
 } from './assetPaths'
+
+export { resolveHeroAssetKey } from './heroAssetKey'

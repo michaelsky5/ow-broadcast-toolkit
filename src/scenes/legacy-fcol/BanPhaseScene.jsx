@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { OW_HERO_BY_ID, resolveHeroAssetKey } from '../../data/overwatch';
 
 const PRIMARY = 'var(--theme-primary)';
 const DARK = '#2A2A2A';
@@ -40,12 +41,14 @@ const normalizeRole = role => {
 
 const getRosterPath = banInfo => {
   if (!banInfo?.hero || !banInfo?.role || banInfo.hero === 'tbd') return '';
-  return `/roster/${banInfo.role}/${banInfo.hero}.png`;
+  const assetKey = resolveHeroAssetKey(banInfo.hero, OW_HERO_BY_ID);
+  return `/roster/${banInfo.role}/${assetKey}.png`;
 };
 
 const getHeroPath = banInfo => {
   if (!banInfo?.hero || !banInfo?.role || banInfo.hero === 'tbd') return '';
-  return `/heroes/${banInfo.role}/${banInfo.hero}.png`;
+  const assetKey = resolveHeroAssetKey(banInfo.hero, OW_HERO_BY_ID);
+  return `/heroes/${banInfo.role}/${assetKey}.png`;
 };
 
 function TechCorner({ top = true, left = true, color = PRIMARY }) {
@@ -131,9 +134,11 @@ function PendingState() {
 function TeamBanCard({ side = 'left', order = 1, teamName, banInfo, reveal = false }) {
   const isLeft = side === 'left';
   const heroName = banInfo?.hero || 'tbd';
+  const heroData = OW_HERO_BY_ID[heroName];
+  const heroLabel = heroData?.en || heroName;
   const roleLabel = normalizeRole(banInfo?.role);
   const isTbd = heroName === 'tbd';
-  const imageKey = `${banInfo?.role || 'damage'}/${heroName}`;
+  const imageKey = `${banInfo?.role || 'damage'}/${resolveHeroAssetKey(heroName, OW_HERO_BY_ID)}`;
   const [fallback, setFallback] = useState({ key: imageKey, stage: 0 });
   const fallbackStage = fallback.key === imageKey ? fallback.stage : 0;
   const imgSrc = fallbackStage === 0
@@ -207,7 +212,7 @@ function TeamBanCard({ side = 'left', order = 1, teamName, banInfo, reveal = fal
           <>
             <img
               src={imgSrc}
-              alt={heroName}
+              alt={heroLabel}
               onError={handleImageError}
               style={{
                 position: 'absolute',
@@ -257,7 +262,7 @@ function TeamBanCard({ side = 'left', order = 1, teamName, banInfo, reveal = fal
             {isTbd ? 'Ban Status' : roleLabel}
           </div>
           <div style={{ color: '#fff', fontSize: 42, fontWeight: 950, lineHeight: 1.12, letterSpacing: 0.45, textTransform: 'uppercase', textAlign: isLeft ? 'left' : 'right' }}>
-            {isTbd ? 'Pending' : heroName}
+            {isTbd ? 'Pending' : heroLabel}
           </div>
         </div>
       </div>
