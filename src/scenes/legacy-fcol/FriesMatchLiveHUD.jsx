@@ -319,10 +319,11 @@ const banLabelStyle = {
   flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
-  fontSize: '9px',
+  fontSize: '8px',
   fontWeight: '900',
   color: COLORS.black,
-  padding: '4px 0',
+  lineHeight: 1,
+  padding: '3px 0',
   boxSizing: 'border-box'
 };
 
@@ -385,10 +386,10 @@ const getTotalMapsFromFormat = format => {
   return 5;
 };
 
-const BanBox = React.memo(({ role, hero, align }) => (
+const BanBox = React.memo(({ role, hero, align, order }) => (
   <div style={{ ...banBoxContainer, flexDirection: align === 'left' ? 'row-reverse' : 'row' }}>
     <img src={`/heroes/${role}/${resolveHeroAssetKey(hero, OW_HERO_BY_ID)}.png`} style={banImgStyle} alt="ban" onError={e => { e.target.src = '/OW.svg'; }} />
-    <div style={banLabelStyle}><span>B</span><span>A</span><span>N</span></div>
+    <div style={banLabelStyle}><span>B</span><span>A</span><span>N</span><span>{order}</span></div>
   </div>
 ));
 
@@ -1134,6 +1135,9 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
 
   const { role: roleA, hero: heroA } = parseHudBanEntry(currentBanA);
   const { role: roleB, hero: heroB } = parseHudBanEntry(currentBanB);
+  const isTeamBFirstBan = String(matchData.banOrderMode || 'A_FIRST').trim().toUpperCase() === 'B_FIRST';
+  const banOrderA = isTeamBFirstBan ? 2 : 1;
+  const banOrderB = isTeamBFirstBan ? 1 : 2;
 
   const currentMapModeKey = getModeKey(currentMapData?.type);
   const currentMapNumberLabel = `MAP ${matchData.currentMap || 1}`;
@@ -1470,7 +1474,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                     <img src={safeLogoA} style={logoImgStyle} alt="logoA" />
                   </div>
                   {matchData.showBans && (
-                    <div style={banAreaStyle}><BanBox role={roleA} hero={heroA} align="right" /></div>
+                    <div style={banAreaStyle}><BanBox role={roleA} hero={heroA} align="right" order={banOrderA} /></div>
                   )}
                   <div style={{ ...teamNameBlockStyle, fontSize: `${teamNameFontSize}px` }}>
                     <div style={teamNameTextStyle}>{matchData.teamA}</div>
@@ -1587,7 +1591,7 @@ export default function MatchLiveHUD({ matchData, isActive = false }) {
                     <div style={teamNameTextStyle}>{matchData.teamB}</div>
                   </div>
                   {matchData.showBans && (
-                    <div style={banAreaStyle}><BanBox role={roleB} hero={heroB} align="left" /></div>
+                    <div style={banAreaStyle}><BanBox role={roleB} hero={heroB} align="left" order={banOrderB} /></div>
                   )}
                   <div style={{ ...logoBlockStyle, backgroundColor: matchData.logoBgB }}>
                     <img src={safeLogoB} style={logoImgStyle} alt="logoB" />
