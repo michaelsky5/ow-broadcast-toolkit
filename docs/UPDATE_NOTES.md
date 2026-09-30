@@ -14,6 +14,9 @@
 - Include a fictitious two-team practice project, match-package text, and a separate team-library backup, using existing schemas and manual import controls.
 - Link the guide from startup and system settings, and remove promises of a future Windows app from interface copy.
 - Prepare a Chinese video script; recording, narration, and final video format remain to be selected.
+- Clarify legacy project-text transfer, the library import confirmation/save steps, and the separate OBS/browser practice inputs; add a preflight checklist.
+- Prefer the current tutorial host in its OBS address selector, with protected-preview guidance and a public-host fallback for offline reading.
+- Show an edit-selection hint when the library already has saved teams instead of suggesting it is still empty.
 
 ### Release Preparation
 

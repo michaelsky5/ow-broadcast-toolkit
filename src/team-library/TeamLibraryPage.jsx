@@ -1708,9 +1708,9 @@ export default function TeamLibraryPage({
         <section className={styles.editor}>
           {!draftTeam ? (
             <div className={styles.editorEmpty}>
-              <span className={styles.emptyKicker}>{copy.emptyKicker}</span>
-              <strong>{copy.emptyStartTitle}</strong>
-              <p>{copy.emptyStartBody}</p>
+              <span className={styles.emptyKicker}>{teams.length ? copy.inspect : copy.emptyKicker}</span>
+              <strong>{teams.length ? copy.selectSavedTeamTitle : copy.emptyStartTitle}</strong>
+              <p>{teams.length ? copy.selectSavedTeamBody : copy.emptyStartBody}</p>
               <div className={styles.emptyActions}>
                 <button type="button" className={styles.primaryButton} onClick={createTeam}>{copy.createTeam}</button>
                 <button type="button" onClick={() => requestProtectedAction('project-save')} disabled={!(project.teams || []).length}>{copy.saveCurrent}</button>
