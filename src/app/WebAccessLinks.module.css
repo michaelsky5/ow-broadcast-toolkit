@@ -38,3 +38,24 @@
 @media (max-width: 640px) {
   .row { align-items: flex-start; flex-direction: column; }
 }
+
+.guideRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 12px;
+  font-size: 12px;
+}
+
+.guideRow a {
+  color: var(--theme-primary);
+  text-underline-offset: 3px;
+}
+
+.guideRow a:focus-visible {
+  outline: 2px solid var(--theme-primary);
+  outline-offset: 4px;
+}

@@ -15,6 +15,10 @@ export default function WebAccessLinks({ copy }) {
         </nav>
       </div>
       <p>{copy.webAccessBackupHint}</p>
+      <div className={styles.guideRow}>
+        <strong>{copy.webGuideTitle}</strong>
+        <a href="/guide/" target="_blank" rel="noopener noreferrer">{copy.webGuideLink}</a>
+      </div>
     </section>
   )
 }

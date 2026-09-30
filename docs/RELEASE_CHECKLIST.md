@@ -1,6 +1,6 @@
 # OWBT Web v0.1 Release Checklist
 
-Use this checklist for the web release build. Keep UI changes frozen during this pass unless a blocker appears.
+Use this checklist as the full Web regression reference. For a focused maintenance release, select checks for changed workflows and critical interactions, and reuse clearly attributed event/OBS evidence for unchanged features. Unchecked unchanged features are follow-up coverage, unless a known failure affects the intended release. Keep the selected UI changes frozen during final validation unless a blocker appears.
 
 Use [WEB_RELEASE_RUNBOOK.md](./WEB_RELEASE_RUNBOOK.md) to record the stable baseline, candidate CI and preview checks, actual OBS acceptance, and recovery target before publishing.
 

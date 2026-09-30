@@ -71,6 +71,14 @@ Use the Console and Overlay from the same origin. For example, the live Console 
 
 The Team Library and OBS Control routes are separate working surfaces that share the same OWBT project format. The Overlay renders the current Program state only and does not show editing UI.
 
+## Operator Quick Start
+
+- [中文图文教程](docs/QUICK_START_ZH.md): OBS setup, match-package transfer, TAKE, backup, and recovery.
+- The startup and system pages link to the same-host `/guide/` page, which includes selectable demo project and match-package text, plus a separate team-library backup.
+- [中文演示视频脚本](docs/VIDEO_TUTORIAL_ZH.md): a recording and editing plan; the final video format has not yet been selected.
+
+Demo data is fictitious. Importing a complete demo project replaces current editing and Program state; export your own project first and practise off air.
+
 ## Send Teams Into OBS
 
 1. In a regular browser, open the Team Library and select Team A and Team B.

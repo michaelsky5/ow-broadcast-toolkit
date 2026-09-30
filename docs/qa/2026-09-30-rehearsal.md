@@ -45,12 +45,16 @@ The imported Chinese project restored A's roster after source refresh. A later B
 
 Public HTTPS verification matched 189/189 frozen files. See [deployment identity and recovery procedure](../STABLE_WEB_FALLBACK.md).
 
-## Remaining release gates and optimization order
+## Follow-up coverage and optimization order
+
+The operator reports that the stable baseline has already been used in multiple tournament broadcasts. Together with the recorded actual OBS checks, this is practical evidence for unchanged core workflows. The broader coverage below remains useful follow-up work; unfinished checks on unchanged OCR, data, media, or toolbox features are not automatic blockers for this focused text-transfer, save-feedback, recovery-entry, and operator-guide update. A reproduced regression in a required live workflow remains a blocker.
+
+For this candidate, verify the changed transfer/save/recovery flows and new guide/download surfaces, require checks on the selected head, and record the exact preview and released runtime identities. Production promotion still requires authorization.
 
 1. Complete OCR's real browser workflow using the prepared known-value synthetic image, then a real game screenshot with manually checked rows/time. The OCR workbench opened, but its upload action was interrupted and reconnecting localhost was rejected by the browser URL policy. No OCR success is claimed.
 2. Complete Match Stats, Player Data, MVP, and media output; test a prepared five-second synthetic MP4, playback progress, and actual OBS sound. Complete toolbox/static-graphic downloads and inspect the downloaded files.
-3. Repeat final-candidate text restore, refresh, and normal OBS restart on the final runtime. Earlier candidate and frozen-host evidence are separate.
+3. Repeat the relevant final-candidate transfer/restore checks when the underlying workflow changes. A normal OBS restart is appropriate for storage or synchronization changes; documentation or guide-link-only updates do not by themselves require repeating every unchanged scenario. Earlier candidate and frozen-host runtime identities remain separate.
 4. Check the clean final international domain and a mainland device/network after an authorized release. A working mainland URL on this Singapore computer is not mainland network-performance evidence.
 5. Keep source-license policy as an explicit owner decision. Public source visibility and the existing community/noncommercial notice do not establish a standard open-source license.
 
-Prioritize completing these operating flows and clear transfer/recovery instructions before broad scene redesign or a Windows wrapper. FryDeck already serves the user's desktop need.
+Prioritize clear operator instructions, output confirmation, and focused reliability improvements in small updates. Schedule remaining full-feature checks as follow-up coverage, and use actual event feedback to choose the next change. FryDeck already serves the user's desktop need.

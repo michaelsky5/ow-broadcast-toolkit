@@ -8,6 +8,13 @@
 - Show a persistent warning in the console and system setup with project backup export and Retry Save actions. Autosave indicators now reflect a failed save.
 - Keep the existing live update delivery available when persistence fails, and clear the warning after both editing and Program saves recover.
 
+### Operator Guide
+
+- Add a Chinese illustrated quick start with actual page and OBS rehearsal screenshots.
+- Include a fictitious two-team practice project, match-package text, and a separate team-library backup, using existing schemas and manual import controls.
+- Link the guide from startup and system settings, and remove promises of a future Windows app from interface copy.
+- Prepare a Chinese video script; recording, narration, and final video format remain to be selected.
+
 ### Release Preparation
 
 - Add GitHub Actions checks on Linux and Windows with locked dependency installation, asset checks, ESLint, regression tests, and production builds.
