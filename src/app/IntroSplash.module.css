@@ -3,7 +3,8 @@
   inset: 0;
   display: grid;
   place-items: center;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 32px;
   background:
     linear-gradient(105deg, rgba(255, 255, 255, 0.055), transparent 22%, transparent 74%, var(--theme-primary-softer)),
@@ -641,5 +642,11 @@
   .statusMatrix div {
     min-height: 74px;
     border-right: 0;
+  }
+}
+
+@media (max-height: 780px) {
+  .splash {
+    align-items: start;
   }
 }

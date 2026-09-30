@@ -32,7 +32,7 @@ The web version focuses on the core console:
 - Local browser autosave
 - Project import and export through JSON files or copy/paste text
 
-The future Windows desktop version can unlock local filesystem paths, larger asset libraries, OBS scene file export, and deeper production workflows.
+OWBT currently focuses on the web workflow. Local filesystem and deeper desktop integrations can be assessed separately after the web release is accepted.
 
 ## Scene Packages
 
@@ -50,6 +50,10 @@ Console: https://owbt.fries-cup.com/
 Team Library: https://owbt.fries-cup.com/#library
 OBS Control: https://owbt.fries-cup.com/#control
 Overlay: https://owbt.fries-cup.com/#overlay
+
+Mainland China: https://owbt-cn.fries-cup.com/
+Mainland OBS Control: https://owbt-cn.fries-cup.com/#control
+Mainland Overlay: https://owbt-cn.fries-cup.com/#overlay
 ```
 
 Use the Console and Overlay from the same origin. For example, the live Console should pair with the live Overlay above, and a local development Console should pair with `http://127.0.0.1:4174/#overlay`.
@@ -64,6 +68,20 @@ Use the Console and Overlay from the same origin. For example, the live Console 
 ```
 
 The Team Library and OBS Control routes are separate working surfaces that share the same OWBT project format. The Overlay renders the current Program state only and does not show editing UI.
+
+## Send Teams Into OBS
+
+1. In a regular browser, open the Team Library and select Team A and Team B.
+2. Choose **Copy Match Package**. The complete text is always shown; use the copy button or Ctrl+A, Ctrl+C in the text box.
+3. In the OBS custom browser dock at `/#control`, choose **Paste Match Package** and press Ctrl+V in the text box.
+4. Choose **Preview Package**, review both teams and the refresh/swap/new-match impact, then confirm.
+5. Press **TAKE** to send the scene to the Browser Source.
+
+No JSON file picker is required for this transfer. To back up or restore the **entire project**, use Export/Import Project → Project Text instead. Team-library backups are separate.
+
+Switching between international, mainland, and frozen stable hosts does not move browser data automatically. Back up the project and team library separately, and use one host for the OBS dock and Browser Source.
+
+See [STABLE_WEB_FALLBACK.md](docs/STABLE_WEB_FALLBACK.md) for the frozen-version plan and public-link activation.
 
 ## Runtime Notes
 

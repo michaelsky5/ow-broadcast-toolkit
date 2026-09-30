@@ -8,6 +8,7 @@ import {
 import { getAppCopy, getAppLanguage } from './appCopy'
 import { EditorDialog } from './editors/shared/editorControls'
 import { getOverlayUrl } from './overlayUrl'
+import WebAccessLinks from './WebAccessLinks'
 import { fileToDataUrl } from './toolbox/toolboxModel'
 import styles from './ConsoleEntry.module.css'
 
@@ -271,6 +272,7 @@ export default function ConsoleEntry({
 
       {activeSection === 'system' ? (
         <section className={styles.preferencesWorkspace}>
+          <WebAccessLinks copy={copy} />
           {consoleSettingsPanel}
         </section>
       ) : (

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { getAppCopy } from './appCopy'
 import { acceptUsageNotice, isUsageNoticeAccepted } from './usageNotice'
+import WebAccessLinks from './WebAccessLinks'
 import styles from './IntroSplash.module.css'
 
 export default function IntroSplash({ project, languageOverride = '', duration = 1450, onFinish }) {
@@ -98,6 +99,8 @@ export default function IntroSplash({ project, languageOverride = '', duration =
             </button>
           </aside>
         </div>
+
+        <WebAccessLinks copy={copy} />
 
         <div className={[styles.setupAction, isReady ? styles.setupReady : ''].join(' ')}>
           <div className={styles.progress}>

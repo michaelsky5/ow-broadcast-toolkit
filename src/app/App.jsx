@@ -1300,6 +1300,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
             key={`${message}-${initialText.length}`}
             ref={matchPackageTextRef}
             defaultValue={initialText}
+            autoFocus
             aria-label={copy.matchPackagePasteTitle}
             placeholder={copy.matchPackagePastePlaceholder}
             spellCheck={false}
@@ -1328,28 +1329,10 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     })
   }
 
-  const handlePasteMatchPackage = async () => {
-    let text = ''
-    let clipboardDenied = false
+  const handlePasteMatchPackage = () => {
     setMatchPackageNotice(null)
-    try {
-      if (!navigator.clipboard?.readText) throw new Error('Clipboard unavailable')
-      text = await navigator.clipboard.readText()
-    } catch {
-      // OBS browser docks can deny clipboard reads; the manual paste dialog remains available.
-      clipboardDenied = true
-    }
-
-    if (!text.trim()) {
-      showMatchPackageTextImport('', clipboardDenied ? copy.matchPackageClipboardDenied : copy.matchPackageClipboardEmpty)
-      return
-    }
-
-    try {
-      showMatchPackagePreview(parseMatchPackage(text))
-    } catch (error) {
-      showMatchPackageTextImport(text, getMatchPackageErrorMessage(copy, error))
-    }
+    // OBS can leave readText() pending indefinitely. Native Ctrl+V remains available.
+    showMatchPackageTextImport()
   }
 
   const handleExportProject = () => {
