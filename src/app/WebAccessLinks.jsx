@@ -1,7 +1,7 @@
 import styles from './WebAccessLinks.module.css'
 
-// Enable only after the frozen deployment has a verified public address.
-const stableUrl = import.meta.env.VITE_OWBT_STABLE_URL?.trim() || ''
+// Frozen baseline verified on its public host and in an actual OBS dock/source pair.
+const stableUrl = import.meta.env.VITE_OWBT_STABLE_URL?.trim() || 'https://owbt-stable.fries-cup.com/'
 
 export default function WebAccessLinks({ copy }) {
   return (

@@ -54,6 +54,8 @@ Overlay: https://owbt.fries-cup.com/#overlay
 Mainland China: https://owbt-cn.fries-cup.com/
 Mainland OBS Control: https://owbt-cn.fries-cup.com/#control
 Mainland Overlay: https://owbt-cn.fries-cup.com/#overlay
+
+Previous Stable (2026-09-30): https://owbt-stable.fries-cup.com/
 ```
 
 Use the Console and Overlay from the same origin. For example, the live Console should pair with the live Overlay above, and a local development Console should pair with `http://127.0.0.1:4174/#overlay`.
@@ -83,7 +85,7 @@ OWBT packages and project backups are loaded through OWBT controls in the browse
 
 Switching between international, mainland, and frozen stable hosts does not move browser data automatically. Back up the project and team library separately, and use one host for the OBS dock and Browser Source.
 
-See [STABLE_WEB_FALLBACK.md](docs/STABLE_WEB_FALLBACK.md) for the frozen-version plan and public-link activation.
+See [STABLE_WEB_FALLBACK.md](docs/STABLE_WEB_FALLBACK.md) for the verified frozen deployment and switching procedure.
 
 ## Runtime Notes
 

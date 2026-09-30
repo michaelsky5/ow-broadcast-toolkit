@@ -46,7 +46,7 @@ Saving failure is already covered by automated regression tests and a local brow
 
 ## Frozen User Fallback
 
-See [STABLE_WEB_FALLBACK.md](./STABLE_WEB_FALLBACK.md). A public frozen-version entry and operator deployment rollback are separate recovery paths.
+The previous stable version is publicly available at [owbt-stable.fries-cup.com](https://owbt-stable.fries-cup.com/), deployed independently from the frozen baseline. Unsigned HTTPS verified all 189 files, and actual OBS core TAKE, roster colors/Chinese text, and text-backup restore passed. See [STABLE_WEB_FALLBACK.md](./STABLE_WEB_FALLBACK.md) and [partial whole-event rehearsal](./qa/2026-09-30-rehearsal.md) for the exact evidence and remaining gates. A public frozen-version entry and operator deployment rollback are separate recovery paths.
 
 ## Publish and Recovery
 

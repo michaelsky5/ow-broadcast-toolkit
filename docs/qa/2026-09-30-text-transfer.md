@@ -56,9 +56,9 @@ Blue/orange team colors were confirmed by the operator in the OBS package previe
 
 ## Remaining gates
 
-- Complete the remaining full-release checklist, including roster-scene team colors, Chinese glyphs across scenes, OCR, media, static graphics, and a whole-event rehearsal.
+- Complete the remaining full-release checklist. Chinese candidate output and frozen-host roster colors have partial rehearsal evidence; OCR, media, static graphics, and a whole-event rehearsal remain unfinished. See [rehearsal](./2026-09-30-rehearsal.md).
 - Complete clean production-domain output acceptance and a mainland-device/network check.
 - Repeat updated-runtime restart/recovery as part of that final rehearsal; keep earlier-runtime evidence separate.
-- Publish and verify the separate frozen host before enabling its public link; see [fallback plan](../STABLE_WEB_FALLBACK.md).
+- The separate frozen host has now passed public-file and core actual OBS checks; the candidate follow-up enables its public link. See [fallback record](../STABLE_WEB_FALLBACK.md).
 
 The main production domain remains on the recorded stable baseline. The draft candidate has not been merged or promoted.
