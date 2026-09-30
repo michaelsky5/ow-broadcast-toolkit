@@ -44,6 +44,19 @@ Browser storage and `BroadcastChannel` are local to a browser environment and or
 
 Saving failure is already covered by automated regression tests and a local browser fault simulation. That simulation confirms the visible warning, latest-edit text export, retry behavior, and continued live message delivery. It is separate evidence from actual OBS acceptance.
 
+## International and Mainland Release Targets
+
+Both primary hosts are connected to `michaelsky5/ow-broadcast-toolkit` on `main`, but run separate builds. A main merge triggers production deployment on both platforms; verify each deployment and released domain separately.
+
+| Entrance | Platform | Current baseline recorded on 2026-09-30 |
+| --- | --- | --- |
+| `https://owbt.fries-cup.com/` | Vercel project `prj_SIOmxxPvAegzC2aqFlgUshpLYaVN` | `0950bd1` / `dpl_CgnKM37NwVi8YsVRmpLVy8EDhuPQ` |
+| `https://owbt-cn.fries-cup.com/` | Tencent EdgeOne Makers project `makers-bnjuhuzmtewr` | `0950bd1` / `dptr1qpvwg9f` |
+
+The mainland console lists the global region including mainland China. On 2026-09-30, the focused candidate at `97676aa` built successfully in its separate preview environment (`dpawc95jgmcv`, 33 seconds, Node.js 24.18.0). That preview does not replace the mainland production domain. Final candidate records are tracked separately from these baseline IDs. See [release preflight](./qa/2026-09-30-release-preflight.md).
+
+Record the current mainland deployment before publishing, and inspect its recovery action in the console. Do not infer that a Vercel rollback changes the mainland host. Keep the frozen public fallback available for operators, and preserve separate project and library backups when switching hosts. Verify the chosen release on both formal domains after their builds finish; a green candidate check is not formal-domain acceptance.
+
 ## Frozen User Fallback
 
 The previous stable version is publicly available at [owbt-stable.fries-cup.com](https://owbt-stable.fries-cup.com/), deployed independently from the frozen baseline. Unsigned HTTPS verified all 189 files, and actual OBS core TAKE, roster colors/Chinese text, and text-backup restore passed. See [STABLE_WEB_FALLBACK.md](./STABLE_WEB_FALLBACK.md) and [partial whole-event rehearsal](./qa/2026-09-30-rehearsal.md) for the exact evidence and remaining gates. A public frozen-version entry and operator deployment rollback are separate recovery paths.

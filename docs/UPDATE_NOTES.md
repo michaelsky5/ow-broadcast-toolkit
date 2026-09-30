@@ -20,6 +20,8 @@
 
 ### Release Preparation
 
+- Refresh five indirect development/build dependencies to their first patched versions after the mainland preview exposed new audit findings. Framework versions and runtime dependency records remain unchanged; full audit returns zero findings, and all 199 build files match the accepted candidate byte for byte.
+
 - Add GitHub Actions checks on Linux and Windows with locked dependency installation, asset checks, ESLint, regression tests, and production builds.
 - Document the recorded stable baseline, candidate preview checks, actual OBS acceptance, and deployment recovery in `WEB_RELEASE_RUNBOOK.md`.
 - Preserve the existing project schema, storage keys, and Preview / Program workflow.
