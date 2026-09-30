@@ -74,4 +74,4 @@ If the preview server selects a different port, use that origin for all routes.
 - The web app cannot read arbitrary local filesystem paths.
 - Team-library records live in browser IndexedDB; export a library backup before clearing site data or moving to another browser profile.
 - Browser clipboard writes may fall back to showing the Overlay URL in a dialog when the browser blocks clipboard access.
-- Full local asset roots, batch asset management, OBS scene export paths, and deeper filesystem workflows belong to the future Windows desktop version.
+- Full local asset roots, batch asset management, OBS scene export paths, and deeper filesystem workflows are outside the current web scope. Assess desktop support separately after web release acceptance.

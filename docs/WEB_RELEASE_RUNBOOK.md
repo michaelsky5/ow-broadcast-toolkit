@@ -8,7 +8,7 @@ Use one focused candidate at a time. Keep the current production deployment avai
 - Local baseline tag: `baseline/web-stable-20260930`.
 - Vercel project: `ow-broadcast-toolkit` (`prj_SIOmxxPvAegzC2aqFlgUshpLYaVN`).
 - Vercel production deployment: `dpl_CgnKM37NwVi8YsVRmpLVy8EDhuPQ`.
-- Stable deployment URL: `https://ow-broadcast-toolkit-pbc72s4pq-shenkeyu5-2087s-projects.vercel.app`.
+- Recorded deployment URL (requires Vercel access): `https://ow-broadcast-toolkit-pbc72s4pq-shenkeyu5-2087s-projects.vercel.app`.
 - Production domain: `https://owbt.fries-cup.com`.
 
 These identify the baseline for the save-feedback candidate. Before every later release, record the then-current production commit and deployment again.
@@ -33,12 +33,12 @@ Use test data in the candidate. In OBS, add a custom browser dock at the candida
 | --- | --- | --- |
 | Edit a scene in Preview | The current Program output stays unchanged until TAKE, except for controls intended to update live. | Passed in OBS 32.2.2; see [evidence](./qa/2026-09-30-save-feedback.md). |
 | Press TAKE, including a content update in the same scene | Program and the OBS Browser Source show the selected content. | Passed in OBS 32.2.2; see [evidence](./qa/2026-09-30-save-feedback.md). |
-| Observe configured transitions between scenes and during same-scene TAKE | The selected transition visibly plays in the actual Browser Source. | Pending |
+| Observe configured transitions between scenes and during same-scene TAKE | The selected transition visibly plays in the actual Browser Source. | Operator reported both Brand Stinger cases passed on the updated preview; animation frames were not independently captured. See [follow-up](./qa/2026-09-30-text-transfer.md). |
 | Change scores and switch broadcast scenes | The Browser Source follows the controls without editing UI appearing in the output. | Live HUD `2:1` verified in OBS 32.2.2; Vercel preview toolbar remains visible. See [evidence](./qa/2026-09-30-save-feedback.md). |
 | Refresh the dock and Browser Source after a successful save | The saved edit and Program state remain available. | Passed in OBS 32.2.2; see [evidence](./qa/2026-09-30-save-feedback.md). |
 | Close and reopen OBS | The same saved project and output can be recovered. | Passed in OBS 32.2.2; see [evidence](./qa/2026-09-30-save-feedback.md). |
 | Export project text, then import it into the preview using test data | The project content is restored. Text export remains usable when OBS cannot create a download file. | Passed in OBS 32.2.2; `2:1` restored after an operator-reported `3:3` edit. See [evidence](./qa/2026-09-30-save-feedback.md). |
-| Import an A/B match package from the external-browser team library into the dock | A text box opens immediately; Ctrl+V, preview, and confirmation load both teams, roster, logos, and colors without a JSON file picker. | Earlier preview failed with no response; see [follow-up](./qa/2026-09-30-text-transfer.md). |
+| Import an A/B match package from the external-browser team library into the dock | A text box opens immediately; Ctrl+V, preview, and confirmation load both teams, roster, logos, and colors without a JSON file picker. | Updated preview passed native text paste and confirmation. Actual source verified both logos, ten players, score updates, and Alpha 0 / Beta 2 after an explicit A/B swap. Preview colors were operator-confirmed; roster-scene color rendering remains in the full checklist. See [follow-up](./qa/2026-09-30-text-transfer.md). |
 
 Browser storage and `BroadcastChannel` are local to a browser environment and origin. Matching URLs alone do not prove that an external browser, an OBS dock, and an OBS Browser Source share the same storage context. Test the actual dock-to-source pairing. Team-library packages are transferred from the external browser using the dock's manual paste workflow. The library always shows the complete text. In OBS, click Paste Match Package, press Ctrl+V, preview the impact, confirm, and TAKE. Full project backups use Export/Import Project → Project Text instead.
 

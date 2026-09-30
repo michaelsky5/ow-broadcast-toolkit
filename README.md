@@ -79,6 +79,8 @@ The Team Library and OBS Control routes are separate working surfaces that share
 
 No JSON file picker is required for this transfer. To back up or restore the **entire project**, use Export/Import Project → Project Text instead. Team-library backups are separate.
 
+OWBT packages and project backups are loaded through OWBT controls in the browser dock. OBS's [Scene Collection import](https://obsproject.com/kb/scene-collections) loads OBS scenes and sources.
+
 Switching between international, mainland, and frozen stable hosts does not move browser data automatically. Back up the project and team library separately, and use one host for the OBS dock and Browser Source.
 
 See [STABLE_WEB_FALLBACK.md](docs/STABLE_WEB_FALLBACK.md) for the frozen-version plan and public-link activation.
@@ -92,7 +94,7 @@ See [STABLE_WEB_FALLBACK.md](docs/STABLE_WEB_FALLBACK.md) for the frozen-version
 - Console and Overlay sync through same-origin browser storage/events and `BroadcastChannel` when available.
 - Export the project as a JSON file or copied project text before clearing browser data or moving to another machine. Text mode works in OBS Browser Sources that cannot create download files.
 - Uploaded assets are stored with the project as browser data URLs. URL assets can be used too, but same-origin or uploaded assets are safest for PNG export.
-- The web app does not read arbitrary local filesystem paths; that workflow is reserved for the future Windows desktop version.
+- The web app does not read arbitrary local filesystem paths. Desktop support can be assessed separately if the accepted web workflow leaves a demonstrated gap.
 
 ## Requirements
 
