@@ -24,6 +24,8 @@ export default function ConsoleEntry({
   activeSection = 'system',
   consoleLanguage = '',
   consoleSettingsPanel,
+  saveFailed = false,
+  saveWarning,
   onSectionChange,
   onUpdateConsoleLanguage,
   onUpdateProject,
@@ -248,6 +250,8 @@ export default function ConsoleEntry({
         </div>
       </header>
 
+      {saveWarning}
+
       <nav className={styles.sectionTabs} aria-label={sectionCopy.title}>
         <button
           type="button"
@@ -425,7 +429,7 @@ export default function ConsoleEntry({
 
               <div className={styles.stateTile}>
                 <span>{copy.autosave}</span>
-                <strong>{copy.active}</strong>
+                <strong>{saveFailed ? copy.autosaveFailed : copy.active}</strong>
                 <em>{copy.statusLocal}</em>
               </div>
             </div>
@@ -556,7 +560,7 @@ export default function ConsoleEntry({
               </div>
               <div>
                 <span>{copy.autosave}</span>
-                <strong>{copy.active}</strong>
+                <strong>{saveFailed ? copy.autosaveFailed : copy.active}</strong>
               </div>
             </div>
           </section>

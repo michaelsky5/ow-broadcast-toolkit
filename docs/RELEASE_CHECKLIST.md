@@ -2,6 +2,8 @@
 
 Use this checklist for the web release build. Keep UI changes frozen during this pass unless a blocker appears.
 
+Use [WEB_RELEASE_RUNBOOK.md](./WEB_RELEASE_RUNBOOK.md) to record the stable baseline, candidate CI and preview checks, actual OBS acceptance, and recovery target before publishing.
+
 ## Preflight
 
 ```bash

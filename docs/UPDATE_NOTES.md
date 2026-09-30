@@ -1,5 +1,19 @@
 # Update Notes
 
+## Unreleased - 2026-09-30
+
+### Fixed
+
+- Report project and Program save failures instead of treating a failed browser-storage write as success.
+- Show a persistent warning in the console and system setup with project backup export and Retry Save actions. Autosave indicators now reflect a failed save.
+- Keep the existing live update delivery available when persistence fails, and clear the warning after both editing and Program saves recover.
+
+### Release Preparation
+
+- Add GitHub Actions checks on Linux and Windows with locked dependency installation, asset checks, ESLint, regression tests, and production builds.
+- Document the recorded stable baseline, candidate preview checks, actual OBS acceptance, and deployment recovery in `WEB_RELEASE_RUNBOOK.md`.
+- Preserve the existing project schema, storage keys, and Preview / Program workflow.
+
 ## Unreleased - 2026-07-21
 
 ### Added
