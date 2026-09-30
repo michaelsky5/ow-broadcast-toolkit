@@ -47,14 +47,16 @@ export default function IntroSplash({ project, languageOverride = '', duration =
 
   return (
     <main className={styles.splash} aria-label={copy.startupAria}>
-      <div className={styles.gridLayer} />
-      <div className={styles.scanline} />
+      <div className={styles.background} aria-hidden="true">
+        <div className={styles.gridLayer} />
+        <div className={styles.scanline} />
+      </div>
 
       <section className={styles.bootPanel}>
         <div className={styles.topRail}>
           <span>OWBT STARTUP / v0.1</span>
           <strong>
-            <span>{copy.statusReady}</span>
+            <span>{isReady ? copy.statusReady : copy.startupLoading}</span>
             <em>{copy.startupReadyMeta}</em>
           </strong>
         </div>
@@ -75,7 +77,7 @@ export default function IntroSplash({ project, languageOverride = '', duration =
             <div className={styles.statusMatrix}>
               <div>
                 <span>Boot</span>
-                <strong>{isReady ? copy.statusReady : 'Loading'}</strong>
+                <strong>{isReady ? copy.statusReady : copy.startupLoading}</strong>
               </div>
               <div>
                 <span>{copy.startupNoticeLabel}</span>
@@ -100,17 +102,18 @@ export default function IntroSplash({ project, languageOverride = '', duration =
           </aside>
         </div>
 
-        <WebAccessLinks copy={copy} />
-
         <div className={[styles.setupAction, isReady ? styles.setupReady : ''].join(' ')}>
-          <div className={styles.progress}>
-            <span />
+          <div className={styles.actionIntro}>
+            <strong>{copy.bootText}</strong>
+            <p>{copy.startupActionHint}</p>
           </div>
           <button type="button" disabled={!isReady} onClick={enterSetup}>
             <span>{copy.enterSetup}</span>
             <em>{copy.openingSettings}</em>
           </button>
         </div>
+
+        <WebAccessLinks copy={copy} />
       </section>
 
       {showNotice && (

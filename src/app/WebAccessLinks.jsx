@@ -6,18 +6,45 @@ const stableUrl = import.meta.env.VITE_OWBT_STABLE_URL?.trim() || 'https://owbt-
 export default function WebAccessLinks({ copy }) {
   return (
     <section className={styles.access} aria-label={copy.webAccessTitle}>
-      <div className={styles.row}>
-        <strong>{copy.webAccessTitle}</strong>
-        <nav aria-label={copy.webAccessTitle}>
-          <a href="https://owbt.fries-cup.com/" target="_blank" rel="noopener noreferrer">{copy.webAccessGlobal}</a>
-          <a href="https://owbt-cn.fries-cup.com/" target="_blank" rel="noopener noreferrer">{copy.webAccessMainland}</a>
-          {stableUrl && <a href={stableUrl} target="_blank" rel="noopener noreferrer">{copy.webAccessStable}</a>}
+      <a className={styles.guide} href="/guide/" target="_blank" rel="noopener noreferrer">
+        <span className={styles.guideIcon} aria-hidden="true"><span /></span>
+        <span className={styles.guideContent}>
+          <span className={styles.kicker}>{copy.webGuideTitle}</span>
+          <strong>{copy.webGuideLink}</strong>
+          <span className={styles.guideHint}>{copy.webGuideHint}</span>
+        </span>
+        <span className={styles.externalIcon} aria-hidden="true" />
+      </a>
+
+      <div className={styles.sites}>
+        <div className={styles.siteHeading}>
+          <h2>{copy.webAccessTitle}</h2>
+          <span>{copy.webAccessRegionHint}</span>
+        </div>
+        <nav className={styles.siteLinks} aria-label={copy.webAccessTitle}>
+          <a href="https://owbt.fries-cup.com/" target="_blank" rel="noopener noreferrer">
+            <strong>{copy.webAccessGlobal}</strong>
+            <span>{copy.webAccessGlobalHint}</span>
+            <span className={styles.externalIcon} aria-hidden="true" />
+          </a>
+          <a href="https://owbt-cn.fries-cup.com/" target="_blank" rel="noopener noreferrer">
+            <strong>{copy.webAccessMainland}</strong>
+            <span>{copy.webAccessMainlandHint}</span>
+            <span className={styles.externalIcon} aria-hidden="true" />
+          </a>
+          {stableUrl && (
+            <a className={styles.stable} href={stableUrl} target="_blank" rel="noopener noreferrer">
+              <strong>{copy.webAccessStable}</strong>
+              <span>{copy.webAccessStableHint}</span>
+              <span className={styles.externalIcon} aria-hidden="true" />
+            </a>
+          )}
         </nav>
       </div>
-      <p>{copy.webAccessBackupHint}</p>
-      <div className={styles.guideRow}>
-        <strong>{copy.webGuideTitle}</strong>
-        <a href="/guide/" target="_blank" rel="noopener noreferrer">{copy.webGuideLink}</a>
+
+      <div className={styles.backupHint}>
+        <strong>{copy.webAccessBackupTitle}</strong>
+        <p>{copy.webAccessBackupHint}</p>
       </div>
     </section>
   )

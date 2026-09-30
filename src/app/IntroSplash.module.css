@@ -2,7 +2,8 @@
   position: fixed;
   inset: 0;
   display: grid;
-  place-items: center;
+  align-items: safe center;
+  justify-items: center;
   overflow-x: hidden;
   overflow-y: auto;
   padding: 32px;
@@ -12,6 +13,14 @@
   color: var(--theme-text);
   font-family: var(--theme-font-family);
   isolation: isolate;
+}
+
+.background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .gridLayer {
@@ -48,6 +57,12 @@
   animation: panelIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.bootPanel > section:last-child {
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+}
+
 .topRail {
   display: flex;
   align-items: center;
@@ -81,17 +96,17 @@
 
 .launchGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 330px;
-  min-height: 332px;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  min-height: 280px;
 }
 
 .identity {
   display: grid;
   grid-template-columns: 136px minmax(0, 1fr);
-  gap: 32px;
+  gap: 28px;
   align-items: center;
   border-right: 1px solid rgba(255, 255, 255, 0.11);
-  padding: 42px 46px;
+  padding: 32px 36px;
 }
 
 .logoFrame {
@@ -198,9 +213,9 @@
   display: grid;
   align-content: center;
   gap: 8px;
-  min-height: 90px;
+  min-height: 70px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 20px 22px;
+  padding: 15px 22px;
   background:
     linear-gradient(90deg, var(--theme-primary-softer), transparent 44%),
     rgba(255, 255, 255, 0.02);
@@ -232,7 +247,7 @@
   grid-template-columns: minmax(0, 1fr) 110px;
   gap: 12px;
   align-items: center;
-  min-height: 78px;
+  min-height: 72px;
   width: 100%;
   border-top: 1px solid rgba(255, 255, 255, 0.13);
   border-right: 0;
@@ -291,12 +306,12 @@
 
 .setupAction {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 206px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 244px;
+  gap: 24px;
   align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.13);
-  box-shadow: inset 0 4px 0 var(--theme-primary);
-  padding: 16px 18px;
+  background: var(--theme-primary-softer);
+  padding: 18px 24px;
   opacity: 0.44;
   transition: opacity 0.2s ease;
 }
@@ -305,21 +320,23 @@
   opacity: 1;
 }
 
-.progress {
-  height: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.055);
-  overflow: hidden;
+.actionIntro {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
 }
 
-.progress span {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background:
-    linear-gradient(90deg, var(--theme-primary), rgba(255, 255, 255, 0.86), var(--theme-primary));
-  transform-origin: left;
-  animation: fill 1.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+.actionIntro strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.actionIntro p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 .setupAction button,
@@ -339,6 +356,19 @@
   display: grid;
   place-items: center;
   gap: 4px;
+  height: 54px;
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.setupAction button:hover:not(:disabled) {
+  background: var(--theme-primary-light);
+}
+
+.setupAction button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
 }
 
 .setupAction button em {
@@ -534,16 +564,6 @@
   }
 }
 
-@keyframes fill {
-  from {
-    transform: scaleX(0);
-  }
-
-  to {
-    transform: scaleX(1);
-  }
-}
-
 @keyframes panelIn {
   from {
     opacity: 0;
@@ -561,9 +581,7 @@
     width: min(680px, calc(100vw - 40px));
   }
 
-  .launchGrid,
-  .identity,
-  .setupAction {
+  .launchGrid {
     grid-template-columns: 1fr;
   }
 
@@ -571,7 +589,7 @@
     gap: 20px;
     border-right: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.11);
-    padding: 32px;
+    padding: 28px 32px;
   }
 
   .startupStack {
@@ -584,7 +602,7 @@
   }
 
   .statusMatrix div {
-    min-height: 86px;
+    min-height: 68px;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
   }
 
@@ -615,38 +633,79 @@
   }
 
   .identity {
-    padding: 24px;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 18px;
+    padding: 24px 18px;
   }
 
   .logoFrame {
-    width: 112px;
-    height: 112px;
+    width: 76px;
+    height: 76px;
   }
 
   .logoFrame img {
-    width: 82px;
-    height: 82px;
+    width: 56px;
+    height: 56px;
   }
 
   .identityText h1 {
     font-size: 44px;
   }
 
-  .statusMatrix,
-  .licensePlate,
+  .identityText p {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  .identityText em {
+    font-size: 9px;
+    letter-spacing: 0.04em;
+  }
+
+  .setupAction,
   .modalActions,
   .noticeRules {
     grid-template-columns: 1fr;
   }
 
   .statusMatrix div {
-    min-height: 74px;
-    border-right: 0;
+    min-height: 68px;
+    gap: 6px;
+    padding: 12px;
+  }
+
+  .statusMatrix strong {
+    font-size: 12px;
+    letter-spacing: 0.01em;
+  }
+
+  .licensePlate {
+    grid-template-columns: minmax(0, 1fr) 132px;
+    min-height: 64px;
+  }
+
+  .setupAction {
+    gap: 14px;
+    padding: 18px;
   }
 }
 
 @media (max-height: 780px) {
   .splash {
     align-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanline {
+    display: none;
+  }
+
+  .bootPanel {
+    animation: none;
+  }
+
+  .setupAction {
+    transition: none;
   }
 }
