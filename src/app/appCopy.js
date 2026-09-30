@@ -365,7 +365,7 @@ export const APP_COPY = {
     webAccessBackupTitle: 'Before switching',
     webAccessBackupHint: 'Back up the project and team library separately before switching. Use the same entry for the OBS dock and Browser Source.',
     webGuideTitle: 'Getting Started',
-    webGuideLink: 'Quick Start and Demo Project (Chinese)',
+    webGuideLink: 'Quick Start & Practice (Chinese)',
     webGuideHint: 'Connect OBS, import a matchup, and restore a backup with practice projects.',
     startupActionHint: 'Set up your event, opening scenes, and OBS output',
     startupLoading: 'Preparing',
