@@ -16,7 +16,7 @@ These identify the baseline for the save-feedback candidate. Before every later 
 ## Candidate Checks
 
 1. Put the focused change on a separate branch and open a draft PR targeting `main`.
-2. Confirm both `Check (ubuntu-latest)` and `Check (windows-latest)` pass for the latest candidate. The workflow installs the lockfile with `npm ci` and runs `npm run check` with Node.js 24.14.0, matching the locally validated runtime.
+2. Confirm both `Check (ubuntu-24.04)` and `Check (windows-2025)` pass for the latest candidate. The workflow fixes the operating-system image labels and action commit SHAs, installs the lockfile with `npm ci`, and runs `npm run check` with Node.js 24.14.0, matching the locally validated runtime. Hosted images still receive maintenance updates within those fixed labels.
 3. Confirm the Vercel deployment is `READY`, targets preview, and records the same candidate commit. A build succeeding is separate from browser or OBS acceptance.
 4. Use the candidate's unique deployment hostname for its control, library, and Overlay routes throughout the check. A branch alias can move when another commit is pushed.
 5. Complete the relevant checks below and the existing [release checklist](./RELEASE_CHECKLIST.md). Record the OBS version, operating system, candidate commit, tested routes, and observed results.
@@ -47,7 +47,7 @@ Saving failure is already covered by automated regression tests and a local brow
 
 Publish only after the candidate checks and OBS acceptance pass. Merge the reviewed candidate, wait for main checks and the production deployment, and verify the formal domain's control-to-Overlay behavior against the released commit. Record the resulting deployment ID and URL.
 
-If the released version fails, restore the recorded known-good deployment using Vercel's deployment controls. Check the deployment details and the available rollback/promotion action for the account before changing the production alias. If the old deployment cannot be reused, redeploy its recorded Git commit and verify that build before promoting it.
+If the released version fails, restore the recorded known-good deployment using Vercel's deployment controls. Check the deployment details and the available rollback/promotion action for the account before changing the production alias. Hobby accounts can instantly roll back to the immediately previous production deployment; Pro and Enterprise accounts can choose other eligible deployments. If the old deployment cannot be reused, redeploy its recorded Git commit and verify that build before promoting it.
 
 For an authorized CLI rollback to this recorded baseline, the explicit target is:
 
