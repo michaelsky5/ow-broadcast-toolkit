@@ -39,10 +39,12 @@ main { width: min(1120px, calc(100% - 48px)); margin: 0 auto; padding: 36px 0 24
 h1 { margin: 8px 0 12px; font-size: clamp(32px, 5vw, 52px); line-height: 1.2; letter-spacing: -0.03em; }
 h2 { margin: 10px 0 16px; font-size: 23px; line-height: 1.35; }
 p { margin: 0 0 20px; color: var(--muted); }
-.support-layout { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); align-items: start; gap: 24px; }
+.support-layout { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); align-items: stretch; gap: 24px; }
 .community-column { display: grid; gap: 18px; min-width: 0; }
 .community, .report { padding: 24px; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
 .community { border-top: 3px solid var(--mint); }
+.report { display: flex; flex-direction: column; }
+.report textarea { flex: 1; }
 label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 12px; }
 input, textarea { display: block; width: 100%; border: 1px solid var(--line); background: var(--ink); color: var(--text); }
 input { padding: 12px; font-size: clamp(23px, 3vw, 34px); font-weight: 700; letter-spacing: 0.04em; }
