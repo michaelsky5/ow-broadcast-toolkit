@@ -73,7 +73,7 @@ const publishState = ({
 
   const payload = createProjectPayload(project, source, eventType)
 
-  saveProject(payload.project)
+  const saved = saveProject(payload.project)
 
   try {
     window.localStorage?.setItem(pulseKey, JSON.stringify({
@@ -98,7 +98,7 @@ const publishState = ({
     console.warn('[OWBT_SYNC] BroadcastChannel post failed:', error)
   }
 
-  return true
+  return saved
 }
 
 export const publishProjectState = (project, source = 'console') => publishState({

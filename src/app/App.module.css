@@ -311,6 +311,44 @@
   margin-bottom: 12px;
 }
 
+.consoleNotice.projectSaveWarning {
+  grid-template-columns: minmax(0, 1fr) auto;
+  max-width: 1540px;
+  margin-inline: auto;
+  border-color: rgba(255, 179, 87, 0.5);
+  border-left-color: #ffd29a;
+  background: rgba(103, 53, 13, 0.2);
+}
+
+.consoleNotice.projectSaveWarning strong {
+  color: #ffd29a;
+}
+
+.consoleNotice.projectSaveWarning em {
+  white-space: normal;
+  line-height: 1.6;
+}
+
+.projectSaveWarning .projectSaveActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.consoleNotice.projectSaveWarning button {
+  width: auto;
+  height: auto;
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .consoleNotice.projectSaveWarning {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .statBox {
   min-width: 0;
   border: 1px solid rgba(255,255,255,0.1);

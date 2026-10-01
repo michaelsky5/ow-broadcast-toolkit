@@ -8,6 +8,7 @@ import {
 import { getAppCopy, getAppLanguage } from './appCopy'
 import { EditorDialog } from './editors/shared/editorControls'
 import { getOverlayUrl } from './overlayUrl'
+import WebAccessLinks from './WebAccessLinks'
 import { fileToDataUrl } from './toolbox/toolboxModel'
 import styles from './ConsoleEntry.module.css'
 
@@ -24,6 +25,8 @@ export default function ConsoleEntry({
   activeSection = 'system',
   consoleLanguage = '',
   consoleSettingsPanel,
+  saveFailed = false,
+  saveWarning,
   onSectionChange,
   onUpdateConsoleLanguage,
   onUpdateProject,
@@ -212,7 +215,7 @@ export default function ConsoleEntry({
 
   const openUpdateNotes = () => {
     setEntryDialog({
-      kicker: 'OWBT V0.1',
+      kicker: `OWBT ${copy.versionNumber}`,
       title: copy.changelogTitle,
       message: copy.updateNotesFull,
       confirmLabel: copy.ok,
@@ -248,6 +251,8 @@ export default function ConsoleEntry({
         </div>
       </header>
 
+      {saveWarning}
+
       <nav className={styles.sectionTabs} aria-label={sectionCopy.title}>
         <button
           type="button"
@@ -267,6 +272,7 @@ export default function ConsoleEntry({
 
       {activeSection === 'system' ? (
         <section className={styles.preferencesWorkspace}>
+          <WebAccessLinks copy={copy} />
           {consoleSettingsPanel}
         </section>
       ) : (
@@ -425,7 +431,7 @@ export default function ConsoleEntry({
 
               <div className={styles.stateTile}>
                 <span>{copy.autosave}</span>
-                <strong>{copy.active}</strong>
+                <strong>{saveFailed ? copy.autosaveFailed : copy.active}</strong>
                 <em>{copy.statusLocal}</em>
               </div>
             </div>
@@ -556,7 +562,7 @@ export default function ConsoleEntry({
               </div>
               <div>
                 <span>{copy.autosave}</span>
-                <strong>{copy.active}</strong>
+                <strong>{saveFailed ? copy.autosaveFailed : copy.active}</strong>
               </div>
             </div>
           </section>

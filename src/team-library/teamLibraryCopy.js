@@ -15,7 +15,7 @@ const COPY = {
     guideSteps: [
       { title: '整理队伍', body: '新建队伍，或把当前项目中的队伍保存到素材仓库并补齐阵容。' },
       { title: '选择对阵', body: '按直播左右顺序选择 A 队和 B 队，并打开检查确认素材状态。' },
-      { title: '送入 OBS', body: '复制对阵包，在 OBS 控制台点击“粘贴对阵包”后开始本场导播。' }
+      { title: '送入 OBS', body: '复制完整对阵包文本，在 OBS 点击「粘贴对阵包」，按 Ctrl+V，预览确认后 TAKE。无需 JSON 文件。' }
     ],
     guideBackupTitle: '本地数据提醒',
     guideBackupNote: '素材保存在当前浏览器中。重要赛事开始前请导出备份，避免清理浏览器数据后丢失。',
@@ -67,6 +67,8 @@ const COPY = {
     railEmptyBody: '新建、导入或保存项目队伍后会显示在这里。',
     emptyKicker: '建立本地素材仓库',
     emptyStartTitle: '从第一支队伍开始',
+    selectSavedTeamTitle: '选择一支队伍编辑',
+    selectSavedTeamBody: '队伍已保存在左侧列表。点击队伍查看或修改资料；本场 A/B 对阵请在上方选择。',
     emptyStartBody: '手动创建队伍，保存当前项目中的队伍，或通过 CSV 和素材库备份批量导入。',
     noResults: '没有符合条件的队伍',
     players: count => `${count} 名选手`,
@@ -116,8 +118,9 @@ const COPY = {
     maxSelected: '对阵包固定包含 A、B 两支队伍，请先取消一支已选队伍。',
     selectTwoTeams: '请按顺序选择 A、B 两支队伍。',
     matchPackageCopied: '对阵包已复制，可以粘贴到 OBS 导播台。',
-    matchPackageNextStep: '下一步：在 OBS 控制台点击“粘贴对阵包”。',
+    matchPackageNextStep: 'OBS：粘贴对阵包 → Ctrl+V → 预览确认 → TAKE。',
     matchPackageCopyTitle: '复制对阵包文本',
+    matchPackageCopyInstructions: '复制下面的完整文本，在 OBS 控制台点击「粘贴对阵包」，按 Ctrl+V，预览确认后点击 TAKE。无需 JSON 文件。',
     matchPackageCopyFallback: '无法直接写入剪贴板，请复制下面的完整文本。',
     matchPackageManualCopy: '请在文本框中按 Ctrl+A，再按 Ctrl+C 手动复制。',
     matchPackageDuplicateTeams: 'A 队和 B 队实际是同一支队伍，请重新选择。',
@@ -325,7 +328,7 @@ const COPY = {
     guideSteps: [
       { title: 'Prepare Teams', body: 'Create teams or save the current project teams, then complete each broadcast roster.' },
       { title: 'Select Matchup', body: 'Select Team A and Team B in broadcast order, then open Check to review the assets.' },
-      { title: 'Send to OBS', body: 'Copy the match package and choose Paste Match Package in the OBS console.' }
+      { title: 'Send to OBS', body: 'Copy the complete package text. In OBS, choose Paste Match Package, press Ctrl+V, preview and confirm, then TAKE. No JSON file is needed.' }
     ],
     guideBackupTitle: 'Local Data Reminder',
     guideBackupNote: 'Assets stay in this browser. Export a backup before important events in case browser data is cleared.',
@@ -377,6 +380,8 @@ const COPY = {
     railEmptyBody: 'Created, imported, and saved project teams will appear here.',
     emptyKicker: 'BUILD YOUR LOCAL LIBRARY',
     emptyStartTitle: 'Start With Your First Team',
+    selectSavedTeamTitle: 'Select a Team to Edit',
+    selectSavedTeamBody: 'Your saved teams are listed on the left. Select one to view or edit its details; choose the match teams using the A/B selectors above.',
     emptyStartBody: 'Create a team manually, save teams from the current project, or import them from CSV or a library backup.',
     noResults: 'No matching teams',
     players: count => `${count} players`,
@@ -428,6 +433,7 @@ const COPY = {
     matchPackageCopied: 'Match package copied. Paste it into the OBS console.',
     matchPackageNextStep: 'Next: choose Paste Match Package in the OBS console.',
     matchPackageCopyTitle: 'Copy Match Package Text',
+    matchPackageCopyInstructions: 'Copy all text below. In the OBS console, choose Paste Match Package, press Ctrl+V, preview and confirm, then TAKE. No JSON file is needed.',
     matchPackageCopyFallback: 'Clipboard access is unavailable. Copy the complete text below.',
     matchPackageManualCopy: 'Press Ctrl+A and then Ctrl+C in the text box to copy it manually.',
     matchPackageDuplicateTeams: 'Team A and Team B resolve to the same team. Choose two different teams.',

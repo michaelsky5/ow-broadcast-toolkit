@@ -1,5 +1,31 @@
 # Update Notes
 
+## Unreleased - 2026-09-30
+
+### Fixed
+
+- Report project and Program save failures instead of treating a failed browser-storage write as success.
+- Show a persistent warning in the console and system setup with project backup export and Retry Save actions. Autosave indicators now reflect a failed save.
+- Keep the existing live update delivery available when persistence fails, and clear the warning after both editing and Program saves recover.
+
+### Operator Guide
+
+- Add a Chinese illustrated quick start with actual page and OBS rehearsal screenshots.
+- Include a fictitious two-team practice project, match-package text, and a separate team-library backup, using existing schemas and manual import controls.
+- Link the guide from startup and system settings, and remove promises of a future Windows app from interface copy.
+- Prepare a Chinese video script; recording, narration, and final video format remain to be selected.
+- Clarify legacy project-text transfer, the library import confirmation/save steps, and the separate OBS/browser practice inputs; add a preflight checklist.
+- Prefer the current tutorial host in its OBS address selector, with protected-preview guidance and a public-host fallback for offline reading.
+- Show an edit-selection hint when the library already has saved teams instead of suggesting it is still empty.
+
+### Release Preparation
+
+- Refresh five indirect development/build dependencies to their first patched versions after the mainland preview exposed new audit findings. Framework versions and runtime dependency records remain unchanged; full audit returns zero findings, and all 199 build files match the accepted candidate byte for byte.
+
+- Add GitHub Actions checks on Linux and Windows with locked dependency installation, asset checks, ESLint, regression tests, and production builds.
+- Document the recorded stable baseline, candidate preview checks, actual OBS acceptance, and deployment recovery in `WEB_RELEASE_RUNBOOK.md`.
+- Preserve the existing project schema, storage keys, and Preview / Program workflow.
+
 ## Unreleased - 2026-07-21
 
 ### Added

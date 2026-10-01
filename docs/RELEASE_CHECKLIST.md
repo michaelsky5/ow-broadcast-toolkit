@@ -1,6 +1,8 @@
 # OWBT Web v0.1 Release Checklist
 
-Use this checklist for the web release build. Keep UI changes frozen during this pass unless a blocker appears.
+Use this checklist as the full Web regression reference. For a focused maintenance release, select checks for changed workflows and critical interactions, and reuse clearly attributed event/OBS evidence for unchanged features. Unchecked unchanged features are follow-up coverage, unless a known failure affects the intended release. Keep the selected UI changes frozen during final validation unless a blocker appears.
+
+Use [WEB_RELEASE_RUNBOOK.md](./WEB_RELEASE_RUNBOOK.md) to record the stable baseline, candidate CI and preview checks, actual OBS acceptance, and recovery target before publishing.
 
 ## Preflight
 
@@ -72,4 +74,4 @@ If the preview server selects a different port, use that origin for all routes.
 - The web app cannot read arbitrary local filesystem paths.
 - Team-library records live in browser IndexedDB; export a library backup before clearing site data or moving to another browser profile.
 - Browser clipboard writes may fall back to showing the Overlay URL in a dialog when the browser blocks clipboard access.
-- Full local asset roots, batch asset management, OBS scene export paths, and deeper filesystem workflows belong to the future Windows desktop version.
+- Full local asset roots, batch asset management, OBS scene export paths, and deeper filesystem workflows are outside the current web scope. Assess desktop support separately after web release acceptance.

@@ -669,6 +669,8 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   const [undoStack, setUndoStack] = useState([])
   const [appDialog, setAppDialog] = useState(null)
   const [matchPackageNotice, setMatchPackageNotice] = useState(null)
+  const [projectSaveFailed, setProjectSaveFailed] = useState(false)
+  const [programSaveFailed, setProgramSaveFailed] = useState(false)
   const [workspaceMode, setWorkspaceMode] = useState('production')
   const [entrySection, setEntrySection] = useState('system')
   const [sceneModeHints, setSceneModeHints] = useState({
@@ -687,6 +689,16 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   const libraryReturnScreenRef = useRef(libraryReturnScreen)
   const previousRouteRef = useRef(route)
   const internalLibraryNavigationRef = useRef(false)
+  const saveConsoleProject = useCallback((nextState, source = 'console') => {
+    const saved = publishProjectState(nextState, source)
+    setProjectSaveFailed(!saved)
+    return saved
+  }, [])
+  const saveConsoleProgram = useCallback((nextState, source = 'console-program') => {
+    const saved = publishProgramState(nextState, source)
+    setProgramSaveFailed(!saved)
+    return saved
+  }, [])
   const copy = getAppCopy(project, consoleSettings.interfaceLanguage)
   const language = getAppLanguage(project, consoleSettings.interfaceLanguage)
   const competitionName = getCompetitionName(project, language)
@@ -753,25 +765,25 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     projectRef.current = project
     applyThemeTokens(project.theme)
     const syncTimer = window.setTimeout(() => {
-      publishProjectState(projectRef.current, 'console')
+      saveConsoleProject(projectRef.current)
     }, PROJECT_SYNC_DEBOUNCE_MS)
 
     return () => window.clearTimeout(syncTimer)
-  }, [project])
+  }, [project, saveConsoleProject])
 
   useEffect(() => {
     programProjectRef.current = programProject
     const syncTimer = window.setTimeout(() => {
-      publishProgramState(programProjectRef.current, 'console-program')
+      saveConsoleProgram(programProjectRef.current)
     }, PROJECT_SYNC_DEBOUNCE_MS)
 
     return () => window.clearTimeout(syncTimer)
-  }, [programProject])
+  }, [programProject, saveConsoleProgram])
 
   useEffect(() => {
     const flushProjectState = () => {
-      publishProjectState(projectRef.current, 'console')
-      publishProgramState(programProjectRef.current, 'console-program')
+      saveConsoleProject(projectRef.current)
+      saveConsoleProgram(programProjectRef.current)
     }
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') flushProjectState()
@@ -784,7 +796,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
       window.removeEventListener('pagehide', flushProjectState)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [])
+  }, [saveConsoleProject, saveConsoleProgram])
 
   const pushUndoSnapshot = reason => {
     setUndoStack(prev => [{
@@ -806,7 +818,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     setProject(nextProject)
 
     if (options.persistImmediately === true) {
-      publishProjectState(nextProject, 'console')
+      saveConsoleProject(nextProject)
     }
 
     if (options.live === true) {
@@ -815,7 +827,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
       setProgramProject(nextProgramProject)
 
       if (options.persistImmediately === true) {
-        publishProgramState(nextProgramProject, 'console-program')
+        saveConsoleProgram(nextProgramProject)
       }
     }
   }
@@ -1288,6 +1300,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
             key={`${message}-${initialText.length}`}
             ref={matchPackageTextRef}
             defaultValue={initialText}
+            autoFocus
             aria-label={copy.matchPackagePasteTitle}
             placeholder={copy.matchPackagePastePlaceholder}
             spellCheck={false}
@@ -1316,28 +1329,10 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     })
   }
 
-  const handlePasteMatchPackage = async () => {
-    let text = ''
-    let clipboardDenied = false
+  const handlePasteMatchPackage = () => {
     setMatchPackageNotice(null)
-    try {
-      if (!navigator.clipboard?.readText) throw new Error('Clipboard unavailable')
-      text = await navigator.clipboard.readText()
-    } catch {
-      // OBS browser docks can deny clipboard reads; the manual paste dialog remains available.
-      clipboardDenied = true
-    }
-
-    if (!text.trim()) {
-      showMatchPackageTextImport('', clipboardDenied ? copy.matchPackageClipboardDenied : copy.matchPackageClipboardEmpty)
-      return
-    }
-
-    try {
-      showMatchPackagePreview(parseMatchPackage(text))
-    } catch (error) {
-      showMatchPackageTextImport(text, getMatchPackageErrorMessage(copy, error))
-    }
+    // OBS can leave readText() pending indefinitely. Native Ctrl+V remains available.
+    showMatchPackageTextImport()
   }
 
   const handleExportProject = () => {
@@ -1425,6 +1420,23 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     consoleSettings.hotkeysEnabled
   ])
 
+  const saveFailed = projectSaveFailed || programSaveFailed
+  const saveWarning = saveFailed ? (
+    <section className={`${styles.consoleNotice} ${styles.projectSaveWarning}`} role="alert">
+      <div>
+        <strong>{copy.projectSaveFailedTitle}</strong>
+        <em>{copy.projectSaveFailedMessage}</em>
+      </div>
+      <div className={styles.projectSaveActions}>
+        <button type="button" onClick={handleExportProject}>{copy.exportProject}</button>
+        <button type="button" onClick={() => {
+          saveConsoleProject(projectRef.current)
+          saveConsoleProgram(programProjectRef.current)
+        }}>{copy.retryProjectSave}</button>
+      </div>
+    </section>
+  ) : null
+
   if (consoleScreen === 'intro') {
     return (
       <IntroSplash
@@ -1438,26 +1450,31 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
 
   if (consoleScreen === 'entry') {
     return (
-      <ConsoleEntry
-        project={project}
-        activeSection={entrySection}
-        consoleLanguage={language}
-        consoleSettingsPanel={(
-          <ConsoleSettingsWorkspace
-            copy={copy}
-            language={language}
-            settings={consoleSettings}
-            onLanguageChange={updateConsoleLanguage}
-            onReset={resetConsoleSettings}
-            onUpdate={updateConsoleSettings}
-          />
-        )}
-        onSectionChange={setEntrySection}
-        onUpdateConsoleLanguage={updateConsoleLanguage}
-        onUpdateProject={updateProject}
-        onOpenTeamLibrary={() => openTeamLibrary('entry')}
-        onEnterConsole={enterWorkspace}
-      />
+      <>
+        <ConsoleEntry
+          project={project}
+          saveFailed={saveFailed}
+          saveWarning={saveWarning}
+          activeSection={entrySection}
+          consoleLanguage={language}
+          consoleSettingsPanel={(
+            <ConsoleSettingsWorkspace
+              copy={copy}
+              language={language}
+              settings={consoleSettings}
+              onLanguageChange={updateConsoleLanguage}
+              onReset={resetConsoleSettings}
+              onUpdate={updateConsoleSettings}
+            />
+          )}
+          onSectionChange={setEntrySection}
+          onUpdateConsoleLanguage={updateConsoleLanguage}
+          onUpdateProject={updateProject}
+          onOpenTeamLibrary={() => openTeamLibrary('entry')}
+          onEnterConsole={enterWorkspace}
+        />
+        {appDialog && <EditorDialog {...appDialog} />}
+      </>
     )
   }
 
@@ -1596,6 +1613,8 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
             />
           </div>
         </header>
+
+        {saveWarning}
 
         {matchPackageNotice && (
           <section className={styles.consoleNotice} role="status">

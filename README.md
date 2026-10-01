@@ -32,7 +32,7 @@ The web version focuses on the core console:
 - Local browser autosave
 - Project import and export through JSON files or copy/paste text
 
-The future Windows desktop version can unlock local filesystem paths, larger asset libraries, OBS scene file export, and deeper production workflows.
+OWBT currently focuses on the web workflow. Local filesystem and deeper desktop integrations can be assessed separately after the web release is accepted.
 
 ## Scene Packages
 
@@ -50,6 +50,12 @@ Console: https://owbt.fries-cup.com/
 Team Library: https://owbt.fries-cup.com/#library
 OBS Control: https://owbt.fries-cup.com/#control
 Overlay: https://owbt.fries-cup.com/#overlay
+
+Mainland China: https://owbt-cn.fries-cup.com/
+Mainland OBS Control: https://owbt-cn.fries-cup.com/#control
+Mainland Overlay: https://owbt-cn.fries-cup.com/#overlay
+
+Previous Stable (2026-09-30): https://owbt-stable.fries-cup.com/
 ```
 
 Use the Console and Overlay from the same origin. For example, the live Console should pair with the live Overlay above, and a local development Console should pair with `http://127.0.0.1:4174/#overlay`.
@@ -65,6 +71,30 @@ Use the Console and Overlay from the same origin. For example, the live Console 
 
 The Team Library and OBS Control routes are separate working surfaces that share the same OWBT project format. The Overlay renders the current Program state only and does not show editing UI.
 
+## Operator Quick Start
+
+- [中文图文教程](docs/QUICK_START_ZH.md): OBS setup, match-package transfer, TAKE, backup, and recovery.
+- The startup and system pages link to the same-host `/guide/` page, which includes selectable demo project and match-package text, plus a separate team-library backup.
+- [中文演示视频脚本](docs/VIDEO_TUTORIAL_ZH.md): a recording and editing plan; the final video format has not yet been selected.
+
+Demo data is fictitious. Importing a complete demo project replaces current editing and Program state; export your own project first and practise off air.
+
+## Send Teams Into OBS
+
+1. In a regular browser, open the Team Library and select Team A and Team B.
+2. Choose **Copy Match Package**. The complete text is always shown; use the copy button or Ctrl+A, Ctrl+C in the text box.
+3. In the OBS custom browser dock at `/#control`, choose **Paste Match Package** and press Ctrl+V in the text box.
+4. Choose **Preview Package**, review both teams and the refresh/swap/new-match impact, then confirm.
+5. Press **TAKE** to send the scene to the Browser Source.
+
+No JSON file picker is required for this transfer. To back up or restore the **entire project**, use Export/Import Project → Project Text instead. Team-library backups are separate.
+
+OWBT packages and project backups are loaded through OWBT controls in the browser dock. OBS's [Scene Collection import](https://obsproject.com/kb/scene-collections) loads OBS scenes and sources.
+
+Switching between international, mainland, and frozen stable hosts does not move browser data automatically. Back up the project and team library separately, and use one host for the OBS dock and Browser Source.
+
+See [STABLE_WEB_FALLBACK.md](docs/STABLE_WEB_FALLBACK.md) for the verified frozen deployment and switching procedure.
+
 ## Runtime Notes
 
 - OWBT is a static Vite React app.
@@ -74,7 +104,7 @@ The Team Library and OBS Control routes are separate working surfaces that share
 - Console and Overlay sync through same-origin browser storage/events and `BroadcastChannel` when available.
 - Export the project as a JSON file or copied project text before clearing browser data or moving to another machine. Text mode works in OBS Browser Sources that cannot create download files.
 - Uploaded assets are stored with the project as browser data URLs. URL assets can be used too, but same-origin or uploaded assets are safest for PNG export.
-- The web app does not read arbitrary local filesystem paths; that workflow is reserved for the future Windows desktop version.
+- The web app does not read arbitrary local filesystem paths. Desktop support can be assessed separately if the accepted web workflow leaves a demonstrated gap.
 
 ## Requirements
 

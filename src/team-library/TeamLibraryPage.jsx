@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { downloadTextFile } from '../project/projectUtils'
+import { tryCopyText } from '../app/clipboard'
 import {
   MAX_ROSTER_PLAYERS,
   getDefaultHeroForRole,
@@ -312,6 +313,7 @@ export default function TeamLibraryPage({
   const [storageEstimate, setStorageEstimate] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [copyFallbackText, setCopyFallbackText] = useState('')
+  const [copyFallbackNotice, setCopyFallbackNotice] = useState('')
   const [copiedPackageSignature, setCopiedPackageSignature] = useState('')
   const [duplicateTarget, setDuplicateTarget] = useState(null)
   const [duplicateCleanup, setDuplicateCleanup] = useState(null)
@@ -750,18 +752,15 @@ export default function TeamLibraryPage({
       return
     }
 
-    try {
-      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable')
-      await navigator.clipboard.writeText(text)
+    // Show the text before attempting clipboard access, including when the promise never settles.
+    setCopyFallbackText(text)
+    setCopyFallbackNotice(copy.matchPackageManualCopy)
+    setError('')
+    const copied = await tryCopyText(text)
+    if (copied) {
       setCopiedPackageSignature(selectedIds.join('|'))
       setStatus(copy.matchPackageCopied)
-      setError('')
-    } catch {
-      setCopyFallbackText(text)
-      window.setTimeout(() => {
-        matchPackageTextRef.current?.focus()
-        matchPackageTextRef.current?.select()
-      }, 0)
+      setCopyFallbackNotice(copy.matchPackageCopied)
     }
   }
 
@@ -1709,9 +1708,9 @@ export default function TeamLibraryPage({
         <section className={styles.editor}>
           {!draftTeam ? (
             <div className={styles.editorEmpty}>
-              <span className={styles.emptyKicker}>{copy.emptyKicker}</span>
-              <strong>{copy.emptyStartTitle}</strong>
-              <p>{copy.emptyStartBody}</p>
+              <span className={styles.emptyKicker}>{teams.length ? copy.inspect : copy.emptyKicker}</span>
+              <strong>{teams.length ? copy.selectSavedTeamTitle : copy.emptyStartTitle}</strong>
+              <p>{teams.length ? copy.selectSavedTeamBody : copy.emptyStartBody}</p>
               <div className={styles.emptyActions}>
                 <button type="button" className={styles.primaryButton} onClick={createTeam}>{copy.createTeam}</button>
                 <button type="button" onClick={() => requestProtectedAction('project-save')} disabled={!(project.teams || []).length}>{copy.saveCurrent}</button>
@@ -2402,7 +2401,7 @@ export default function TeamLibraryPage({
           wide
           kicker={copy.matchPackage}
           title={copy.matchPackageCopyTitle}
-          message={copy.matchPackageCopyFallback}
+          message={copy.matchPackageCopyInstructions}
           actions={[
             { label: copy.close, onClick: () => setCopyFallbackText('') },
             {
@@ -2419,14 +2418,14 @@ export default function TeamLibraryPage({
                 }
 
                 if (copied) {
-                  setCopyFallbackText('')
                   setCopiedPackageSignature(selectedIds.join('|'))
                   setStatus(copy.matchPackageCopied)
+                  setCopyFallbackNotice(copy.matchPackageCopied)
                   setError('')
                   return
                 }
 
-                setError(copy.matchPackageManualCopy)
+                setCopyFallbackNotice(copy.matchPackageManualCopy)
               }
             }
           ]}
@@ -2434,10 +2433,13 @@ export default function TeamLibraryPage({
           <textarea
             ref={matchPackageTextRef}
             value={copyFallbackText}
+            autoFocus
+            onFocus={event => event.target.select()}
             aria-label={copy.matchPackageCopyTitle}
             readOnly
             spellCheck={false}
           />
+          <p role="status">{copyFallbackNotice}</p>
         </EditorDialog>
       )}
     </main>
