@@ -54,7 +54,7 @@ export default function IntroSplash({ project, languageOverride = '', duration =
 
       <section className={styles.bootPanel}>
         <div className={styles.topRail}>
-          <span>OWBT STARTUP / v0.1</span>
+          <span>OWBT STARTUP / {copy.versionNumber}</span>
           <strong>
             <span>{isReady ? copy.statusReady : copy.startupLoading}</span>
             <em>{copy.startupReadyMeta}</em>

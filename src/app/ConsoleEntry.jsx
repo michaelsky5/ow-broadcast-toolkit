@@ -215,7 +215,7 @@ export default function ConsoleEntry({
 
   const openUpdateNotes = () => {
     setEntryDialog({
-      kicker: 'OWBT V0.1',
+      kicker: `OWBT ${copy.versionNumber}`,
       title: copy.changelogTitle,
       message: copy.updateNotesFull,
       confirmLabel: copy.ok,
