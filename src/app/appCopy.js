@@ -1,6 +1,8 @@
 export const APP_COPY = {
   zh: {
     startupAria: 'OWBT 启动',
+    feedbackCenter: '反馈中心',
+    feedbackLanguage: 'zh',
     webAccessTitle: '访问入口',
     webAccessGlobal: '国际版',
     webAccessMainland: '中国大陆版',
@@ -354,6 +356,8 @@ export const APP_COPY = {
   },
   en: {
     startupAria: 'OWBT startup',
+    feedbackCenter: 'Feedback Center',
+    feedbackLanguage: 'en',
     webAccessTitle: 'Web Access',
     webAccessGlobal: 'International',
     webAccessMainland: 'Mainland China',

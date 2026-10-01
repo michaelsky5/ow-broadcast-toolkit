@@ -45,6 +45,10 @@ export default function WebAccessLinks({ copy }) {
       <div className={styles.backupHint}>
         <strong>{copy.webAccessBackupTitle}</strong>
         <p>{copy.webAccessBackupHint}</p>
+        <a className={styles.feedbackLink} href={`/feedback/?lang=${copy.feedbackLanguage}`} target="_blank" rel="noopener noreferrer">
+          {copy.feedbackCenter}
+          <span className={styles.externalIcon} aria-hidden="true" />
+        </a>
       </div>
     </section>
   )

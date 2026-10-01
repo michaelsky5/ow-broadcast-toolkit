@@ -165,7 +165,8 @@
 }
 
 .backupHint {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: baseline;
   gap: 12px;
   grid-column: 1 / -1;
@@ -184,6 +185,25 @@
 .backupHint p {
   margin: 0;
   color: rgba(255, 255, 255, 0.52);
+}
+
+.feedbackLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--theme-primary);
+  font-weight: 750;
+  text-underline-offset: 4px;
+}
+
+.feedbackLink:focus-visible {
+  outline: 2px solid var(--theme-primary);
+  outline-offset: 4px;
+}
+
+.feedbackLink .externalIcon {
+  width: 12px;
+  height: 12px;
 }
 
 @media (max-width: 920px) {
@@ -232,8 +252,14 @@
   }
 
   .backupHint {
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: start;
     gap: 8px;
+  }
+
+  .backupHint p {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 }
 
