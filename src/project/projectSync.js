@@ -1,7 +1,8 @@
-import { normalizeProject } from './projectUtils'
+import { normalizeProject, safeParseProject } from './projectUtils'
 import {
   OWBT_PROGRAM_STORAGE_KEY,
   OWBT_STORAGE_KEY,
+  isProjectReadBlocked,
   saveStoredProgramProject,
   saveStoredProject
 } from './projectStorage'
@@ -16,7 +17,6 @@ let sharedChannel = null
 let publishSeq = 0
 
 const canUseWindow = () => typeof window !== 'undefined'
-const canUseStorage = () => canUseWindow() && !!window.localStorage
 const canUseBroadcastChannel = () => canUseWindow() && 'BroadcastChannel' in window
 
 const getSharedChannel = () => {
@@ -26,9 +26,9 @@ const getSharedChannel = () => {
 }
 
 const readStoredRaw = storageKey => {
-  if (!canUseStorage()) return ''
+  if (!canUseWindow()) return ''
   try {
-    return window.localStorage.getItem(storageKey) || ''
+    return window.localStorage?.getItem(storageKey) || ''
   } catch {
     return ''
   }
@@ -43,7 +43,7 @@ const readStoredFromKey = storageKey => {
   if (!raw) return null
 
   try {
-    return normalizeProject(JSON.parse(raw))
+    return safeParseProject(raw)
   } catch (error) {
     console.warn('[OWBT_SYNC] Failed to parse stored project:', error)
     return null
@@ -67,9 +67,10 @@ const publishState = ({
   project,
   pulseKey,
   saveProject,
+  storageKey,
   source
 }) => {
-  if (!canUseWindow() || !project) return false
+  if (!canUseWindow() || !project || isProjectReadBlocked(storageKey)) return false
 
   const payload = createProjectPayload(project, source, eventType)
 
@@ -106,6 +107,7 @@ export const publishProjectState = (project, source = 'console') => publishState
   project,
   pulseKey: OWBT_SYNC_PULSE_KEY,
   saveProject: saveStoredProject,
+  storageKey: OWBT_STORAGE_KEY,
   source
 })
 
@@ -114,6 +116,7 @@ export const publishProgramState = (project, source = 'console') => publishState
   project,
   pulseKey: OWBT_PROGRAM_SYNC_PULSE_KEY,
   saveProject: saveStoredProgramProject,
+  storageKey: OWBT_PROGRAM_STORAGE_KEY,
   source
 })
 

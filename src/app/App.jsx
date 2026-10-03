@@ -4,12 +4,16 @@ import { getCompetitionName } from '../project/branding'
 import {
   exportProjectAsJson,
   readProjectFile,
-  safeParseProject,
+  parseImportedProject,
   stringifyProject
 } from '../project/projectUtils'
 import {
   loadStoredProgramProject,
   loadStoredProject,
+  OWBT_STORAGE_KEY,
+  OWBT_PROGRAM_STORAGE_KEY,
+  getProjectLoadIssues,
+  getUnrestoredProjectText,
   replaceStoredProject,
   resetStoredProject
 } from '../project/projectStorage'
@@ -219,6 +223,11 @@ const getMatchPackageErrorMessage = (copy, error) => {
   }
 }
 
+const getProjectImportErrorMessage = (copy, error) => {
+  const message = copy.projectImportErrors?.[error?.code] || copy.invalidProjectFile
+  return message.replace('{path}', error?.path || 'project')
+}
+
 const setDocumentSurface = showOverlay => {
   if (typeof document === 'undefined') return
   const surface = showOverlay ? 'overlay' : 'console'
@@ -343,9 +352,8 @@ const normalizeConsoleSettings = settings => {
 }
 
 const loadConsoleSettings = () => {
-  if (typeof window === 'undefined' || !window.localStorage) return DEFAULT_CONSOLE_SETTINGS
-
   try {
+    if (typeof window === 'undefined' || !window.localStorage) return DEFAULT_CONSOLE_SETTINGS
     return normalizeConsoleSettings(JSON.parse(window.localStorage.getItem(CONSOLE_SETTINGS_STORAGE_KEY) || '{}'))
   } catch {
     return DEFAULT_CONSOLE_SETTINGS
@@ -353,8 +361,12 @@ const loadConsoleSettings = () => {
 }
 
 const saveConsoleSettings = settings => {
-  if (typeof window === 'undefined' || !window.localStorage) return
-  window.localStorage.setItem(CONSOLE_SETTINGS_STORAGE_KEY, JSON.stringify(normalizeConsoleSettings(settings)))
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return
+    window.localStorage.setItem(CONSOLE_SETTINGS_STORAGE_KEY, JSON.stringify(normalizeConsoleSettings(settings)))
+  } catch {
+    // The active settings remain available even when browser storage is blocked.
+  }
 }
 
 const isTypingTarget = target => {
@@ -654,6 +666,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   const controlMode = route === APP_ROUTES.CONTROL
   const [project, setProject] = useState(() => loadStoredProject() || createDefaultProject())
   const [programProject, setProgramProject] = useState(() => loadStoredProgramProject() || project)
+  const [projectLoadIssues, setProjectLoadIssues] = useState(getProjectLoadIssues)
   const [consoleScreen, setConsoleScreen] = useState(() => {
     if (route === APP_ROUTES.LIBRARY) {
       return isUsageNoticeAccepted() ? 'library' : 'intro'
@@ -990,6 +1003,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   const performResetProject = () => {
     pushUndoSnapshot('RESET PROJECT')
     const next = resetStoredProject()
+    setProjectLoadIssues(getProjectLoadIssues())
     projectRef.current = next
     programProjectRef.current = next
     setProject(next)
@@ -1026,7 +1040,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     setAppDialog({
       kicker: copy.project,
       title: copy.importFailedTitle,
-      message: error?.message || copy.invalidProjectFile,
+      message: getProjectImportErrorMessage(copy, error),
       confirmLabel: copy.ok,
       onConfirm: () => setAppDialog(null)
     })
@@ -1035,6 +1049,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
   const applyImportedProject = importedProject => {
     pushUndoSnapshot('IMPORT PROJECT')
     const next = replaceStoredProject(importedProject)
+    setProjectLoadIssues(getProjectLoadIssues())
     projectRef.current = next
     programProjectRef.current = next
     setProject(next)
@@ -1163,10 +1178,12 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
           tone: 'primary',
           onClick: () => {
             const text = projectTextRef.current?.value || ''
-            const importedProject = safeParseProject(text)
-            if (!importedProject) {
+            let importedProject
+            try {
+              importedProject = parseImportedProject(text)
+            } catch (error) {
               pushLog(copy.logImportFailed)
-              showProjectTextImport(text, copy.invalidProjectFile)
+              showProjectTextImport(text, getProjectImportErrorMessage(copy, error))
               return
             }
             requestProjectImport(importedProject)
@@ -1420,8 +1437,44 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
     consoleSettings.hotkeysEnabled
   ])
 
-  const saveFailed = projectSaveFailed || programSaveFailed
-  const saveWarning = saveFailed ? (
+  const retryProjectRead = () => {
+    const failedKeys = new Set(getProjectLoadIssues().map(issue => issue.key))
+    const restoredProject = failedKeys.has(OWBT_STORAGE_KEY) ? loadStoredProject() : null
+    const restoredProgram = failedKeys.has(OWBT_PROGRAM_STORAGE_KEY) ? loadStoredProgramProject() : null
+    const remainingIssues = getProjectLoadIssues()
+    setProjectLoadIssues(remainingIssues)
+    if (restoredProject && !remainingIssues.some(issue => issue.key === OWBT_STORAGE_KEY)) {
+      projectRef.current = restoredProject
+      setProject(restoredProject)
+      setPreviewSceneId(getConsoleSceneById(restoredProject.scenes.activeSceneId).id)
+      setEditorSceneId(getConsoleSceneById(restoredProject.scenes.activeSceneId).id)
+    }
+    if (restoredProgram && !remainingIssues.some(issue => issue.key === OWBT_PROGRAM_STORAGE_KEY)) {
+      programProjectRef.current = restoredProgram
+      setProgramProject(restoredProgram)
+    }
+  }
+
+  const loadFailed = projectLoadIssues.length > 0
+  const saveFailed = loadFailed || projectSaveFailed || programSaveFailed
+  const saveWarning = loadFailed ? (
+    <section className={`${styles.consoleNotice} ${styles.projectSaveWarning}`} role="alert">
+      <div>
+        <strong>{copy.projectLoadFailedTitle}</strong>
+        <em>{copy.projectLoadFailedMessage}</em>
+      </div>
+      <div className={styles.projectSaveActions}>
+        {projectLoadIssues.filter(issue => issue.reason === 'invalid').map(issue => (
+          <button key={issue.key} type="button" onClick={() => {
+            const rawText = getUnrestoredProjectText(issue.key)
+            if (rawText) showProjectTextExport(rawText, copy.unrestoredProjectTextMessage)
+          }}>{copy.exportUnrestoredProject} · {issue.key === OWBT_PROGRAM_STORAGE_KEY ? copy.program : copy.project}</button>
+        ))}
+        <button type="button" onClick={handleImportProjectChoice}>{copy.importProject}</button>
+        <button type="button" onClick={retryProjectRead}>{copy.retryProjectRead}</button>
+      </div>
+    </section>
+  ) : saveFailed ? (
     <section className={`${styles.consoleNotice} ${styles.projectSaveWarning}`} role="alert">
       <div>
         <strong>{copy.projectSaveFailedTitle}</strong>
