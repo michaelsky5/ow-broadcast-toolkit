@@ -1,9 +1,10 @@
 # Third-party materials and licenses
 
 The [OWBT Community Source License](LICENSE) covers OWBT's original source,
-build scripts, documentation, and original examples only to the extent that
-the Licensor may license them. It does not relicense third-party components,
-artwork, fonts, trademarks, or user-supplied content.
+build scripts, documentation, examples, and original interface and branding
+artwork only to the extent that the Licensor may license them. It does not
+relicense third-party components, artwork, fonts, trademarks, or user-supplied
+content.
 
 This document identifies the main material boundaries. It is not a replacement
 for each component's complete license or an exhaustive list of transitive npm
