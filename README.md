@@ -227,6 +227,21 @@ npm run check
 
 OWBT is made by michaelsky5 and provided free for Overwatch community tournament broadcasts.
 
+The source code is public under the [OWBT Community Source License 1.0](LICENSE).
+You may study and modify the original code, self-host it for the permitted
+community purposes, and redistribute original or modified copies for free
+under the same terms. Keep the creator credit and identify modified versions;
+resale, paid access, paid hosted services, and white-label repackaging require
+separate permission. This is a source-available community license with use
+restrictions, not an OSI-approved open-source license.
+
+中文授权范围见 [社区源码许可说明](docs/LICENSE.zh-CN.md)。
+
 OWBT is not an official Blizzard or Overwatch product and does not imply official authorization or endorsement.
 
 Please keep the creator credit unless separate permission is granted. Do not resell, paywall, relicense, or redistribute it for profit. Permission and compliance for event logos, team logos, sponsor marks, gameplay footage, and other third-party assets are the user's responsibility.
+
+OWBT uses HarmonyOS Sans SC. Fonts, Overwatch artwork, dependencies, and other
+third-party materials retain their respective rights and licenses; see
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The project license does not
+grant permission to use or redistribute those materials.
