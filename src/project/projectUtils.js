@@ -1,5 +1,6 @@
 import { createDefaultProject, PROJECT_SCHEMA_VERSION } from './defaultProject'
 import { DEFAULT_COMPETITION_NAME_EN, DEFAULT_COMPETITION_NAME_ZH } from './branding'
+import { MAX_PROJECT_IMPORT_BYTES, PROJECT_IMPORT_ERROR_CODES, ProjectImportError, parseProjectData } from './projectValidation'
 
 export const isPlainObject = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 
@@ -134,12 +135,14 @@ export const normalizeProject = rawProject => {
 
 export const safeParseProject = jsonText => {
   try {
-    return normalizeProject(JSON.parse(jsonText))
+    return normalizeProject(parseProjectData(jsonText))
   } catch (error) {
     console.error('[OWBT] Failed to parse project JSON:', error)
     return null
   }
 }
+
+export const parseImportedProject = jsonText => normalizeProject(parseProjectData(jsonText, { importing: true }))
 
 export const createProjectFileName = project => {
   const name = String(project?.meta?.name || project?.event?.name || 'owbt-project')
@@ -179,12 +182,19 @@ export const readProjectFile = file => new Promise((resolve, reject) => {
     return
   }
 
+  if (file.size > MAX_PROJECT_IMPORT_BYTES) {
+    reject(new ProjectImportError(PROJECT_IMPORT_ERROR_CODES.TOO_LARGE))
+    return
+  }
+
   const reader = new FileReader()
 
   reader.onload = event => {
-    const project = safeParseProject(event.target?.result || '')
-    if (!project) reject(new Error('Invalid OWBT project file.'))
-    else resolve(project)
+    try {
+      resolve(parseImportedProject(event.target?.result || ''))
+    } catch (error) {
+      reject(error)
+    }
   }
 
   reader.onerror = () => reject(new Error('Failed to read project file.'))

@@ -1,5 +1,21 @@
 # Update Notes
 
+## v0.2.1 candidate - 2026-10-04
+
+### Fixed
+
+- Validate complete-project text and file imports before replacing editing or Program state. Reject unrelated match packages, team-library backups, unsupported schemas and malformed fields, with localized guidance to the correct import surface.
+- Keep valid v0.1 project schemas and optional legacy fields compatible. Limit external full-project imports to 64 MiB measured in UTF-8; oversized files are rejected before reading.
+- Read saved projects even when the first write attempt fails because storage is full. Saving can recover after space becomes available without reloading.
+- Catch startup storage read/access errors and preserve unrestored original data. Block autosave and fallback broadcasts for the affected stream until recovery or an explicit import/reset.
+- Add Retry Read and original-data text recovery controls. Recover editing and Program separately so retry does not TAKE pending edits.
+
+### Validation
+
+- `npm run check`: asset checks, ESLint, all 35 tests and production build pass, including import and startup-storage regressions alongside existing live-delivery/save-feedback tests.
+- Dedicated Edge checks pass wrong-input rejection, canceled/confirmed text import, match-package transfer, separate control-to-Overlay TAKE, refresh recovery, four startup storage fault cases and 420 px recovery-warning layout. See [local verification](./qa/2026-10-04-v021-reliability.md).
+- Production deployment and real OBS acceptance are tracked separately from the local checks. This section describes a candidate, not a completed release.
+
 ## Unreleased - 2026-09-30
 
 ### Fixed

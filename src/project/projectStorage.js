@@ -5,76 +5,70 @@ export const OWBT_STORAGE_KEY = 'owbt.currentProject.v0.1'
 export const OWBT_BACKUP_KEY = 'owbt.lastBackupProject.v0.1'
 export const OWBT_PROGRAM_STORAGE_KEY = 'owbt.programProject.v0.1'
 
-let storageAvailability = null
+const loadIssues = new Map()
+export const getProjectLoadIssues = () => [...loadIssues]
+  .filter(([key]) => key === OWBT_STORAGE_KEY || key === OWBT_PROGRAM_STORAGE_KEY)
+  .map(([key, issue]) => ({ key, reason: issue.reason }))
+export const isProjectReadBlocked = key => loadIssues.has(key)
+export const getUnrestoredProjectText = key => loadIssues.get(key)?.raw || ''
 
 export const canUseStorage = () => {
-  if (storageAvailability !== null) return storageAvailability
-
   try {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      storageAvailability = false
-      return false
-    }
-
+    if (typeof window === 'undefined' || !window.localStorage) return false
     const testKey = '__owbt_storage_test__'
     window.localStorage.setItem(testKey, '1')
     window.localStorage.removeItem(testKey)
-    storageAvailability = true
     return true
   } catch {
-    storageAvailability = false
     return false
   }
 }
 
-export const readStoredProjectRaw = () => {
-  if (!canUseStorage()) return ''
-
+const readRaw = key => {
   try {
-    return window.localStorage.getItem(OWBT_STORAGE_KEY) || ''
+    if (typeof window === 'undefined' || !window.localStorage) return ''
+    return window.localStorage.getItem(key) || ''
   } catch (error) {
-    console.error('[OWBT] Failed to read raw project:', error)
+    console.error('[OWBT] Failed to read project storage:', error)
     return ''
   }
 }
 
-export const readStoredProgramProjectRaw = () => {
-  if (!canUseStorage()) return ''
+export const readStoredProjectRaw = () => readRaw(OWBT_STORAGE_KEY)
+export const readStoredProgramProjectRaw = () => readRaw(OWBT_PROGRAM_STORAGE_KEY)
 
+const loadProject = (key, missingFallback, failedFallback = createDefaultProject) => {
+  let raw
   try {
-    return window.localStorage.getItem(OWBT_PROGRAM_STORAGE_KEY) || ''
+    if (typeof window === 'undefined') return missingFallback()
+    if (!window.localStorage) throw new Error('Project storage is unavailable.')
+    raw = window.localStorage.getItem(key)
   } catch (error) {
-    console.error('[OWBT] Failed to read raw program project:', error)
-    return ''
+    loadIssues.set(key, { reason: 'unavailable' })
+    console.error('[OWBT] Failed to load project storage:', error)
+    return failedFallback()
   }
-}
-
-export const loadStoredProject = () => {
-  if (!canUseStorage()) return createDefaultProject()
-
-  const raw = window.localStorage.getItem(OWBT_STORAGE_KEY)
-  if (!raw) return createDefaultProject()
-
+  if (!raw) {
+    loadIssues.delete(key)
+    return missingFallback()
+  }
   const project = safeParseProject(raw)
-  return project || createDefaultProject()
+  if (!project) {
+    loadIssues.set(key, { reason: 'invalid', raw })
+    return failedFallback()
+  }
+  loadIssues.delete(key)
+  return project
 }
 
-export const loadStoredProgramProject = () => {
-  if (!canUseStorage()) return loadStoredProject()
+export const loadStoredProject = () => loadProject(OWBT_STORAGE_KEY, createDefaultProject)
+export const loadStoredProgramProject = () => loadProject(OWBT_PROGRAM_STORAGE_KEY, loadStoredProject)
 
-  const raw = window.localStorage.getItem(OWBT_PROGRAM_STORAGE_KEY)
-  if (!raw) return loadStoredProject()
-
-  const project = safeParseProject(raw)
-  return project || loadStoredProject()
-}
-
-export const saveStoredProject = project => {
-  if (!canUseStorage() || !project) return false
-
+const saveProject = (key, project) => {
+  if (!project || isProjectReadBlocked(key)) return false
   try {
-    const finalProject = touchProject(project)
-    window.localStorage.setItem(OWBT_STORAGE_KEY, JSON.stringify(finalProject))
+    if (typeof window === 'undefined' || !window.localStorage) return false
+    window.localStorage.setItem(key, JSON.stringify(touchProject(project)))
     return true
   } catch (error) {
     console.error('[OWBT] Failed to save project:', error)
@@ -82,46 +76,18 @@ export const saveStoredProject = project => {
   }
 }
 
-export const saveStoredProgramProject = project => {
-  if (!canUseStorage() || !project) return false
-
-  try {
-    const finalProject = touchProject(project)
-    window.localStorage.setItem(OWBT_PROGRAM_STORAGE_KEY, JSON.stringify(finalProject))
-    return true
-  } catch (error) {
-    console.error('[OWBT] Failed to save program project:', error)
-    return false
-  }
-}
-
-export const backupStoredProject = project => {
-  if (!canUseStorage() || !project) return false
-
-  try {
-    window.localStorage.setItem(OWBT_BACKUP_KEY, JSON.stringify(touchProject(project)))
-    return true
-  } catch (error) {
-    console.error('[OWBT] Failed to backup project:', error)
-    return false
-  }
-}
-
-export const loadBackupProject = () => {
-  if (!canUseStorage()) return null
-
-  const raw = window.localStorage.getItem(OWBT_BACKUP_KEY)
-  if (!raw) return null
-
-  return safeParseProject(raw)
-}
+export const saveStoredProject = project => saveProject(OWBT_STORAGE_KEY, project)
+export const saveStoredProgramProject = project => saveProject(OWBT_PROGRAM_STORAGE_KEY, project)
+export const backupStoredProject = project => saveProject(OWBT_BACKUP_KEY, project)
+export const loadBackupProject = () => loadProject(OWBT_BACKUP_KEY, () => null, () => null)
 
 export const clearStoredProject = () => {
-  if (!canUseStorage()) return false
-
   try {
+    if (typeof window === 'undefined' || !window.localStorage) return false
     window.localStorage.removeItem(OWBT_STORAGE_KEY)
     window.localStorage.removeItem(OWBT_PROGRAM_STORAGE_KEY)
+    loadIssues.delete(OWBT_STORAGE_KEY)
+    loadIssues.delete(OWBT_PROGRAM_STORAGE_KEY)
     return true
   } catch (error) {
     console.error('[OWBT] Failed to clear project:', error)
@@ -129,16 +95,14 @@ export const clearStoredProject = () => {
   }
 }
 
-export const resetStoredProject = () => {
-  const project = createDefaultProject()
-  saveStoredProject(project)
-  saveStoredProgramProject(project)
-  return project
-}
-
 export const replaceStoredProject = project => {
   const normalized = normalizeProject(project)
+  // This path follows an explicit import/reset confirmation, unlike autosave.
+  loadIssues.delete(OWBT_STORAGE_KEY)
+  loadIssues.delete(OWBT_PROGRAM_STORAGE_KEY)
   saveStoredProject(normalized)
   saveStoredProgramProject(normalized)
   return normalized
 }
+
+export const resetStoredProject = () => replaceStoredProject(createDefaultProject())
