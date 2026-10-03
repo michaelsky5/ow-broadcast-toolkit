@@ -3,6 +3,16 @@
 OWBT keeps bundled Overwatch assets in `public/` so both the Console and
 Overlay can load them by stable public URLs.
 
+## Rights and redistribution
+
+Asset paths describe loading conventions, not permission to reuse artwork.
+The [project license](../LICENSE) does not license Overwatch artwork, fonts,
+trademarks, or user-supplied event assets. See
+[THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for the material boundaries
+and the bundled HarmonyOS Sans SC license. Before sharing a build, check
+permissions for its included assets, preserve the applicable notices, and
+replace or omit materials you do not have permission to redistribute.
+
 ## Hero Assets
 
 - Hero portraits live in `public/heroes/{role}/{assetKey}.png`.

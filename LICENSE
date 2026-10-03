@@ -1,0 +1,106 @@
+OWBT Community Source License
+Version 1.0 - 2026-10-03
+
+Copyright (c) 2026 michaelsky5.
+
+1. Scope
+
+This license is offered by michaelsky5 (the Licensor) for the copyright
+rights that the Licensor owns or is authorized to license in OWBT's
+original source code, build scripts, documentation, original examples,
+and original interface and branding artwork (the Covered Materials).
+Separately licensed components and third-party materials are excluded,
+as described in section 5.
+
+This is a source-available community license with use restrictions. It
+is not an OSI-approved open-source license.
+
+2. Permission
+
+Subject to these terms, the Licensor grants you a non-exclusive,
+worldwide, royalty-free permission to view, download, copy, study, run,
+modify, and create builds of the Covered Materials for personal learning,
+evaluation, community tournament broadcasts, and other non-commercial
+community uses and broadcasts.
+
+You may configure event identity, layouts, features, and workflow; use
+your modifications privately; and self-host an instance for these
+permitted purposes. You may share unmodified or modified copies, in
+source or built form, without charging for the software or access to it,
+provided you meet sections 3 and 4. Private modifications do not have to
+be published.
+
+3. Attribution and redistribution
+
+Every redistributed copy must include this license, the original
+copyright and attribution notices, and the applicable notices and
+licenses for third-party components included in that copy.
+
+Keep the existing michaelsky5 creator credit in the application and in
+outputs where the software already provides that credit. Obtain separate
+permission before removing or changing that credit. This requirement does
+not require adding a new credit to every frame of a broadcast.
+
+Clearly identify a modified version as modified, identify its maintainer,
+and describe the changes. Do not imply that it is an official OWBT release
+or is endorsed by the Licensor, Blizzard, or Overwatch.
+
+Redistributed Covered Materials, including modifications to them, must
+remain under this license. You may not replace these terms with another
+license, grant a paid sublicense, or claim ownership of the original work.
+Recipients receive permission for the Covered Materials directly under
+this license. This condition does not change the separate licenses of
+third-party components or apply to your independent work.
+
+4. Restrictions
+
+Without separate permission from the Licensor, you may not sell or resell
+the Covered Materials or builds of them; charge a license, subscription,
+download, or access fee for them; put their software functionality behind
+a paywall; or offer them as a paid hosted service.
+
+You may not redistribute them for profit or white-label them by removing
+OWBT's identity or creator credit and presenting the original work as
+your own product. Configuring an event's own name, theme, team branding,
+or sponsor information is an ordinary permitted customization, subject
+to the attribution requirements and third-party rights.
+
+Uses outside the permission in section 2 require separate permission.
+No trademark license or official endorsement is granted.
+
+5. Third-party materials and user content
+
+Overwatch and Blizzard names, logos, hero or roster portraits, map artwork,
+mode or role icons, gameplay footage, fonts, dependency code, and other
+third-party materials are not licensed by this license. Their respective
+rights holders' terms continue to apply. Their inclusion in a repository
+or build is not a grant of rights from those holders. See
+THIRD_PARTY_NOTICES.md and any accompanying licenses.
+
+This license does not change the ownership or license of your event data,
+team information, uploaded assets, or other independently created content.
+You are responsible for permission to use and redistribute third-party
+materials in your project, broadcast, or redistributed build. You may
+remove or replace such materials while preserving required notices for
+any materials that remain.
+
+6. No warranty or liability
+
+To the extent permitted by applicable law, the Covered Materials are
+provided as is, without warranties, including warranties of merchantability,
+fitness for a particular purpose, or non-infringement. The Licensor is not
+liable for claims, damages, loss of data, or other liability arising from
+their use, modification, or distribution.
+
+7. Termination and other permissions
+
+Your permission under this license ends if you violate its terms. Rights
+not expressly granted remain reserved. The Licensor may provide separate
+written permission for a use not covered here; that permission does not
+alter these terms for other recipients.
+
+For permission requests, contact michaelsky5 through the official project:
+https://github.com/michaelsky5/ow-broadcast-toolkit
+
+The English text in this file is the license. docs/LICENSE.zh-CN.md is a
+Chinese reading guide and does not replace these terms.
