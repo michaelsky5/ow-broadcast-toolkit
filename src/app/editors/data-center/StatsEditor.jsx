@@ -1,5 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react'
-import { downloadTextFile, getCurrentTeams } from '../../../project/projectUtils'
+import { downloadTextFile, getCurrentTeams, getTeamPlayers } from '../../../project/projectUtils'
 import {
   CORE_STATS,
   buildCoreMetricsFromRows,
@@ -15,6 +15,7 @@ import { EditorDialog } from '../shared/editorControls'
 import { getPageEditorCopy } from '../shared/editorCopy'
 import { ensureSceneSettings, getSceneSettings } from '../shared/editorHelpers'
 import StatsCaptureModal from './StatsCaptureModal'
+import { validateCaptureData } from './statsCaptureReview.js'
 import StatsDataInputPanel from './StatsDataInputPanel'
 import StatsMapDataStorePanel from './StatsMapDataStorePanel'
 import StatsMetricBoardPanel from './StatsMetricBoardPanel'
@@ -90,7 +91,6 @@ function StatsEditor({ project, language = 'en', onUpdateProject }) {
     onUpdateProject(draft => {
       const nextSettings = ensureSceneSettings(draft, 'stats')
       nextSettings.capture = capture
-      if (capture.dataMinutes !== undefined) nextSettings.dataMinutes = Number(capture.dataMinutes) || 0
     })
   }
 
@@ -102,7 +102,7 @@ function StatsEditor({ project, language = 'en', onUpdateProject }) {
       const nextSettings = ensureSceneSettings(draft, 'stats')
       nextSettings.capture = {
         ...(nextSettings.capture || {}),
-        dataMinutes: Number(nextSettings.dataMinutes ?? nextSettings.capture?.dataMinutes ?? 10) || 0,
+        dataMinutes: 0, timeText: '', timeZone: '', resultStale: true, teamOrderSwapped: false,
         imageDataUrl
       }
       nextSettings.imageCrop = {
@@ -129,18 +129,22 @@ function StatsEditor({ project, language = 'en', onUpdateProject }) {
       const nextSettings = ensureSceneSettings(draft, 'stats')
       nextSettings.capture = {
         ...(nextSettings.capture || {}),
-        imageDataUrl: ''
+        imageDataUrl: '', timeZone: '', resultStale: true
       }
       nextSettings.statsDisplayMode = 'metrics'
     })
   }
 
-  const applyCaptureRows = (rawRows, playerIds = {}) => {
+  const applyCaptureRows = (rawRows, playerIds = {}, minutes) => {
     const rows = normalizeStatsRows(rawRows)
     const normalizedPlayerIds = {
       teamA: Array.from({ length: 5 }, (_, index) => playerIds.teamA?.[index] || ''),
       teamB: Array.from({ length: 5 }, (_, index) => playerIds.teamB?.[index] || '')
     }
+    const validation = validateCaptureData({ rows, playerIds: normalizedPlayerIds,
+      playerOptions: { teamA: getTeamPlayers(project, teamA?.id), teamB: getTeamPlayers(project, teamB?.id) },
+      timeInput: String(minutes ?? ''), bindingsReviewed: true })
+    if (!validation.canApply) return
     const summedMetrics = buildCoreMetricsFromRows(rows, ACTIVE_CATEGORY)
 
     onUpdateProject(draft => {
@@ -148,7 +152,8 @@ function StatsEditor({ project, language = 'en', onUpdateProject }) {
       const otherMetrics = (nextSettings.metrics || []).filter(metric => getMetricCategory(metric) !== ACTIVE_CATEGORY)
       nextSettings.ocrRows = rows
       nextSettings.statsPlayerIds = normalizedPlayerIds
-      nextSettings.dataMinutes = Number(nextSettings.capture?.dataMinutes ?? nextSettings.dataMinutes ?? 10) || 0
+      nextSettings.dataMinutes = Number(minutes)
+      nextSettings.capture = { ...nextSettings.capture, dataMinutes: Number(minutes), resultStale: false }
       nextSettings.metrics = [...otherMetrics, ...summedMetrics]
     })
     setShowCaptureModal(false)

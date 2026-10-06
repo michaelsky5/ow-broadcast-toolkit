@@ -6,7 +6,6 @@ import teamDataEditor from './styles/teamDataEditor.module.css'
 import statsSharedControls from './styles/statsSharedControls.module.css'
 import mvpEditor from './styles/mvpEditor.module.css'
 import statsDataStore from './styles/statsDataStore.module.css'
-import statsCaptureModal from './styles/statsCaptureModal.module.css'
 import matchupEditor from './styles/matchupEditor.module.css'
 import sharedPanelsAndControls from './styles/sharedPanelsAndControls.module.css'
 import liveHudEditor from './styles/liveHudEditor.module.css'
@@ -40,7 +39,6 @@ const styles = mergeStyleModules(
   statsSharedControls,
   mvpEditor,
   statsDataStore,
-  statsCaptureModal,
   matchupEditor,
   sharedPanelsAndControls,
   liveHudEditor,

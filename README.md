@@ -95,6 +95,15 @@ Switching between international, mainland, and frozen stable hosts does not move
 
 See [STABLE_WEB_FALLBACK.md](docs/STABLE_WEB_FALLBACK.md) for the verified frozen deployment and switching procedure.
 
+## OCR Capture
+
+1. Open the Data Center OCR desk and use an original observer scoreboard screenshot. Select 16:9 or 16:10 and the screenshot's no/one/two-perk layout under Crop Calibration.
+2. Run OCR. Check every value against its row preview; yellow fields require correction or confirmation. Verify the match time, which is used for per-10-minute metrics.
+3. Select the matching player for each row, check A/B order and confirm player assignments. Apply becomes available after required corrections and reviews are complete.
+4. Apply the numbers, players and duration together, check Preview, then TAKE when ready. Replacing the image or changing crop settings clears the OCR draft.
+
+OCR runs locally in the browser. Worker, WASM and English model files are served from the same host under `/ocr-runtime/`; screenshots are not sent to an OCR service. Loading and individual reads have deadlines, and an active run can be cancelled. These presets target observer scoreboards; other layouts need manual crop calibration.
+
 ## Runtime Notes
 
 - OWBT is a static Vite React app.

@@ -1,5 +1,23 @@
 # Update Notes
 
+## v0.3.0 - 2026-10-06
+
+### OCR Capture
+
+- Adopt the System/FryDeck observer crops for all 16:9 and 16:10 no/one/two-perk combinations, including separate team heights and legacy-default migration.
+- Serve the OCR worker, WASM, and English model from the same origin, with initialization/read deadlines and cancellation. Screenshots stay in the browser.
+- Rebuild the review desk around the System result form. Align native-proportion original cell crops under their numeric inputs, collapse calibration/totals/processed previews, and retain responsive controls.
+- Use green/yellow/red accepted/pending/invalid states. Clicking only selects; Enter, completing an edit, or Confirm Row acknowledges exact current values. Row confirmation leaves other rows and time unchanged.
+- Block Apply for missing numbers, invalid duration, duplicate or wrong-team players, unreviewed candidates, and stale results. Apply duration, row values, and player assignments together.
+- Update the guide, demo crop defaults, feedback template, unified favicon, and Chinese/English release copy.
+
+### Validation
+
+- Local assets, ESLint, 47 regression tests, and production build passed.
+- Original no-perk screenshot: all 60 numbers checked against the source; ambiguous 6:27 time required manual correction to 6:22.
+- Browser checks covered Enter/blur/row confirmation, error blocking, aligned crops, two-way swapping, and 400px layout.
+- CI, formal-domain deployment, and production browser acceptance are recorded in the release QA document after completion.
+
 ## Unreleased - 2026-09-30
 
 ### Fixed

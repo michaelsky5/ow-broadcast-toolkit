@@ -1,20 +1,6 @@
-import { CORE_STATS, formatDataMinutes, sumStatRows } from '../../../project/statsModel'
-
-export const DEFAULT_CAPTURE = {
-  xPct: 49,
-  topPct: 18.5,
-  bottomPct: 55.5,
-  wPct: 26.2,
-  hPct: 28.5,
-  timeXPct: 88,
-  timeYPct: 2.5,
-  timeWPct: 12,
-  timeHPct: 15,
-  playerXPct: 33.5,
-  playerWPct: 9,
-  threshold: 165,
-  scale: 3
-}
+import { CORE_STATS, formatDataMinutes, sumStatRows } from '../../../project/statsModel.js'
+import { DEFAULT_CAPTURE, normalizeCaptureConfig } from '../../../project/statsCaptureConfig.js'
+import { STATS_CELL_BOUNDARIES } from './statsCellOcr.js'
 
 const PREVIOUS_PANEL_TIME_CROP = {
   timeXPct: 66.8,
@@ -30,7 +16,20 @@ const PREVIOUS_RIGHT_TIME_CROP = {
   timeHPct: 5
 }
 
+const PREVIOUS_TALL_TIME_CROP = {
+  timeXPct: 88,
+  timeYPct: 2.5,
+  timeWPct: 12,
+  timeHPct: 15
+}
+
 const STATS_DATA_WIDTH_RATIO = 0.92
+
+const getResolutionNormalizedScale = (img, scale) => {
+  const baseScale = Number(scale) || DEFAULT_CAPTURE.scale
+  const height = Number(img.height) || 1080
+  return Math.max(1.2, Math.min(5, baseScale * (1080 / height)))
+}
 
 export const onlyDigits = value => String(value || '').replace(/[^\d]/g, '')
 
@@ -69,6 +68,7 @@ export const resolveTimeCrop = capture => {
     isSameTimeCrop(capture, panelCrop)
     || isSameTimeCrop(capture, PREVIOUS_PANEL_TIME_CROP)
     || isSameTimeCrop(capture, PREVIOUS_RIGHT_TIME_CROP)
+    || isSameTimeCrop(capture, PREVIOUS_TALL_TIME_CROP)
   ) {
     return defaultCrop
   }
@@ -130,6 +130,63 @@ export const formatDurationInput = value => {
 
 export const formatDurationMinutes = formatDataMinutes
 
+export const parseMatchTimeOcr = value => {
+  const source = String(value || '').normalize('NFKC').trim()
+  if (!source) return ''
+
+  const normalized = source
+    .replace(/[OoQqDd]/g, '0')
+    .replace(/[Il|!]/g, '1')
+    .replace(/[Ss]/g, '5')
+    .replace(/[Zz]/g, '2')
+    .replace(/[Bb]/g, '8')
+    // Keep offsets aligned with source so labels and repaired glyphs can be checked.
+    .replace(/[.,;]/g, ':')
+
+  const candidates = []
+  const isFpsContext = index => (
+    /FPS\s*[:=]?\s*$/i.test(source.slice(Math.max(0, index - 12), index))
+    || /FPS$/i.test(source.slice(0, index + 1))
+  )
+  const addCandidate = (minutesText, secondsText, index, score, matchedText) => {
+    if (isFpsContext(index)) return
+
+    const minutes = Number(minutesText)
+    const seconds = Number(secondsText)
+    if (!Number.isInteger(minutes) || minutes < 0 || minutes > 99) return
+    if (!Number.isInteger(seconds) || seconds < 0 || seconds > 59) return
+
+    const originalText = source.slice(index, index + matchedText.length)
+    const repairedGlyphs = [...originalText].filter((char, offset) => (
+      /\d/.test(matchedText[offset]) && !/\d/.test(char)
+    )).length
+    candidates.push({
+      value: `${minutes}:${String(seconds).padStart(2, '0')}`,
+      score: score - repairedGlyphs * 20 + (minutes > 0 && minutes <= 39 ? 10 : 0),
+      index
+    })
+  }
+
+  // Look ahead to include overlapping candidates: "I: 10:54" must not consume
+  // the real time while treating the label's I as the minute in "1:10".
+  for (const match of normalized.matchAll(/(?=((?<!\d)(\d{1,2})\s*:\s*(\d{2})(?!\d)))/g)) {
+    addCandidate(match[2], match[3], match.index, 120, match[1])
+  }
+
+  for (const match of normalized.matchAll(/(?<!\d)(\d{1,2})\s+(\d{2})(?!\d)/g)) {
+    addCandidate(match[1], match[2], match.index, 90, match[0])
+  }
+
+  for (const match of normalized.matchAll(/(?<!\d)(\d{3,4})(?!\d)/g)) {
+    if (normalized.slice(0, match.index).trimEnd().endsWith(':')
+      || normalized.slice(match.index + match[0].length).trimStart().startsWith(':')) continue
+    addCandidate(match[1].slice(0, -2), match[1].slice(-2), match.index, 70, match[0])
+  }
+
+  return candidates
+    .sort((left, right) => right.score - left.score || left.index - right.index)[0]?.value || ''
+}
+
 const normalizeOcrNumberText = value => (
   String(value || '')
     .replace(/[oOqQdDcC]/g, '0')
@@ -141,6 +198,7 @@ const normalizeOcrNumberText = value => (
     .replace(/[\uFF0C\u3001]/g, ',')
     .replace(/[\uFF0E\u3002]/g, '.')
 )
+
 const extractNumberTokens = value => (
   normalizeOcrNumberText(value).match(/\d{1,3}(?:[,.]\d{3})+|\d+/g) || []
 )
@@ -179,14 +237,6 @@ const scoreStatValues = values => {
   if (nums[4] >= nums[1]) score += 3
 
   return score
-}
-
-export const parseStatsCell = (text, statIndex) => {
-  const tokens = normalizeOcrNumberText(text).match(/\d+/g) || []
-  const value = onlyDigits(tokens.join(''))
-  if (!value) return ''
-  if (statIndex < 3 && Number(value) > 99) return ''
-  return value
 }
 
 const buildGuardedStatValues = tokens => {
@@ -256,7 +306,7 @@ const splitLargeStatTokens = tokens => {
     .sort((a, b) => b.score - a.score)[0].groups
 }
 
-export const parseStatsLine = line => {
+export const parseStatsLineDetailed = line => {
   const baseTokens = extractNumberTokens(line)
   const tokenCandidates = [baseTokens]
 
@@ -273,20 +323,116 @@ export const parseStatsLine = line => {
       const guardedValues = buildGuardedStatValues(tokens)
 
       return [
-        {
-          values,
-          score: scoreStatValues(values)
-        },
-        {
-          values: guardedValues,
-          score: scoreStatValues(guardedValues) + 18
-        }
+        { values, score: scoreStatValues(values) },
+        { values: guardedValues, score: scoreStatValues(guardedValues) + 18 }
       ]
     })
     .sort((a, b) => b.score - a.score)[0]
 
-  return buildStatRow(parsed?.values || [])
+  const values = parsed?.values || []
+
+  return {
+    row: buildStatRow(values),
+    values,
+    tokens: baseTokens,
+    score: parsed?.score ?? -1000
+  }
 }
+
+export const parseStatsLine = line => parseStatsLineDetailed(line).row
+
+const CONSENSUS_STAT_FIELDS = ['elim', 'ast', 'dth', 'dmg', 'heal', 'block']
+
+const cleanStatValue = value => String(value ?? '').replace(/,/g, '').trim()
+
+export const mergeStatsCandidateRows = (preferredRow = {}, candidateRows = []) => {
+  const merged = { ...preferredRow }
+
+  CONSENSUS_STAT_FIELDS.forEach(field => {
+    const counts = new Map()
+    candidateRows.forEach(row => {
+      const value = cleanStatValue(row?.[field])
+      if (!value) return
+      counts.set(value, (counts.get(value) || 0) + 1)
+    })
+
+    const ranked = [...counts.entries()].sort((left, right) => right[1] - left[1])
+    const [winner, winnerCount = 0] = ranked[0] || []
+    const runnerUpCount = ranked[1]?.[1] || 0
+    if (winner && winnerCount >= 2 && winnerCount > runnerUpCount) {
+      merged[field] = winner
+    }
+  })
+
+  return merged
+}
+
+export const analyzeStatsCandidateRows = (selectedRow = {}, candidateRows = [], candidateMetadata = []) => Object.fromEntries(
+  CONSENSUS_STAT_FIELDS.map(field => {
+    const selectedValue = cleanStatValue(selectedRow?.[field])
+    const values = candidateRows
+      .map(row => cleanStatValue(row?.[field]))
+      .filter(Boolean)
+    const counts = values.reduce((result, value) => {
+      result.set(value, (result.get(value) || 0) + 1)
+      return result
+    }, new Map())
+    const alternatives = [...counts.entries()]
+      .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+      .map(([value, count]) => ({ value, count }))
+    const supportCount = counts.get(selectedValue) || 0
+    const observedCount = values.length
+    const runnerUpCount = alternatives.find(item => item.value !== selectedValue)?.count || 0
+    const agreement = observedCount ? supportCount / observedCount : 0
+    const familyForCandidate = candidate => Number(candidate?.candidateIndex) === 3
+      ? 'softInvert'
+      : 'binary'
+    const observedFamilies = new Set(
+      candidateMetadata
+        .filter(candidate => cleanStatValue(candidate?.parsed?.row?.[field] ?? candidate?.row?.[field]))
+        .map(familyForCandidate)
+    )
+    const supportingFamilies = new Set(
+      candidateMetadata
+        .filter(candidate => cleanStatValue(candidate?.parsed?.row?.[field] ?? candidate?.row?.[field]) === selectedValue)
+        .map(familyForCandidate)
+    )
+    const selectedConfidence = Math.max(0, ...candidateMetadata
+      .filter(candidate => cleanStatValue(candidate?.parsed?.row?.[field] ?? candidate?.row?.[field]) === selectedValue)
+      .map(candidate => Number(candidate?.confidence) || 0))
+    const competingConfidence = Math.max(0, ...candidateMetadata
+      .filter(candidate => {
+        const value = cleanStatValue(candidate?.parsed?.row?.[field] ?? candidate?.row?.[field])
+        return value && value !== selectedValue
+      })
+      .map(candidate => Number(candidate?.confidence) || 0))
+    const hasCredibleIndependentDissent = observedFamilies.size >= 2
+      && supportingFamilies.size < 2
+      && competingConfidence >= Math.max(0, selectedConfidence - 12)
+    const hasIndependentPreprocessingAgreement = !hasCredibleIndependentDissent
+
+    return [field, {
+      selectedValue,
+      candidateCount: candidateRows.length,
+      observedCount,
+      supportCount,
+      runnerUpCount,
+      agreement,
+      independentObservedCount: observedFamilies.size,
+      independentSupportCount: supportingFamilies.size,
+      selectedConfidence,
+      competingConfidence,
+      hasCredibleIndependentDissent,
+      alternatives,
+      autoApply: Boolean(
+        selectedValue
+        && supportCount >= 2
+        && supportCount > runnerUpCount
+        && hasIndependentPreprocessingAgreement
+      )
+    }]
+  })
+)
 
 export const parseStatsBlock = text => {
   const lines = String(text || '')
@@ -304,17 +450,20 @@ export const fileToDataUrl = file => new Promise((resolve, reject) => {
   reader.readAsDataURL(file)
 })
 
-export const buildCropAssets = (imageDataUrl, capture) => new Promise((resolve, reject) => {
+export const buildCropAssets = (imageDataUrl, captureInput = DEFAULT_CAPTURE) => new Promise((resolve, reject) => {
   const img = new Image()
 
   img.onload = () => {
-    const makeZone = yPct => {
+    try {
+    const capture = normalizeCaptureConfig(captureInput)
+    const getTeamHPct = side => Number(capture[side === 'top' ? 'topHPct' : 'bottomHPct'] ?? capture.hPct)
+    const makeZone = (yPct, hPct) => {
       const sourceX = img.width * (Number(capture.xPct) / 100)
       const sourceY = img.height * (Number(yPct) / 100)
       const sourceW = img.width * (Number(capture.wPct) / 100)
       const dataW = sourceW * STATS_DATA_WIDTH_RATIO
-      const sourceH = img.height * (Number(capture.hPct) / 100)
-      const scale = Math.max(1, Number(capture.scale) || DEFAULT_CAPTURE.scale)
+      const sourceH = img.height * (Number(hPct) / 100)
+      const scale = getResolutionNormalizedScale(img, capture.scale)
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d', { willReadFrequently: true })
 
@@ -340,12 +489,12 @@ export const buildCropAssets = (imageDataUrl, capture) => new Promise((resolve, 
       return canvas.toDataURL('image/png')
     }
 
-    const makeSnips = yPct => {
+    const makeSnips = (yPct, hPct) => {
       const sourceX = img.width * (Number(capture.xPct) / 100)
       const sourceY = img.height * (Number(yPct) / 100)
       const sourceW = img.width * (Number(capture.wPct) / 100)
       const dataW = sourceW * STATS_DATA_WIDTH_RATIO
-      const sourceH = img.height * (Number(capture.hPct) / 100)
+      const sourceH = img.height * (Number(hPct) / 100)
       const rowH = sourceH / 5
 
       return Array.from({ length: 5 }, (_, index) => {
@@ -358,11 +507,32 @@ export const buildCropAssets = (imageDataUrl, capture) => new Promise((resolve, 
       })
     }
 
-    const makePlayerSnips = yPct => {
+    // Preview each original numeric cell without stretching its glyphs.
+    const makeCellSnips = (yPct, hPct) => {
+      const sourceX = img.width * Number(capture.xPct) / 100
+      const sourceY = img.height * Number(yPct) / 100
+      const dataW = img.width * Number(capture.wPct) / 100 * STATS_DATA_WIDTH_RATIO
+      const rowH = img.height * Number(hPct) / 100 / 5
+      return Array.from({ length: 5 }, (_, index) => Object.fromEntries(CORE_STATS.map((stat, fieldIndex) => {
+        const left = STATS_CELL_BOUNDARIES[fieldIndex]
+        const width = dataW * (STATS_CELL_BOUNDARIES[fieldIndex + 1] - left)
+        const height = rowH * 0.6
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        canvas.width = Math.max(1, Math.round(width))
+        canvas.height = Math.max(1, Math.round(height))
+        ctx.drawImage(img, sourceX + dataW * left, sourceY + rowH * (index + 0.2),
+          width, height, 0, 0, canvas.width, canvas.height)
+        return [stat.rowKey, canvas.toDataURL('image/png')]
+      })))
+    }
+
+    const makePlayerSnips = (yPct, hPct, side) => {
       const sourceY = img.height * (Number(yPct) / 100)
-      const playerX = img.width * ((Number(capture.playerXPct ?? DEFAULT_CAPTURE.playerXPct) || DEFAULT_CAPTURE.playerXPct) / 100)
+      const playerXPct = side === 'bottom' ? capture.bottomPlayerXPct : capture.playerXPct
+      const playerX = img.width * (Number(playerXPct) / 100)
       const playerW = img.width * ((Number(capture.playerWPct ?? DEFAULT_CAPTURE.playerWPct) || DEFAULT_CAPTURE.playerWPct) / 100)
-      const sourceH = img.height * (Number(capture.hPct) / 100)
+      const sourceH = img.height * (Number(hPct) / 100)
       const rowH = sourceH / 5
 
       return Array.from({ length: 5 }, (_, index) => {
@@ -375,15 +545,68 @@ export const buildCropAssets = (imageDataUrl, capture) => new Promise((resolve, 
       })
     }
 
-    const makeRowZones = yPct => {
+    const postProcessRowImage = (image, variant, threshold) => {
+      const data = image.data
+
+      if (variant === 'softInvert') {
+        for (let pixelIndex = 0; pixelIndex < data.length; pixelIndex += 4) {
+          const luma = 0.2126 * data[pixelIndex] + 0.7152 * data[pixelIndex + 1] + 0.0722 * data[pixelIndex + 2]
+          const color = Math.max(0, Math.min(255, 255 - luma))
+          data[pixelIndex] = color
+          data[pixelIndex + 1] = color
+          data[pixelIndex + 2] = color
+          data[pixelIndex + 3] = 255
+        }
+        return
+      }
+
+      const nextThreshold = variant === 'looseBinary' ? Math.max(90, threshold - 28) : threshold
+
+      for (let pixelIndex = 0; pixelIndex < data.length; pixelIndex += 4) {
+        const luma = 0.2126 * data[pixelIndex] + 0.7152 * data[pixelIndex + 1] + 0.0722 * data[pixelIndex + 2]
+        const color = luma > nextThreshold ? 0 : 255
+        data[pixelIndex] = color
+        data[pixelIndex + 1] = color
+        data[pixelIndex + 2] = color
+        data[pixelIndex + 3] = 255
+      }
+
+      if (variant !== 'thickBinary') return
+
+      const width = image.width
+      const height = image.height
+      const snapshot = new Uint8ClampedArray(data)
+
+      for (let y = 1; y < height - 1; y += 1) {
+        for (let x = 1; x < width - 1; x += 1) {
+          const offset = (y * width + x) * 4
+          if (snapshot[offset] > 12) continue
+
+          const neighbors = [
+            offset - 4,
+            offset + 4,
+            offset - width * 4,
+            offset + width * 4
+          ]
+          neighbors.forEach(nextOffset => {
+            data[nextOffset] = 0
+            data[nextOffset + 1] = 0
+            data[nextOffset + 2] = 0
+            data[nextOffset + 3] = 255
+          })
+        }
+      }
+    }
+
+    const makeRowZones = (yPct, hPct, variant = 'binary') => {
       const sourceX = img.width * (Number(capture.xPct) / 100)
       const sourceY = img.height * (Number(yPct) / 100)
       const sourceW = img.width * (Number(capture.wPct) / 100)
       const dataW = sourceW * STATS_DATA_WIDTH_RATIO
-      const sourceH = img.height * (Number(capture.hPct) / 100)
+      const sourceH = img.height * (Number(hPct) / 100)
       const rowH = sourceH / 5
-      const scale = Math.max(1, Number(capture.scale) || DEFAULT_CAPTURE.scale)
-      const threshold = Number(capture.threshold) || DEFAULT_CAPTURE.threshold
+      const scale = getResolutionNormalizedScale(img, Number(capture.scale))
+      const threshold = Number(capture.threshold)
 
       return Array.from({ length: 5 }, (_, index) => {
         const canvas = document.createElement('canvas')
@@ -391,60 +614,165 @@ export const buildCropAssets = (imageDataUrl, capture) => new Promise((resolve, 
 
         canvas.width = Math.max(1, Math.round(dataW * scale))
         canvas.height = Math.max(1, Math.round(rowH * scale))
-        ctx.imageSmoothingEnabled = false
+        ctx.imageSmoothingEnabled = variant === 'softInvert'
         ctx.drawImage(img, sourceX, sourceY + index * rowH, dataW, rowH, 0, 0, canvas.width, canvas.height)
 
         const image = ctx.getImageData(0, 0, canvas.width, canvas.height)
-        const data = image.data
-
-        for (let pixelIndex = 0; pixelIndex < data.length; pixelIndex += 4) {
-          const luma = 0.2126 * data[pixelIndex] + 0.7152 * data[pixelIndex + 1] + 0.0722 * data[pixelIndex + 2]
-          const color = luma > threshold ? 0 : 255
-          data[pixelIndex] = color
-          data[pixelIndex + 1] = color
-          data[pixelIndex + 2] = color
-          data[pixelIndex + 3] = 255
-        }
+        postProcessRowImage(image, variant, threshold)
 
         ctx.putImageData(image, 0, 0)
         return canvas.toDataURL('image/png')
       })
     }
 
+    const makeRowZoneVariants = (yPct, hPct) => {
+      const variants = ['looseBinary', 'thickBinary', 'softInvert']
+      const rowsByVariant = variants.map(variant => makeRowZones(yPct, hPct, variant))
+
+      return Array.from({ length: 5 }, (_, rowIndex) => (
+        rowsByVariant.map(rows => rows[rowIndex]).filter(Boolean)
+      ))
+    }
+
     const timeCrop = resolveTimeCrop(capture)
-    const makeTimeZone = () => {
+    const isOrangeTimePixel = (red, green, blue) => (
+      red >= 145 && green >= 25 && green <= 190
+      && red - green >= 35 && red - blue >= 70
+    )
+    const makeTimeZone = (variant = 'original') => {
       const sourceX = img.width * (timeCrop.timeXPct / 100)
       const sourceY = img.height * (timeCrop.timeYPct / 100)
       const sourceW = img.width * (timeCrop.timeWPct / 100)
       const sourceH = img.height * (timeCrop.timeHPct / 100)
-      const scale = 2.6
+      const scale = getResolutionNormalizedScale(img, 2.6)
       const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d', { willReadFrequently: true })
 
       canvas.width = Math.max(1, Math.round(sourceW * scale))
       canvas.height = Math.max(1, Math.round(sourceH * scale))
-      ctx.imageSmoothingEnabled = false
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
       ctx.drawImage(img, sourceX, sourceY, sourceW, sourceH, 0, 0, canvas.width, canvas.height)
+
+      if (variant !== 'original') {
+        const image = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        const data = image.data
+
+        for (let index = 0; index < data.length; index += 4) {
+          const red = data[index]
+          const green = data[index + 1]
+          const blue = data[index + 2]
+          const luma = 0.2126 * red + 0.7152 * green + 0.0722 * blue
+          const isOrange = isOrangeTimePixel(red, green, blue)
+          const isInk = variant === 'orangeMask' ? isOrange : luma >= 150
+          const color = isInk ? 0 : 255
+
+          data[index] = color
+          data[index + 1] = color
+          data[index + 2] = color
+          data[index + 3] = 255
+        }
+
+        ctx.putImageData(image, 0, 0)
+      }
+
       return canvas.toDataURL('image/png')
     }
 
+    const makeIsolatedOrangeTimeZone = () => {
+      const sourceX = img.width * (timeCrop.timeXPct / 100)
+      const sourceY = img.height * (timeCrop.timeYPct / 100)
+      const sourceW = Math.max(1, Math.round(img.width * (timeCrop.timeWPct / 100)))
+      const sourceH = Math.max(1, Math.round(img.height * (timeCrop.timeHPct / 100)))
+      const sourceCanvas = document.createElement('canvas')
+      const sourceCtx = sourceCanvas.getContext('2d', { willReadFrequently: true })
+      sourceCanvas.width = sourceW
+      sourceCanvas.height = sourceH
+      sourceCtx.drawImage(img, sourceX, sourceY, sourceW, sourceH, 0, 0, sourceW, sourceH)
+
+      const sourceImage = sourceCtx.getImageData(0, 0, sourceW, sourceH)
+      const sourceData = sourceImage.data
+      let minX = sourceW
+      let minY = sourceH
+      let maxX = -1
+      let maxY = -1
+      let orangePixels = 0
+
+      for (let y = 0; y < sourceH; y += 1) {
+        for (let x = 0; x < sourceW; x += 1) {
+          const offset = (y * sourceW + x) * 4
+          if (!isOrangeTimePixel(sourceData[offset], sourceData[offset + 1], sourceData[offset + 2])) continue
+          minX = Math.min(minX, x)
+          minY = Math.min(minY, y)
+          maxX = Math.max(maxX, x)
+          maxY = Math.max(maxY, y)
+          orangePixels += 1
+        }
+      }
+
+      if (orangePixels < 40 || maxX - minX < 12 || maxY - minY < 8) return ''
+
+      const paddingX = Math.max(4, Math.round(sourceW * 0.015))
+      const paddingY = Math.max(3, Math.round(sourceH * 0.08))
+      minX = Math.max(0, minX - paddingX)
+      minY = Math.max(0, minY - paddingY)
+      maxX = Math.min(sourceW - 1, maxX + paddingX)
+      maxY = Math.min(sourceH - 1, maxY + paddingY)
+
+      const tightW = maxX - minX + 1
+      const tightH = maxY - minY + 1
+      const scale = getResolutionNormalizedScale(img, 5)
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d', { willReadFrequently: true })
+      canvas.width = Math.max(1, Math.round(tightW * scale))
+      canvas.height = Math.max(1, Math.round(tightH * scale))
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
+      ctx.drawImage(sourceCanvas, minX, minY, tightW, tightH, 0, 0, canvas.width, canvas.height)
+
+      const image = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      const data = image.data
+      for (let index = 0; index < data.length; index += 4) {
+        const color = isOrangeTimePixel(data[index], data[index + 1], data[index + 2]) ? 0 : 255
+        data[index] = color
+        data[index + 1] = color
+        data[index + 2] = color
+        data[index + 3] = 255
+      }
+      ctx.putImageData(image, 0, 0)
+      return canvas.toDataURL('image/png')
+    }
+
+    const isolatedTimeZone = makeIsolatedOrangeTimeZone()
+
     resolve({
-      zones: [makeZone(capture.topPct), makeZone(capture.bottomPct)],
+      zones: [makeZone(capture.topPct, getTeamHPct('top')), makeZone(capture.bottomPct, getTeamHPct('bottom'))],
       timeZone: makeTimeZone(),
+      isolatedTimeZone,
+      timeZoneVariants: [isolatedTimeZone, makeTimeZone('orangeMask'), makeTimeZone('brightBinary')].filter(Boolean),
       timeCrop,
       snippets: {
-        teamA: makeSnips(capture.topPct),
-        teamB: makeSnips(capture.bottomPct)
+        teamA: makeSnips(capture.topPct, getTeamHPct('top')),
+        teamB: makeSnips(capture.bottomPct, getTeamHPct('bottom'))
+      },
+      cellSnippets: {
+        teamA: makeCellSnips(capture.topPct, getTeamHPct('top')),
+        teamB: makeCellSnips(capture.bottomPct, getTeamHPct('bottom'))
       },
       playerSnippets: {
-        teamA: makePlayerSnips(capture.topPct),
-        teamB: makePlayerSnips(capture.bottomPct)
+        teamA: makePlayerSnips(capture.topPct, getTeamHPct('top'), 'top'),
+        teamB: makePlayerSnips(capture.bottomPct, getTeamHPct('bottom'), 'bottom')
+      },
+      rowZoneVariants: {
+        teamA: makeRowZoneVariants(capture.topPct, getTeamHPct('top')),
+        teamB: makeRowZoneVariants(capture.bottomPct, getTeamHPct('bottom'))
       },
       rowZones: {
-        teamA: makeRowZones(capture.topPct),
-        teamB: makeRowZones(capture.bottomPct)
+        teamA: makeRowZones(capture.topPct, getTeamHPct('top')),
+        teamB: makeRowZones(capture.bottomPct, getTeamHPct('bottom'))
       }
     })
+    } catch (error) { reject(error) }
   }
 
   img.onerror = reject
