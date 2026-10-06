@@ -1,5 +1,6 @@
 import { createDefaultProject, PROJECT_SCHEMA_VERSION } from './defaultProject'
 import { DEFAULT_COMPETITION_NAME_EN, DEFAULT_COMPETITION_NAME_ZH } from './branding'
+import { normalizeCaptureConfig } from './statsCaptureConfig.js'
 
 export const isPlainObject = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 
@@ -114,6 +115,7 @@ export const normalizeProject = rawProject => {
   const fallback = createDefaultProject()
   const source = isPlainObject(rawProject) ? rawProject : {}
   const merged = normalizeLegacyDefaultMvp(normalizeLegacyDefaultBrand(deepMerge(fallback, source)), source)
+  const sourceCapture = source.scenes?.settings?.stats?.capture
 
   return {
     ...merged,
@@ -125,6 +127,16 @@ export const normalizeProject = rawProject => {
     },
     scenes: {
       ...merged.scenes,
+      settings: {
+        ...merged.scenes.settings,
+        stats: {
+          ...merged.scenes.settings.stats,
+          capture: {
+            ...merged.scenes.settings.stats.capture,
+            ...normalizeCaptureConfig(isPlainObject(sourceCapture) ? sourceCapture : {})
+          }
+        }
+      },
       activeSceneId: normalizeSceneId(merged.scenes?.activeSceneId || fallback.scenes.activeSceneId),
       enabledSceneIds: normalizeSceneIdList(merged.scenes?.enabledSceneIds),
       order: normalizeSceneIdList(merged.scenes?.order)

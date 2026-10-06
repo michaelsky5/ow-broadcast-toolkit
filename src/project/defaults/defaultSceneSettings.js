@@ -1,4 +1,5 @@
 import { OW_DEFAULT_EVENT_MAP_POOL } from '../../data/overwatch'
+import { DEFAULT_CAPTURE } from '../statsCaptureConfig.js'
 
 export const DEFAULT_SCENE_ORDER = [
   'live-hud',
@@ -106,22 +107,10 @@ export const createDefaultSceneSettings = () => ({
       hPct: 29.6
     },
     capture: {
+      ...DEFAULT_CAPTURE,
       dataMinutes: 10,
-      xPct: 49,
-      topPct: 18.5,
-      bottomPct: 55.5,
-      wPct: 26.2,
-      hPct: 28.5,
-      timeXPct: 66.8,
-      timeYPct: 13.8,
-      timeWPct: 8.4,
-      timeHPct: 3.8,
-      playerXPct: 33.5,
-      playerWPct: 9,
       timeText: '10',
       timeZone: '',
-      threshold: 165,
-      scale: 3,
       imageDataUrl: ''
     },
     ocrRows: {

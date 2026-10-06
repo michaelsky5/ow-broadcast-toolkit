@@ -1,4 +1,4 @@
-const releaseVersion = '0.2.0'
+const releaseVersion = '0.3.0'
 const copy = {
   zh: {
     language: '语言', title: '反馈中心',
@@ -12,7 +12,7 @@ const copy = {
     templateHint: '本页不提交反馈。请把填好的模板发到所选渠道；截图请附在消息或 Issue 中。',
     helpTitle: '先看看使用教程', helpBody: 'OBS 接入、对阵包导入、项目备份与恢复，都有图文步骤和练习素材。',
     guide: '打开中文上手教程', return: '返回 OWBT', copied: '已复制', manual: '请在已选中的文本框中按 Ctrl+C（Mac：⌘C）手动复制。',
-    template: (origin) => `问题 / 建议：\nOWBT 版本：v${releaseVersion}\n使用站点：${origin}\n使用环境：普通浏览器 / OBS 停靠窗口\n浏览器 / OBS 版本：\n复现步骤：\n1. \n预期结果：\n实际结果：\n相关截图：请另附`
+    template: (origin) => `问题 / 建议：\nOWBT 版本：v${releaseVersion}\n使用站点：${origin}\n使用环境：普通浏览器 / OBS 停靠窗口\n浏览器 / OBS 版本：\n复现步骤：\n1. \n预期结果：\n实际结果：\n若为 OCR 问题：\n截图分辨率 / 比例：\n威能布局：无威能 / 单威能 / 双威能\n截图来源：游戏原图 / 经聊天软件压缩\n出错阶段：引擎加载 / 裁切 / 数字 / 时长 / 选手对应 / 应用\n页面状态或错误文字：\n使用的裁切设置：\n相关截图：请另附原图与裁切预览（可遮盖个人信息）`
   },
   en: {
     language: 'Language', title: 'Feedback Center',
@@ -26,7 +26,7 @@ const copy = {
     templateHint: 'This page does not submit feedback. Send the completed template through your chosen channel and attach screenshots there.',
     helpTitle: 'Check the quick-start guide', helpBody: 'Follow illustrated steps for OBS, match packages, backups, and recovery with practice assets.',
     guide: 'Open Guide (Chinese)', return: 'Back to OWBT', copied: 'Copied', manual: 'Press Ctrl+C (Mac: ⌘C) in the selected field to copy manually.',
-    template: (origin) => `Issue / suggestion:\nOWBT version: v${releaseVersion}\nWebsite: ${origin}\nEnvironment: browser / OBS dock\nBrowser / OBS version:\nSteps to reproduce:\n1. \nExpected result:\nActual result:\nScreenshots: attach separately`
+    template: (origin) => `Issue / suggestion:\nOWBT version: v${releaseVersion}\nWebsite: ${origin}\nEnvironment: browser / OBS dock\nBrowser / OBS version:\nSteps to reproduce:\n1. \nExpected result:\nActual result:\nFor OCR issues:\nScreenshot resolution / aspect:\nPerks: none / one / two\nScreenshot source: game original / compressed by chat software\nFailure stage: engine loading / crop / numbers / time / players / Apply\nPage status or error message:\nCrop settings used:\nScreenshots: attach original and crop previews separately (redact personal information if needed)`
   }
 }
 
