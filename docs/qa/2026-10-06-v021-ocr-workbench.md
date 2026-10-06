@@ -1,4 +1,4 @@
-# OWBT v0.3.0 OCR release preflight
+# OWBT v0.2.1 OCR release preflight
 
 Date: 2026-10-06. This record covers the OCR desk, crop presets, feedback icon/template, and associated guide and version copy.
 
@@ -12,7 +12,7 @@ Date: 2026-10-06. This record covers the OCR desk, crop presets, feedback icon/t
 
 ## Automated validation
 
-Node.js 24.14.0 on Windows: `npm run check` passed asset validation, ESLint, 47 tests in 7 suites, and the Vite 8.1.5 production build (168 modules). `git diff --check` passed. Dependency versions are unchanged; package and feedback versions are 0.3.0.
+Node.js 24.14.0 on Windows: `npm run check` passed asset validation, ESLint, 47 tests in 7 suites, and the Vite 8.1.5 production build (168 modules). `git diff --check` passed. Dependency versions are unchanged; package and feedback versions are 0.2.1.
 
 ## Local browser acceptance
 
@@ -29,6 +29,6 @@ The built application was checked at `http://127.0.0.1:4188/#control` using the 
 
 ## Production verification
 
-CI and hosting results are recorded in the GitHub v0.3.0 release after completion. Local and CI results alone do not establish formal-domain acceptance. Check both formal domains against the production build, including the bundled OCR worker, WASM, and model, feedback icon/version, guide, and control-to-Overlay delivery.
+CI and hosting results are recorded in the GitHub v0.2.1 release after completion. Local and CI results alone do not establish formal-domain acceptance. Check both formal domains against the production build, including the bundled OCR worker, WASM, and model, feedback icon/version, guide, and control-to-Overlay delivery.
 
 Native OBS was not rerun for this OCR-only release. Existing OBS evidence for unchanged sync and output behavior remains in the earlier release QA records; browser checks do not claim OBS or real-event acceptance.
