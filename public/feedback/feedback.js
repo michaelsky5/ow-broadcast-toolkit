@@ -1,4 +1,4 @@
-const releaseVersion = '0.3.0'
+const releaseVersion = '0.2.1'
 const copy = {
   zh: {
     language: '语言', title: '反馈中心',

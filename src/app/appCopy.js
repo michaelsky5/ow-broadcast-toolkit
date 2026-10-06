@@ -1,4 +1,4 @@
-const releaseVersion = '0.3.0'
+const releaseVersion = '0.2.1'
 
 export const APP_COPY = {
   zh: {
@@ -294,7 +294,7 @@ export const APP_COPY = {
     obsHintTitle: 'OBS 输出',
     obsHintBody: '浏览器源按所选输出分辨率设置（1080P / 4K），勾选透明背景，地址使用 Overlay URL。',
     changelogTitle: '更新说明',
-    changelogBody: 'V0.3.0 更新 OCR 工作台，支持无威能与 16:10 截图，提供逐列原图核对、整行确认和更清晰的错误拦截。',
+    changelogBody: 'V0.2.1 更新 OCR 工作台，支持无威能与 16:10 截图，提供逐列原图核对、整行确认和更清晰的错误拦截。',
     updateNotesView: '查看更新',
     updateNotesBrief: '六套观战截图预设、本地 OCR 引擎、逐列原图核对、绿黄红状态和整行确认。',
     updateNotesFull: [
@@ -658,7 +658,7 @@ export const APP_COPY = {
     obsHintTitle: 'OBS Output',
     obsHintBody: 'Set the Browser Source to the selected output resolution (1080P / 4K), enable transparent background, and use the Overlay URL.',
     changelogTitle: 'Update Notes',
-    changelogBody: 'V0.3.0 updates the OCR desk with no-perk and 16:10 layouts, aligned original crops, row confirmation, and clearer validation.',
+    changelogBody: 'V0.2.1 updates the OCR desk with no-perk and 16:10 layouts, aligned original crops, row confirmation, and clearer validation.',
     updateNotesView: 'View Updates',
     updateNotesBrief: 'Six observer presets, local OCR, aligned original crops, green/yellow/red states, and row confirmation.',
     updateNotesFull: [
