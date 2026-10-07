@@ -1,5 +1,19 @@
 # Update Notes
 
+## v0.2.2 - 2026-10-07
+
+### Overwatch Season 5
+
+- Add Support hero Doctrine (血律) and the FryDeck-matched 256×256 hero portrait and 1920×1080 roster artwork.
+- Move Sombra from Damage to Support and add Support portrait paths; keep existing Damage files available for historical project and BAN references.
+- Add Escort map Watchpoint: Grímsvötn (监测站：格里姆火山) and its map artwork.
+- Refresh the Season 5 catalog version and fresh default Damage hero picks; saved projects remain unchanged.
+- Update startup release notes and the feedback template version.
+
+### Validation
+
+Candidate validation and release status are recorded in [the Season 5 QA report](./qa/2026-10-07-v022-season5.md). OCR regression uses the supplied no-perk observer screenshot; an actual Season 5 screenshot containing Doctrine has not yet been supplied.
+
 ## v0.2.1 - 2026-10-06
 
 ### OCR Capture

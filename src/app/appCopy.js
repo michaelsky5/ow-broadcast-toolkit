@@ -1,4 +1,4 @@
-const releaseVersion = '0.2.1'
+const releaseVersion = '0.2.2'
 
 export const APP_COPY = {
   zh: {
@@ -294,13 +294,18 @@ export const APP_COPY = {
     obsHintTitle: 'OBS 输出',
     obsHintBody: '浏览器源按所选输出分辨率设置（1080P / 4K），勾选透明背景，地址使用 Overlay URL。',
     changelogTitle: '更新说明',
-    changelogBody: 'V0.2.1 更新 OCR 工作台，支持无威能与 16:10 截图，提供逐列原图核对、整行确认和更清晰的错误拦截。',
+    changelogBody: 'V0.2.2 同步守望先锋第 5 赛季：新增支援英雄血律，黑影调整为支援，加入监测站：格里姆火山。',
     updateNotesView: '查看更新',
-    updateNotesBrief: '六套观战截图预设、本地 OCR 引擎、逐列原图核对、绿黄红状态和整行确认。',
+    updateNotesBrief: '血律头像与阵容图、黑影支援分类、新地图格里姆火山。',
     updateNotesFull: [
       `V${releaseVersion} 版本说明`,
       '',
       '这次更新',
+      '- 新增支援英雄血律（Doctrine），补齐英雄选择、BAN 和阵容展示所用的头像与展示图。',
+      '- 黑影（Sombra）调整为支援英雄，补齐支援分类的素材；保留旧输出分类的图片供历史项目使用。',
+      '- 新增运载目标地图监测站：格里姆火山（Watchpoint: Grímsvötn）及地图图片。',
+      '',
+      'V0.2.1 OCR 工作台',
       '- 同步 System / FryDeck 的六套观战截图裁切：16:9、16:10，以及无威能、单威能、双威能。',
       '- OCR 引擎、WASM 和模型由本站提供，截图在浏览器本地识别；支持取消，并提示加载或识别超时。',
       '- 工作台按 System 赛果表单整理，数字下方对应原图裁切；绿为已通过、黄为待核对、红为需修正。',
@@ -658,13 +663,18 @@ export const APP_COPY = {
     obsHintTitle: 'OBS Output',
     obsHintBody: 'Set the Browser Source to the selected output resolution (1080P / 4K), enable transparent background, and use the Overlay URL.',
     changelogTitle: 'Update Notes',
-    changelogBody: 'V0.2.1 updates the OCR desk with no-perk and 16:10 layouts, aligned original crops, row confirmation, and clearer validation.',
+    changelogBody: 'V0.2.2 adds Season 5 Support hero Doctrine, moves Sombra to Support, and adds Watchpoint: Grímsvötn.',
     updateNotesView: 'View Updates',
-    updateNotesBrief: 'Six observer presets, local OCR, aligned original crops, green/yellow/red states, and row confirmation.',
+    updateNotesBrief: 'Doctrine portraits, Sombra Support classification, and Watchpoint: Grímsvötn.',
     updateNotesFull: [
       `V${releaseVersion} Release Notes`,
       '',
       'This Update',
+      '- Added Support hero Doctrine, with portraits for hero selection, bans, and roster output.',
+      '- Moved Sombra to Support and added matching assets. Existing Damage portraits remain available for older projects.',
+      '- Added Escort map Watchpoint: Grímsvötn and its map artwork.',
+      '',
+      'V0.2.1 OCR Desk',
       '- Adopted the six System / FryDeck observer presets: 16:9 and 16:10, with no, one, or two perks.',
       '- OCR workers, WASM, and model files are served by this site. Recognition stays in the browser, with cancellation and loading/read deadlines.',
       '- The desk follows the System result form, with original crops below each value. Green is accepted, yellow requires review, and red requires correction.',

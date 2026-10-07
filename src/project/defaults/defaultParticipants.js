@@ -92,7 +92,7 @@ export const createDefaultPlayers = () => [
     teamId: 'team-b',
     avatar: '',
     portraitXPct: 50,
-    primaryHeroes: ['tracer', 'sombra', 'venture']
+    primaryHeroes: ['tracer', 'reaper', 'venture']
   },
   {
     id: 'b-dps-2',
