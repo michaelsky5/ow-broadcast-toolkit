@@ -20,6 +20,7 @@ export const OW_MAPS = [
   { id: 'rialto', zh: '里阿尔托', en: 'Rialto', mode: 'escort', assetKey: 'rialto' },
   { id: 'shambali-monastery', zh: '香巴里寺院', en: 'Shambali Monastery', mode: 'escort', assetKey: 'shambali' },
   { id: 'circuit-royal', zh: '皇家赛道', en: 'Circuit Royal', mode: 'escort', assetKey: 'circuit-royal' },
+  { id: 'watchpoint-grimsvotn', zh: '监测站：格里姆火山', en: 'Watchpoint: Grímsvötn', mode: 'escort', assetKey: 'watchpoint-grimsvotn' },
 
   // Hybrid
   { id: 'blizzard-world', zh: '暴雪世界', en: 'Blizzard World', mode: 'hybrid', assetKey: 'blizzard-world' },
