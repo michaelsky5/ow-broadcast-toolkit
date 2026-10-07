@@ -37,7 +37,6 @@ export const OW_HEROES = [
   { id: 'soldier-76', zh: '士兵：76', en: 'Soldier: 76', role: 'damage', assetKey: 'soldier-76' },
   { id: 'sierra', zh: '西拉', en: 'Sierra', role: 'damage', assetKey: 'sierra' },
   { id: 'shion', zh: '死怨', en: 'Shion', role: 'damage', assetKey: 'shion' },
-  { id: 'sombra', zh: '黑影', en: 'Sombra', role: 'damage', assetKey: 'sombra' },
   { id: 'symmetra', zh: '秩序之光', en: 'Symmetra', role: 'damage', assetKey: 'symmetra' },
   { id: 'torbjorn', zh: '托比昂', en: 'Torbjörn', role: 'damage', assetKey: 'torbjorn' },
   { id: 'tracer', zh: '猎空', en: 'Tracer', role: 'damage', assetKey: 'tracer' },
@@ -46,6 +45,8 @@ export const OW_HEROES = [
   { id: 'widowmaker', zh: '黑百合', en: 'Widowmaker', role: 'damage', assetKey: 'widowmaker' },
 
   // Support
+  { id: 'doctrine', zh: '血律', en: 'Doctrine', role: 'support', assetKey: 'doctrine' },
+  { id: 'sombra', zh: '黑影', en: 'Sombra', role: 'support', assetKey: 'sombra' },
   { id: 'ana', zh: '安娜', en: 'Ana', role: 'support', assetKey: 'ana' },
   { id: 'baptiste', zh: '巴蒂斯特', en: 'Baptiste', role: 'support', assetKey: 'baptiste' },
   { id: 'brigitte', zh: '布丽吉塔', en: 'Brigitte', role: 'support', assetKey: 'brigitte' },
