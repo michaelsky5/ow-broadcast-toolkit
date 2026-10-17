@@ -1,5 +1,4 @@
 import { normalizeImportedTeamDb } from '../app/editors/roster/rosterEditorUtils'
-import { getTeamPlayers } from '../project/projectUtils'
 import {
   TEAM_LIBRARY_SCHEMA_VERSION,
   createLibraryRecordFromProject,
@@ -209,10 +208,7 @@ export const parseOwbtTeamSource = (input, existingRecords = []) => {
     error.importCode = 'project-no-valid-teams'
     throw error
   }
-  let omittedPlayers = 0
   const records = normalizedProject.teams.map(team => {
-    const sourcePlayers = getTeamPlayers(normalizedProject, team.id)
-    omittedPlayers += Math.max(0, sourcePlayers.length - 7)
     const existing = findLibraryTeamMatch({ ...team, id: '' }, existingRecords)
     return createLibraryRecordFromProject(
       normalizedProject,
@@ -227,6 +223,6 @@ export const parseOwbtTeamSource = (input, existingRecords = []) => {
     sourceName: getSourceName(payload, source),
     teamCount: records.length,
     playerCount: records.reduce((count, team) => count + team.players.length, 0),
-    omittedPlayers
+    omittedPlayers: 0
   }
 }

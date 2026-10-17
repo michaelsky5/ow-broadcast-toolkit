@@ -189,8 +189,42 @@
   bottom: 126px;
   left: 80px;
   display: grid;
-  grid-template-columns: repeat(var(--player-count), minmax(0, 1fr));
+  grid-template-columns: repeat(var(--roster-columns, var(--player-count)), minmax(0, 1fr));
   gap: 14px;
+}
+
+.eightPlayerRoster {
+  gap: 10px;
+}
+
+.eightPlayerRoster .playerInfo {
+  padding: 16px 12px;
+}
+
+.eightPlayerRoster .playerInfo strong {
+  font-size: 26px;
+}
+
+.twoRowRoster {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.twoRowRoster .portrait {
+  inset: 10px 10px 82px;
+}
+
+.twoRowRoster .playerInfo {
+  padding: 8px 14px;
+}
+
+.twoRowRoster .playerInfo strong {
+  margin: 4px 0;
+  font-size: 24px;
+}
+
+.twoRowRoster .portraitPlaceholder {
+  gap: 6px;
+  padding: 14px;
 }
 
 .staffCards {

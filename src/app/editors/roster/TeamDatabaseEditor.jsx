@@ -1,4 +1,5 @@
 import { getTeamPlayers } from '../../../project/projectUtils'
+import { getRosterLimit } from '../../../project/rosterRules'
 import styles from '../shared/SceneEditor.styles.js'
 import { Panel } from '../shared/editorControls'
 import { ensureSceneSettings } from '../shared/editorHelpers'
@@ -71,6 +72,12 @@ function TeamSideCard({
           {isDisplaySide ? rosterText.displayedTeam : rosterText.displayTeam}
         </button>
       </header>
+
+      {players.length > getRosterLimit(project) && (
+        <p className={styles.rosterLimitWarning} role="status">
+          {rosterText.rosterOverLimit(players.length, getRosterLimit(project))}
+        </p>
+      )}
 
       <div className={styles.currentMatchTeamFields}>
         <label>

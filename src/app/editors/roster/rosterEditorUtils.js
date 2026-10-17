@@ -7,9 +7,7 @@ export const ROLE_SORT_ORDER = {
   support: 2
 }
 
-export const MAX_ROSTER_PLAYERS = 7
-export const MIN_ACTIVE_ROSTER_PLAYERS = 5
-export const MAX_ACTIVE_ROSTER_PLAYERS = 7
+export { getRosterOutputIds, MIN_ACTIVE_ROSTER_PLAYERS } from '../../../project/rosterRules'
 
 const TEAM_DB_EXPORT_VERSION = 'owbt-team-db-v1'
 
@@ -66,19 +64,6 @@ export const getStartingFiveForTeam = (project, teamId) => {
   })
 
   return orderedPlayers.slice(0, 5).map(player => player.id)
-}
-
-export const getRosterOutputIds = (players, savedIds = []) => {
-  const rosterPlayers = players.slice(0, MAX_ROSTER_PLAYERS)
-  const rosterIds = rosterPlayers.map(player => player.id)
-  const rosterIdSet = new Set(rosterIds)
-  const selectedIds = savedIds
-    .filter((id, index, ids) => ids.indexOf(id) === index)
-    .filter(id => rosterIdSet.has(id))
-
-  if (selectedIds.length) return selectedIds.slice(0, MAX_ACTIVE_ROSTER_PLAYERS)
-
-  return rosterIds.slice(0, Math.min(MIN_ACTIVE_ROSTER_PLAYERS, rosterIds.length))
 }
 
 export const sanitizeId = value => String(value || '')

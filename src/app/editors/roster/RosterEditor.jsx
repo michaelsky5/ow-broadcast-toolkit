@@ -1,14 +1,13 @@
 import { useRef, useState } from 'react'
 import { OW_ROLE_OPTIONS } from '../../../data/overwatch'
 import { getTeamPlayers } from '../../../project/projectUtils'
+import { getRosterLimit, toggleRosterOutputId } from '../../../project/rosterRules'
 import styles from '../shared/SceneEditor.styles.js'
 import { getRosterEditorCopy } from '../shared/editorCopy'
 import { EditorDialog, Field, Panel, SegmentedControl, ToggleField } from '../shared/editorControls'
 import { ensureSceneSettings, getHeroLabel, getHeroOptionsByRole, getSceneSettings, getTeam } from '../shared/editorHelpers'
 import TeamDatabaseEditor from './TeamDatabaseEditor'
 import {
-  MAX_ACTIVE_ROSTER_PLAYERS,
-  MAX_ROSTER_PLAYERS,
   MIN_ACTIVE_ROSTER_PLAYERS,
   ROLE_SORT_ORDER,
   createEntityId,
@@ -59,10 +58,11 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
   const teamSide = String(settings.teamSide || 'A').toUpperCase() === 'B' ? 'B' : 'A'
   const sideKey = teamSide === 'B' ? 'teamB' : 'teamA'
   const team = getTeam(project, sideKey)
-  const players = getTeamPlayers(project, team?.id).slice(0, MAX_ROSTER_PLAYERS)
-  const rosterSlots = Array.from({ length: MAX_ROSTER_PLAYERS }, (_, index) => players[index] || null)
+  const rosterLimit = getRosterLimit(project)
+  const players = getTeamPlayers(project, team?.id)
+  const rosterSlots = Array.from({ length: Math.max(rosterLimit, players.length) }, (_, index) => players[index] || null)
   const savedActivePlayerIds = settings.activePlayerIds?.[sideKey] || []
-  const activePlayerIds = getRosterOutputIds(players, savedActivePlayerIds)
+  const activePlayerIds = getRosterOutputIds(players, savedActivePlayerIds, rosterLimit)
   const activePlayerIdSet = new Set(activePlayerIds)
   const activePlayers = activePlayerIds
     .map(playerId => players.find(player => player.id === playerId))
@@ -123,12 +123,14 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
   const updateRosterSlot = (slotIndex, playerId, patch) => {
     onUpdateProject(draft => {
       let target = draft.players.find(player => player.id === playerId)
-      if (!target && slotIndex >= 0 && slotIndex < MAX_ROSTER_PLAYERS) {
+      if (!target && slotIndex >= 0 && slotIndex < getRosterLimit(draft)) {
         const targetTeam = draft.teams.find(item => item.id === draft.currentMatch[`${sideKey}Id`])
         if (!targetTeam) return
+        if (getTeamPlayers(draft, targetTeam.id).length >= getRosterLimit(draft)) return
 
         const role = normalizeRosterRole(patch.role)
         const id = createEntityId(`${targetTeam.id}-player`)
+        const nextPlayerIds = getTeamPlayers(draft, targetTeam.id).map(player => player.id)
         target = {
           id,
           name: rosterText.defaultPlayerName(slotIndex + 1),
@@ -141,9 +143,8 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
         }
         draft.players.push(target)
 
-        const nextPlayerIds = [...(targetTeam.playerIds || [])].filter(Boolean)
         nextPlayerIds.splice(slotIndex, 0, id)
-        targetTeam.playerIds = nextPlayerIds.slice(0, MAX_ROSTER_PLAYERS)
+        targetTeam.playerIds = nextPlayerIds
       }
 
       if (target) Object.assign(target, patch)
@@ -174,19 +175,13 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
     onUpdateProject(draft => {
       const draftSettings = ensureSceneSettings(draft, 'roster')
       const targetTeam = draft.teams.find(item => item.id === draft.currentMatch[`${sideKey}Id`])
-      const targetPlayers = getTeamPlayers(draft, targetTeam?.id).slice(0, MAX_ROSTER_PLAYERS)
-      const currentIds = getRosterOutputIds(targetPlayers, draftSettings.activePlayerIds?.[sideKey] || [])
-
-      if (nextActive && currentIds.includes(playerId)) return
-      if (!nextActive && !currentIds.includes(playerId)) return
-      if (nextActive && currentIds.length >= MAX_ACTIVE_ROSTER_PLAYERS) return
-      if (!nextActive && currentIds.length <= MIN_ACTIVE_ROSTER_PLAYERS) return
+      const targetPlayers = getTeamPlayers(draft, targetTeam?.id)
+      const nextIds = toggleRosterOutputId(targetPlayers, draftSettings.activePlayerIds?.[sideKey] || [], playerId, nextActive, getRosterLimit(draft))
+      if (!nextIds) return
 
       draftSettings.activePlayerIds = {
         ...(draftSettings.activePlayerIds || {}),
-        [sideKey]: nextActive
-          ? [...currentIds, playerId]
-          : currentIds.filter(id => id !== playerId)
+        [sideKey]: nextIds
       }
     })
   }
@@ -466,11 +461,11 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
             </div>
             <div>
               <span>{rosterText.slots}</span>
-              <strong>{MAX_ROSTER_PLAYERS}</strong>
+              <strong>{rosterLimit}</strong>
             </div>
             <div>
               <span>{rosterText.active}</span>
-              <strong>{activePlayers.length} / {MAX_ROSTER_PLAYERS}</strong>
+              <strong>{activePlayers.length} / {rosterLimit}</strong>
             </div>
             <div>
               <span>{rosterText.tank}</span>
@@ -492,6 +487,12 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
             </button>
           </div>
 
+          {players.length > rosterLimit && (
+            <p className={styles.rosterLimitWarning} role="status">
+              {rosterText.rosterOverLimit(players.length, rosterLimit)}
+            </p>
+          )}
+
           <div
             className={[
               styles.rosterPlayerHeader,
@@ -511,12 +512,13 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
           <div className={styles.rosterPlayerList}>
             {rosterSlots.map((player, index) => {
               const isPlayerActive = Boolean(player?.id && activePlayerIdSet.has(player.id))
+              const isReplaceAction = Boolean(player?.id && !isPlayerActive && rosterLimit === MIN_ACTIVE_ROSTER_PLAYERS && activePlayers.length >= rosterLimit)
               const canToggleActive = Boolean(player?.id) && (
                 isPlayerActive
                   ? activePlayers.length > MIN_ACTIVE_ROSTER_PLAYERS
-                  : activePlayers.length < MAX_ACTIVE_ROSTER_PLAYERS
+                  : activePlayers.length < rosterLimit || isReplaceAction
               )
-              const isMaxLocked = Boolean(player?.id && !isPlayerActive && activePlayers.length >= MAX_ACTIVE_ROSTER_PLAYERS)
+              const isMaxLocked = Boolean(player?.id && !isPlayerActive && activePlayers.length >= rosterLimit && !isReplaceAction)
               const roleHeroes = getHeroOptionsByRole(player?.role || 'damage')
               const primaryHero = player?.primaryHeroes?.[0] || ''
               const portraitXPct = normalizePortraitXPct(player?.portraitXPct)
@@ -616,10 +618,10 @@ function RosterEditor({ project, copy, text, language, activeSection = 'roster',
                       className={isPlayerActive ? styles.primaryButton : styles.secondaryButton}
                       disabled={!canToggleActive}
                       aria-pressed={isPlayerActive}
-                      title={isMaxLocked ? rosterText.outputMaxHint : undefined}
+                      title={isReplaceAction ? rosterText.replaceOutputHint : isMaxLocked ? rosterText.outputMaxHint(rosterLimit) : undefined}
                       onClick={() => toggleRosterOutput(player?.id, !isPlayerActive)}
                     >
-                      {isPlayerActive ? rosterText.on : isMaxLocked ? rosterText.max : rosterText.off}
+                      {isPlayerActive ? rosterText.on : isReplaceAction ? rosterText.replaceOutput : isMaxLocked ? rosterText.max : rosterText.off}
                     </button>
                   </div>
                 </div>

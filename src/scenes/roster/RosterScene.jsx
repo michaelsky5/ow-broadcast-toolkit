@@ -1,13 +1,11 @@
 import { OW_HERO_BY_ID, OW_ROLE_BY_ID } from '../../data/overwatch'
 import { getBroadcastCompetitionName } from '../../project/branding'
 import { getCurrentTeams, getTeamPlayers } from '../../project/projectUtils'
+import { getRosterLimit, getRosterOutputIds } from '../../project/rosterRules'
 import SponsorLockup from '../shared/SponsorLockup'
 import styles from './RosterScene.module.css'
 
 const clean = value => String(value || '').trim()
-const MIN_ROSTER_OUTPUT_PLAYERS = 5
-const MAX_ROSTER_OUTPUT_PLAYERS = 7
-const MAX_ROSTER_SLOTS = 7
 
 const getPortraitXPct = player => {
   const number = Number(player?.portraitXPct)
@@ -32,21 +30,10 @@ const getTeamForSide = (project, side) => {
 
 const getRosterOutputPlayers = (project, team, side) => {
   const sideKey = side === 'B' ? 'teamB' : 'teamA'
-  const rosterPlayers = getTeamPlayers(project, team?.id).slice(0, MAX_ROSTER_SLOTS)
+  const rosterPlayers = getTeamPlayers(project, team?.id)
   const savedIds = project?.scenes?.settings?.roster?.activePlayerIds?.[sideKey] || []
-  const activeIdSet = new Set(savedIds)
-  const selectedPlayers = rosterPlayers
-    .filter(player => activeIdSet.has(player.id))
-    .slice(0, MAX_ROSTER_OUTPUT_PLAYERS)
-  const selectedIds = new Set(selectedPlayers.map(player => player.id))
-  const targetCount = selectedPlayers.length > MIN_ROSTER_OUTPUT_PLAYERS
-    ? Math.min(MAX_ROSTER_OUTPUT_PLAYERS, selectedPlayers.length)
-    : MIN_ROSTER_OUTPUT_PLAYERS
-
-  return [
-    ...selectedPlayers,
-    ...rosterPlayers.filter(player => !selectedIds.has(player.id))
-  ].slice(0, Math.min(targetCount, rosterPlayers.length))
+  const activeIds = new Set(getRosterOutputIds(rosterPlayers, savedIds, getRosterLimit(project)))
+  return rosterPlayers.filter(player => activeIds.has(player.id))
 }
 
 const handleLogoFallback = event => {
@@ -122,7 +109,10 @@ export default function RosterScene({ project }) {
         )}
       </section>
 
-      <main className={styles.rosterGrid} style={{ '--player-count': Math.max(players.length, 5) }}>
+      <main
+        className={`${styles.rosterGrid} ${players.length > 8 ? styles.twoRowRoster : ''} ${players.length === 8 ? styles.eightPlayerRoster : ''}`}
+        style={{ '--player-count': Math.max(players.length, 5), '--roster-columns': players.length > 8 ? Math.ceil(players.length / 2) : Math.max(players.length, 5) }}
+      >
         {players.length ? players.map((player, index) => {
           const battleTag = clean(player.battleTag)
           const heroImage = getHeroImage(player)
