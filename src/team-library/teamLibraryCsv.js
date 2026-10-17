@@ -1,6 +1,5 @@
 import { OW_HERO_OPTIONS } from '../data/overwatch'
 import {
-  MAX_ROSTER_PLAYERS,
   createEntityId,
   getDefaultHeroForRole,
   normalizePortraitXPct,
@@ -252,7 +251,7 @@ export const parseTeamLibraryCsv = input => {
   const { rows: mappedRows } = mapCsvRows(parseCsvRows(input))
   const groups = new Map()
   let skippedRows = 0
-  let omittedPlayers = 0
+  const omittedPlayers = 0
   let duplicatePlayers = 0
 
   mappedRows.forEach(({ values }) => {
@@ -293,11 +292,6 @@ export const parseTeamLibraryCsv = input => {
     }
 
     if (!values.playerName && !values.battleTag) return
-    if (group.team.players.length >= MAX_ROSTER_PLAYERS) {
-      omittedPlayers += 1
-      return
-    }
-
     const role = normalizeCsvRole(values.role)
     const player = {
       id: createEntityId('library-player'),
@@ -431,7 +425,7 @@ export const parseTeamPlayerCsv = (input, existingRecords) => {
   let skippedRows = 0
   let missingTeams = 0
   let ambiguousTeams = 0
-  let omittedPlayers = 0
+  const omittedPlayers = 0
   let duplicatePlayers = 0
   let missingRoles = 0
   let addedPlayers = 0
@@ -480,10 +474,6 @@ export const parseTeamPlayerCsv = (input, existingRecords) => {
       return
     }
 
-    if (team.players.length >= MAX_ROSTER_PLAYERS) {
-      omittedPlayers += 1
-      return
-    }
     if (!values.role) missingRoles += 1
     team.players.push(createCsvPlayer(values, team))
     addedPlayers += 1

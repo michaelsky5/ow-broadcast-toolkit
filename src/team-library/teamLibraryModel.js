@@ -1,6 +1,5 @@
 import { getTeamPlayers } from '../project/projectUtils'
 import {
-  MAX_ROSTER_PLAYERS,
   getDefaultHeroForRole,
   normalizePortraitXPct,
   normalizeRosterRole
@@ -99,7 +98,7 @@ const preserveMissingLibraryFields = (incoming, existing) => {
 
   if (incomingTeam.players.length) {
     existingTeam.players.forEach(player => {
-      if (players.length >= MAX_ROSTER_PLAYERS || matchedExistingPlayerIds.has(player.id)) return
+      if (matchedExistingPlayerIds.has(player.id)) return
       players.push(normalizeLibraryPlayer(player, incomingTeam.id, players.length))
     })
   }
@@ -174,7 +173,7 @@ export const normalizeLibraryTeam = (team, index = 0) => {
     description: clean(team?.description),
     coach: clean(team?.coach),
     manager: clean(team?.manager),
-    players: players.slice(0, MAX_ROSTER_PLAYERS).map((player, playerIndex) => (
+    players: players.map((player, playerIndex) => (
       normalizeLibraryPlayer(player, id, playerIndex)
     )),
     createdAt: clean(team?.createdAt) || new Date().toISOString(),
@@ -190,7 +189,7 @@ export const createLibraryRecordFromProject = (project, team, existingRecord = n
     player
   ]))
   const playerLinks = {}
-  const players = getTeamPlayers(project, team.id).slice(0, MAX_ROSTER_PLAYERS).map((player, index) => {
+  const players = getTeamPlayers(project, team.id).map((player, index) => {
     const previous = previousPlayers.get(clean(player.id))
     const libraryPlayerId = clean(player.libraryPlayerId || previous?.id) || createId('library-player')
     playerLinks[player.id] = libraryPlayerId
@@ -324,12 +323,6 @@ export const mergeLibraryDuplicateGroup = (rawGroup, keeperId) => {
         mergedPlayers[existingIndex] = mergeMissingPlayerFields(existingPlayer, player)
         identities.forEach(identity => playerIndexByIdentity.set(identity, existingIndex))
         playerIdMap[player.id] = existingPlayer.id
-        return
-      }
-
-      if (mergedPlayers.length >= MAX_ROSTER_PLAYERS) {
-        playerIdMap[player.id] = ''
-        omittedPlayers.push(player.name)
         return
       }
 

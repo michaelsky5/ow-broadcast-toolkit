@@ -364,6 +364,13 @@
   align-items: stretch;
 }
 
+.rosterWarning {
+  margin: 8px 0 0;
+  color: #FFD84A;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .logoPreviewCard {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;

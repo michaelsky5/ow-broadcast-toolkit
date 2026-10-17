@@ -1,6 +1,7 @@
 import { createDefaultProject, PROJECT_SCHEMA_VERSION } from './defaultProject'
 import { DEFAULT_COMPETITION_NAME_EN, DEFAULT_COMPETITION_NAME_ZH } from './branding'
 import { normalizeCaptureConfig } from './statsCaptureConfig.js'
+import { getRosterLimit } from './rosterRules'
 
 export const isPlainObject = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 
@@ -120,6 +121,10 @@ export const normalizeProject = rawProject => {
   return {
     ...merged,
     schemaVersion: merged.schemaVersion || PROJECT_SCHEMA_VERSION,
+    event: {
+      ...merged.event,
+      rosterLimit: getRosterLimit(merged)
+    },
     meta: {
       ...fallback.meta,
       ...(merged.meta || {}),

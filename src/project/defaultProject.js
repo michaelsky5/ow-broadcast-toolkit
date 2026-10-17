@@ -1,6 +1,7 @@
 import { OW_DATA_VERSION } from '../data/overwatch'
 import { createDefaultMatch } from '../match/defaultMatch'
 import { DEFAULT_THEME } from '../theme/defaultTheme'
+import { DEFAULT_ROSTER_LIMIT } from './rosterRules'
 import { createDefaultCasters, createDefaultPlayers, createDefaultStaff, createDefaultTeams } from './defaults/defaultParticipants'
 import { DEFAULT_SCENE_ORDER, createDefaultSceneSettings } from './defaults/defaultSceneSettings'
 
@@ -68,6 +69,7 @@ export const createDefaultProject = () => ({
     nameZh: 'OWBT',
     nameEn: 'OWBT',
     subtitle: 'Overwatch Community Tournament',
+    rosterLimit: DEFAULT_ROSTER_LIMIT,
     logo: '',
     logoBackdrop: 'auto',
     organizerLogo: '',

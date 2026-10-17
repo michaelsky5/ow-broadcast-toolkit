@@ -9,6 +9,8 @@ import { getAppCopy, getAppLanguage } from './appCopy'
 import { EditorDialog } from './editors/shared/editorControls'
 import { getOverlayUrl } from './overlayUrl'
 import WebAccessLinks from './WebAccessLinks'
+import { getTeamPlayers } from '../project/projectUtils'
+import { getRosterLimit, MIN_ROSTER_LIMIT, MAX_ROSTER_LIMIT } from '../project/rosterRules'
 import { fileToDataUrl } from './toolbox/toolboxModel'
 import styles from './ConsoleEntry.module.css'
 
@@ -51,6 +53,8 @@ export default function ConsoleEntry({
         library: '素材仓库'
       }
   const names = getCompetitionNamePair(project)
+  const rosterLimit = getRosterLimit(project)
+  const overLimitTeams = (project.teams || []).filter(team => getTeamPlayers(project, team.id).length > rosterLimit)
   const overlayUrl = getOverlayUrl(project)
   const outputWidth = project.output?.width || 1920
   const outputHeight = project.output?.height || 1080
@@ -223,6 +227,31 @@ export default function ConsoleEntry({
     })
   }
 
+  const rosterLimitControl = (
+    <div>
+      <label className={styles.field}>
+        <span>{copy.rosterLimit}</span>
+        <select
+          value={rosterLimit}
+          onChange={event => {
+            const value = Number(event.target.value)
+            onUpdateProject(draft => { draft.event.rosterLimit = value })
+          }}
+        >
+          {Array.from({ length: MAX_ROSTER_LIMIT - MIN_ROSTER_LIMIT + 1 }, (_, index) => MIN_ROSTER_LIMIT + index).map(limit => (
+            <option key={limit} value={limit}>{copy.rosterLimitOption(limit)}</option>
+          ))}
+        </select>
+      </label>
+      <p className={styles.fieldHint}>{copy.rosterLimitHint}</p>
+      {overLimitTeams.length > 0 && (
+        <p className={styles.rosterWarning} role="status">
+          {copy.rosterOverLimit(overLimitTeams.map(team => team.name || team.shortName).join(' / '), rosterLimit)}
+        </p>
+      )}
+    </div>
+  )
+
   return (
     <main className={styles.entry}>
       <div className={styles.gridLayer} />
@@ -273,6 +302,10 @@ export default function ConsoleEntry({
       {activeSection === 'system' ? (
         <section className={styles.preferencesWorkspace}>
           <WebAccessLinks copy={copy} />
+          <section className={styles.panel}>
+            <div className={styles.panelTitle}>{copy.eventRoster}</div>
+            {rosterLimitControl}
+          </section>
           {consoleSettingsPanel}
         </section>
       ) : (
@@ -302,6 +335,8 @@ export default function ConsoleEntry({
                   <span>{copy.eventSubtitle}</span>
                   <input value={project.event.subtitle || ''} onChange={updateEventField('subtitle')} />
                 </label>
+
+                {rosterLimitControl}
 
                 <div className={styles.eventAssetRow}>
                   <label className={styles.field}>

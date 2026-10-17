@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { downloadTextFile } from '../project/projectUtils'
 import { tryCopyText } from '../app/clipboard'
+import { getRosterLimit } from '../project/rosterRules'
 import {
-  MAX_ROSTER_PLAYERS,
   getDefaultHeroForRole,
   normalizePortraitXPct,
   normalizeRosterRole
@@ -472,7 +472,7 @@ export default function TeamLibraryPage({
   }
 
   const addPlayer = () => {
-    if (!draftTeam || draftTeam.players.length >= MAX_ROSTER_PLAYERS) return
+    if (!draftTeam || draftTeam.players.length >= getRosterLimit(project)) return
     setDraftTeam(previous => ({
       ...previous,
       players: [...previous.players, createEmptyLibraryPlayer(previous, previous.players.length + 1)]
@@ -1779,9 +1779,14 @@ export default function TeamLibraryPage({
 
               <section className={styles.rosterSection}>
                 <header>
-                  <div><span>{copy.roster}</span><strong>{draftTeam.players.length} / {MAX_ROSTER_PLAYERS}</strong></div>
-                  <button type="button" onClick={addPlayer} disabled={draftTeam.players.length >= MAX_ROSTER_PLAYERS}>{copy.addPlayer}</button>
+                  <div><span>{copy.roster}</span><strong>{draftTeam.players.length} / {getRosterLimit(project)}</strong></div>
+                  <button type="button" onClick={addPlayer} disabled={draftTeam.players.length >= getRosterLimit(project)}>{copy.addPlayer}</button>
                 </header>
+                <p className={styles.rosterLimitHint} role="status">
+                  {draftTeam.players.length > getRosterLimit(project)
+                    ? copy.rosterOverLimit(draftTeam.players.length, getRosterLimit(project))
+                    : copy.rosterLimitHint(getRosterLimit(project))}
+                </p>
                 <div className={styles.playerHeader}>
                   <span>#</span><span>{copy.playerName}</span><span>{copy.battleTag}</span><span>{copy.role}</span><span />
                 </div>

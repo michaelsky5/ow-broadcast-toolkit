@@ -1,5 +1,12 @@
 ﻿/* === Roster editor === */
 
+.rosterLimitWarning {
+  margin: 10px 0;
+  color: #FFD84A;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .rosterDesk {
   container-type: inline-size;
   display: grid;

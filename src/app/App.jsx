@@ -1,5 +1,6 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createDefaultProject } from '../project/defaultProject'
+import { getRosterLimit } from '../project/rosterRules'
 import { getCompetitionName } from '../project/branding'
 import {
   exportProjectAsJson,
@@ -1251,7 +1252,7 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
                 <div className={styles.matchPackagePreviewRoster}>
                   <span>{copy.matchPackageRoster}</span>
                   <div>
-                    {team.players.slice(0, 5).map((player, index) => (
+                    {team.players.map((player, index) => (
                       <small key={`${player.id}-${index}`}>{player.name}</small>
                     ))}
                   </div>
@@ -1260,6 +1261,11 @@ function ConsoleApp({ route, onNavigateRoute, onRouteBlockerChange }) {
                       ? copy.matchPackageLineupReady
                       : copy.matchPackageLineupShort(team.players.length)}
                   </em>
+                  {team.players.length > getRosterLimit(project) && (
+                    <em className={styles.matchPackageLineupWarning}>
+                      {copy.matchPackageOverLimit(team.players.length, getRosterLimit(project))}
+                    </em>
+                  )}
                 </div>
               </div>
             </article>
